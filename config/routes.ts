@@ -31,7 +31,7 @@ export default [
   {
     path: '/dataset',
     name: 'dataset',
-    icon: 'smile',
+    icon: 'orderedList',
     component: './Dataset',
   },
   {
