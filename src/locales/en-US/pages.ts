@@ -100,4 +100,6 @@ export default {
   'pages.dataset.display.clickToUpload': 'Click to upload',
   'pages.dataset.display.submit': 'Submit',
   'pages.dataset.display.imageList': 'Image list',
+  'pages.dataset.display.visualizeAnnotations': 'Visualize Annotations',
+  'pages.dataset.display.visualized': 'Visualized',
 };

@@ -1,9 +1,36 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FormattedMessage, history, useIntl, useModel, Helmet } from '@umijs/max';
+import {
+    FormattedMessage,
+    history,
+    useIntl,
+    useModel,
+    Helmet
+} from '@umijs/max';
 import moment from 'moment';
-import { createDataset, listDataset, deleteDataset } from '@/services/ant-design-pro/dataset';
+import {
+    createDataset,
+    listDataset,
+    deleteDataset,
+    visDataset,
+    checkVisDatasetDirExist,
+    getVisDatasetStatus
+} from '@/services/ant-design-pro/dataset';
 import { PageContainer } from '@ant-design/pro-components';
-import { Typography, Table, Tag, Card, theme, message, Spin, Modal, Descriptions, Empty, Space, Badge } from 'antd';
+import {
+    Typography,
+    Table,
+    Tag,
+    Card,
+    theme,
+    message,
+    Spin,
+    Modal,
+    Descriptions,
+    Empty,
+    Space,
+    Badge,
+    Image
+} from 'antd';
 import {
     Button,
     Form,
@@ -11,7 +38,12 @@ import {
     Select,
     Upload
 } from 'antd';
-import { DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import {
+    DeleteOutlined,
+    InfoCircleOutlined,
+    CheckOutlined,
+    Loading3QuartersOutlined
+} from '@ant-design/icons';
 
 interface DatasetItem {
     _id: string;
@@ -35,7 +67,6 @@ const normFile = (e: any) => {
     return e?.fileList;
 };
 
-
 const Dataset: React.FC = () => {
     const { initialState, setInitialState } = useModel('@@initialState');
     const [uploadLoading, setUploadLoading] = useState<boolean>(false);
@@ -44,12 +75,18 @@ const Dataset: React.FC = () => {
     const [datasetDetail, setDatasetDetail] = useState<React.ReactNode>(null);
     const [datasetModalOpen, setDatasetModalOpen] = useState<boolean>(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+    const [imageModalOpen, setImageModalOpen] = useState<boolean>(false);
     const [form] = Form.useForm();
-    const [imgList, setImgList] = useState<any[]>([]); // 根据实际需要定义类型
-    const [jsonFile, setJsonFile] = useState<any>(null); // 用于存储 JSON 文件
+    const [imgList, setImgList] = useState<any[]>([]);
+    const [jsonFile, setJsonFile] = useState<any>(null);
+    const [visDatasetLoading, setVisDatasetLoading] = useState<boolean>(false);
+    const [visImageList, setVisImageList] = useState<string[]>([]);
     const { useToken } = theme;
     const { token } = useToken();
     const deleteDatasetIdRef = useRef<string>('');
+    const currentVisDatasetId = useRef<string>('');
+    const imageRef = useRef<string>('');
+    const imageTitleRef = useRef<string>('');
 
     const columns = [
         {
@@ -64,35 +101,43 @@ const Dataset: React.FC = () => {
             dataIndex: 'type',
             key: 'type',
             width: 150,
-            render: (types: string[]) => (<>
-                {types.map((type: string, i: number) => <Tag key={`${type}-${i}`}>{type.toUpperCase()}</Tag>)}
-            </>)
+            render: (types: string[]) => (
+                <>
+                    {types.map((type: string, i: number) => (
+                        <Tag key={`${type}-${i}`}>{type.toUpperCase()}</Tag>
+                    ))}
+                </>
+            ),
         },
         {
             title: <FormattedMessage id='pages.dataset.display.datasetFormat' defaultMessage='資料格式' />,
             dataIndex: 'dataset_format',
             key: 'dataset_format',
             width: 200,
-            render: (formats: string[]) => (<>
-                {formats.map((format: string, i: number) => <Tag key={`${format}-${i}`}>{format.toUpperCase()}</Tag>)}
-            </>)
+            render: (formats: string[]) => (
+                <>
+                    {formats.map((format: string, i: number) => (
+                        <Tag key={`${format}-${i}`}>{format.toUpperCase()}</Tag>
+                    ))}
+                </>
+            ),
         },
         {
             title: <FormattedMessage id='pages.dataset.display.validImages' defaultMessage='帶標注圖片數量' />,
             dataIndex: 'norfimage',
             key: 'norfimage',
-            width: 120
+            width: 120,
         },
         {
             title: <FormattedMessage id='pages.dataset.display.createdAt' defaultMessage='創建日期' />,
             dataIndex: 'create_date',
             key: 'create_date',
-            width: 150
+            width: 150,
         },
         {
             title: <FormattedMessage id='pages.dataset.display.description' defaultMessage='描述' />,
             key: 'description',
-            dataIndex: 'description'
+            dataIndex: 'description',
         },
         {
             title: <FormattedMessage id='pages.dataset.display.action' defaultMessage='操作' />,
@@ -111,95 +156,279 @@ const Dataset: React.FC = () => {
                         danger
                         icon={<DeleteOutlined />}
                         onClick={() => {
-                            deleteDatasetIdRef.current = dataset_id
-                            setDeleteModalOpen(true)
+                            deleteDatasetIdRef.current = dataset_id;
+                            setDeleteModalOpen(true);
                         }}
                     />
-                </>)
-        }
+                    {/* <Button
+                        type="text"
+                        icon={<InfoCircleOutlined />}
+                        onClick={() => handleVisDataset(dataset_id)}
+                    /> */}
+                </>
+            ),
+        },
     ];
 
-    const handleEditDataset = (dataset_id: string) => {
-        const dataset = datasets.filter(dataset => dataset._id === dataset_id)[0];
+    const handleVisDataset = async (dataset_id: string) => {
+        console.log('Starting visualization task...');
+        setVisDatasetLoading(true);
+        const resp = await visDataset(dataset_id);
+        const taskId = resp.results;
+
+        const fetchTaskProgress = async () => {
+            const progressRes = await getVisDatasetStatus(taskId);
+            // const imageListProgress = await checkVisDatasetDirExist(dataset_id);
+            // setVisImageList(imageListProgress.results.files);
+            handleEditDataset(currentVisDatasetId.current);
+            console.log('Task progress:', progressRes);
+            if (progressRes.results === 'SUCCESS' || progressRes.results === 'FAILURE') {
+                clearInterval(intervalId);
+                setVisDatasetLoading(false);
+                console.log('Task completed');
+            } else {
+                console.log('Task still in progress');
+            }
+        };
+
+        const intervalId = setInterval(fetchTaskProgress, 2000);
+    };
+
+    const handleDisplayVisDatasetLabel = (
+        dataset_id: string,
+        imageFiles: string[],
+        visualizedFiles: string[]
+    ) => {
+        if (!visualizedFiles.length) {
+            return (
+                <Button
+                    size="small"
+                    style={{ marginLeft: 15 }}
+                    loading={visDatasetLoading}
+                    onClick={() => handleVisDataset(dataset_id)}
+                >
+                    <FormattedMessage
+                        id="pages.dataset.display.visualizeAnnotations"
+                        defaultMessage="視覺化標注"
+                    />
+                </Button>
+            );
+        } else if (imageFiles.length !== visualizedFiles.length) {
+            return (
+                <Tag color="orange" style={{ marginLeft: 15 }}>
+                    <Loading3QuartersOutlined />
+                    <span />
+                    <FormattedMessage
+                        id="pages.dataset.display.visualized"
+                        defaultMessage="部分已視覺化"
+                    />
+                </Tag>
+            );
+        } else {
+            return (
+                <Tag color="green" style={{ marginLeft: 15 }}>
+                    <CheckOutlined />
+                    <span />
+                    <FormattedMessage
+                        id="pages.dataset.display.visualized"
+                        defaultMessage="視覺化"
+                    />
+                </Tag>
+            );
+        }
+    };
+
+    const handleDisplayImage = (link: string, image_file: string) => {
+        imageRef.current = link;
+        imageTitleRef.current = image_file;
+        setImageModalOpen(true);
+    };
+
+    const handleDisplayVisDatasetChildren = (
+        dataset: any,
+        visualizedFiles: string[]
+    ) => {
+        const imageList = (imageFile: string, i: number) => {
+            const {
+                currentUser: { userid },
+            } = initialState;
+            if (visualizedFiles.includes(imageFile)) {
+                const link = `http://localhost:8000/static/dataset_visualization/${userid}/${dataset.save_key}/${imageFile}`;
+                return (
+                    <Badge
+                        key={`${i}-${imageFile}`}
+                        status="success"
+                        text={<a>{imageFile}</a>}
+                        onClick={() => handleDisplayImage(link, imageFile)}
+                    />
+                );
+            }
+            return <Badge key={`${i}-${imageFile}`} status="default" text={imageFile} />;
+        };
+
+        return (
+            <Space direction="vertical">
+                {dataset.image_files.map((imageFile: string, i: number) =>
+                    imageList(imageFile, i)
+                )}
+            </Space>
+        );
+    };
+
+    const handleEditDataset = async (dataset_id: string) => {
+        if (!dataset_id) return;
+        console.log('Editing dataset:', dataset_id);
+        currentVisDatasetId.current = dataset_id;
+        const resp = await checkVisDatasetDirExist(dataset_id);
+        const visualizedFiles = resp.results.files;
+        const dataset = datasets.filter((dataset) => dataset._id === dataset_id)[0];
+
         const items = [
             {
                 key: 1,
-                label: <FormattedMessage id='pages.dataset.display.createdAt' defaultMessage='創建日期' />,
-                children: moment(dataset.created_at).format('YYYY-MM-DD HH:mm')
+                label: (
+                    <FormattedMessage
+                        id="pages.dataset.display.createdAt"
+                        defaultMessage="創建日期"
+                    />
+                ),
+                children: moment(dataset.created_at).format('YYYY-MM-DD HH:mm'),
             },
             {
                 key: 2,
-                label: <FormattedMessage id='pages.dataset.display.datasetFormat' defaultMessage='資料格式' />,
-                children: <>{dataset.format.map((format: string, i: number) =>
-                    <Tag key={`${i}-${format}`}>{format.toUpperCase()}</Tag>)}</>
+                label: (
+                    <FormattedMessage
+                        id="pages.dataset.display.datasetFormat"
+                        defaultMessage="資料格式"
+                    />
+                ),
+                children: (
+                    <>
+                        {dataset.format.map((format: string, i: number) => (
+                            <Tag key={`${i}-${format}`}>{format.toUpperCase()}</Tag>
+                        ))}
+                    </>
+                ),
             },
             {
                 key: 3,
-                label: <FormattedMessage id='pages.dataset.display.description' defaultMessage='描述' />,
-                children: dataset.description
+                label: (
+                    <FormattedMessage
+                        id="pages.dataset.display.description"
+                        defaultMessage="描述"
+                    />
+                ),
+                children: dataset.description,
             },
             {
                 key: 4,
-                label: <FormattedMessage id='pages.dataset.display.validImages' defaultMessage='帶標注圖片數量' />,
-                children: dataset.valid_images_num
+                label: (
+                    <FormattedMessage
+                        id="pages.dataset.display.validImages"
+                        defaultMessage="帶標注圖片數量"
+                    />
+                ),
+                children: dataset.valid_images_num,
             },
             {
                 key: 5,
-                label: <FormattedMessage id='pages.dataset.display.imageList' defaultMessage='圖片列表' />,
-                children: <Space direction='vertical'>{dataset.image_files.map((image_file: string, i: number) =>
-                    <Badge key={`${i}-${image_file}`} status="success" text={image_file} />)}</Space>
+                span: { xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 },
+                label: (
+                    <>
+                        <FormattedMessage
+                            id="pages.dataset.display.imageList"
+                            defaultMessage="圖片列表"
+                        />
+                        {handleDisplayVisDatasetLabel(
+                            dataset_id,
+                            dataset.image_files,
+                            visualizedFiles
+                        )}
+                    </>
+                ),
+                children: handleDisplayVisDatasetChildren(dataset, visualizedFiles),
             },
             {
                 key: 6,
-                label: <FormattedMessage id='pages.dataset.display.labelFile' defaultMessage='標注文件' />,
-                children: <p>{dataset.label_file}</p>
-            }
+                label: (
+                    <FormattedMessage
+                        id="pages.dataset.display.labelFile"
+                        defaultMessage="標注文件"
+                    />
+                ),
+                children: <p>{dataset.label_file}</p>,
+            },
         ];
-        setDatasetDetail(<Descriptions title={dataset.name} layout="vertical" bordered items={items} />)
+        setDatasetDetail(
+            <Descriptions title={dataset.name} layout="vertical" bordered items={items} />
+        );
         setDatasetModalOpen(true);
-    }
+    };
 
     const handleDeleteDataset = async (dataset_id: string) => {
-        const result = await deleteDataset(dataset_id)
+        const result = await deleteDataset(dataset_id);
         if (result.code === 200) {
-            message.success(<FormattedMessage id='pages.dataset.display.deleteSuccess' defaultMessage='刪除成功' />);
+            message.success(
+                <FormattedMessage
+                    id="pages.dataset.display.deleteSuccess"
+                    defaultMessage="刪除成功"
+                />
+            );
+        } else {
+            message.error(
+                `${(
+                    <FormattedMessage
+                        id="pages.dataset.display.deleteFail"
+                        defaultMessage="刪除失敗"
+                    />
+                )}: ${result.msg}`
+            );
         }
-        else {
-            message.error(`${<FormattedMessage id='pages.dataset.display.deleteFail' defaultMessage='刪除失敗' />}: ${result.msg}`);
-        }
-        setDeleteModalOpen(false)
-    }
+        setDeleteModalOpen(false);
+    };
 
     const beforeJsonUpload = (file: any) => {
-        // 检查文件类型
         const isJson = file.type === 'application/json';
         if (!isJson) {
-            message.error(<FormattedMessage id='pages.dataset.display.onlyOneJson' defaultMessage='只能上傳一個 Json 文件' />);
+            message.error(
+                <FormattedMessage
+                    id="pages.dataset.display.onlyOneJson"
+                    defaultMessage="只能上傳一個 Json 文件"
+                />
+            );
         }
         return isJson;
     };
 
     const beforeImageUpload = (file: any) => {
-        // 检查文件类型
         const isImage = file.type.startsWith('image/');
         if (!isImage) {
-            message.error(<FormattedMessage id='pages.dataset.display.onlyImageFile' defaultMessage='只能上傳圖片資料' />);
+            message.error(
+                <FormattedMessage
+                    id="pages.dataset.display.onlyImageFile"
+                    defaultMessage="只能上傳圖片資料"
+                />
+            );
         }
-        // 检查文件大小，小于200MB
         const isLt200MB = file.size / 1024 / 1024 < 200;
         if (!isLt200MB) {
-            message.error(<FormattedMessage id='pages.dataset.display.lt200mb' defaultMessage='圖片大小不能超過200MB' />);
+            message.error(
+                <FormattedMessage
+                    id="pages.dataset.display.lt200mb"
+                    defaultMessage="圖片大小不能超過200MB"
+                />
+            );
         }
         return isImage && isLt200MB;
     };
 
     const onJsonChange = ({ fileList: newFileList }) => {
-        const file = newFileList[newFileList.length - 1]; // 获取最后一个文件
-        setJsonFile(file); // 设置 JSON 文件
+        const file = newFileList[newFileList.length - 1];
+        setJsonFile(file);
     };
 
     const onImageChange = ({ fileList: newFileList }) => {
-        console.log(newFileList)
+        console.log(newFileList);
         setImgList(newFileList);
     };
 
@@ -208,7 +437,7 @@ const Dataset: React.FC = () => {
         beforeUpload: beforeJsonUpload,
         onChange: onJsonChange,
         fileList: jsonFile ? [jsonFile] : [],
-        accept: '.json', // 只允许上传 JSON 文件
+        accept: '.json',
     };
 
     const imageUploadProps = {
@@ -221,20 +450,30 @@ const Dataset: React.FC = () => {
     const onFinish = async (values: any) => {
         setUploadLoading(true);
         const formData = new FormData();
-        formData.append('data', JSON.stringify(values)); // 表单数据
+        formData.append('data', JSON.stringify(values));
         if (jsonFile) {
-            formData.append('jsonFile', jsonFile.originFileObj); // JSON 文件
+            formData.append('jsonFile', jsonFile.originFileObj);
         }
-        // 添加所有图片文件
-        imgList.forEach(file => {
-            formData.append('imageFiles', file.originFileObj); // 图片文件
+        imgList.forEach((file) => {
+            formData.append('imageFiles', file.originFileObj);
         });
         const result = await createDataset(formData);
         if (result.code === 200) {
-            message.success(<FormattedMessage id='pages.dataset.display.createSuccess' defaultMessage='創建成功' />);
-        }
-        else {
-            message.error(`${<FormattedMessage id='pages.dataset.display.createFail' defaultMessage='創建失敗' />}: ${result.msg}`);
+            message.success(
+                <FormattedMessage
+                    id="pages.dataset.display.createSuccess"
+                    defaultMessage="創建成功"
+                />
+            );
+        } else {
+            message.error(
+                `${(
+                    <FormattedMessage
+                        id="pages.dataset.display.createFail"
+                        defaultMessage="創建失敗"
+                    />
+                )}: ${result.msg}`
+            );
         }
         form.resetFields();
         setUploadLoading(false);
@@ -242,6 +481,11 @@ const Dataset: React.FC = () => {
 
     const onFinishFailed = (errorInfo: any) => {
         console.log('Failed:', errorInfo);
+    };
+
+    const handleCancleViewDatasetDetail = () => {
+        setDatasetModalOpen(false);
+        currentVisDatasetId.current = '';
     };
 
     useEffect(() => {
@@ -256,7 +500,7 @@ const Dataset: React.FC = () => {
                     create_date: moment(dataset.created_at).format('YYYY-MM-DD HH:mm'),
                     norfimage: dataset.valid_images_num,
                     description: dataset.description,
-                    action: dataset._id
+                    action: dataset._id,
                 }));
                 setDatasets(result);
                 setShowDatasets(datasetList);
@@ -268,10 +512,19 @@ const Dataset: React.FC = () => {
         fetchDatasets();
     }, [uploadLoading, deleteModalOpen]);
 
+    useEffect(() => {
+        handleEditDataset(currentVisDatasetId.current);
+    }, [visDatasetLoading, visImageList]);
+
     return (
         <PageContainer>
             <Card>
-                <Title level={3}><FormattedMessage id='pages.dataset.table.createdDataset' defaultMessage='已創建的資料集' /></Title>
+                <Title level={3}>
+                    <FormattedMessage
+                        id="pages.dataset.table.createdDataset"
+                        defaultMessage="已創建的資料集"
+                    />
+                </Title>
                 <Card
                     style={{
                         backgroundColor: token.colorBgContainer,
@@ -280,14 +533,19 @@ const Dataset: React.FC = () => {
                         color: token.colorTextSecondary,
                         padding: '16px 19px',
                         minWidth: '220px',
-                        flex: 1
+                        flex: 1,
                     }}
                 >
                     {showDatasets.length === 0 && <Empty />}
                     {showDatasets.length > 0 && <Table dataSource={showDatasets} columns={columns} />}
                 </Card>
 
-                <Title level={3} style={{ marginTop: 40 }}><FormattedMessage id='pages.dataset.table.createDataset' defaultMessage='建立新的資料集' /></Title>
+                <Title level={3} style={{ marginTop: 40 }}>
+                    <FormattedMessage
+                        id="pages.dataset.table.createDataset"
+                        defaultMessage="建立新的資料集"
+                    />
+                </Title>
                 <Card
                     style={{
                         backgroundColor: token.colorBgContainer,
@@ -296,26 +554,60 @@ const Dataset: React.FC = () => {
                         color: token.colorTextSecondary,
                         padding: '16px 19px',
                         minWidth: '220px',
-                        flex: 1
+                        flex: 1,
                     }}
                 >
                     <Spin spinning={uploadLoading}>
                         <Form
                             form={form}
                             layout="horizontal"
-                            size='middle'
+                            size="middle"
                             style={{ maxWidth: 600 }}
                             onFinish={onFinish}
                             onFinishFailed={onFinishFailed}
                         >
                             <Form.Item
-                                label={<FormattedMessage id='pages.dataset.display.name' defaultMessage='名稱' />}
+                                label={
+                                    <FormattedMessage
+                                        id="pages.dataset.display.name"
+                                        defaultMessage="名稱"
+                                    />
+                                }
                                 name="name"
-                                rules={[{ required: true, message: <FormattedMessage id='pages.dataset.display.enterDatasetName' defaultMessage='請輸入資料集名稱' /> }]}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: (
+                                            <FormattedMessage
+                                                id="pages.dataset.display.enterDatasetName"
+                                                defaultMessage="請輸入資料集名稱"
+                                            />
+                                        ),
+                                    },
+                                ]}
                             >
                                 <Input />
                             </Form.Item>
-                            <Form.Item label={<FormattedMessage id='pages.dataset.display.detectTypes' defaultMessage='檢測類型' />} name="detect_types" rules={[{ required: true, message: <FormattedMessage id='pages.dataset.display.selectDetectTypes' defaultMessage='請選擇檢測類型' /> }]}>
+                            <Form.Item
+                                label={
+                                    <FormattedMessage
+                                        id="pages.dataset.display.detectTypes"
+                                        defaultMessage="檢測類型"
+                                    />
+                                }
+                                name="detect_types"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: (
+                                            <FormattedMessage
+                                                id="pages.dataset.display.selectDetectTypes"
+                                                defaultMessage="請選擇檢測類型"
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            >
                                 <Select mode="multiple">
                                     <Select.Option value="det">Detection</Select.Option>
                                     <Select.Option value="seg">Segmentation</Select.Option>
@@ -323,25 +615,106 @@ const Dataset: React.FC = () => {
                                     <Select.Option value="kpts">Keypoints</Select.Option>
                                 </Select>
                             </Form.Item>
-                            <Form.Item label={<FormattedMessage id='pages.dataset.display.description' defaultMessage='描述' />} name="description">
+                            <Form.Item
+                                label={
+                                    <FormattedMessage
+                                        id="pages.dataset.display.description"
+                                        defaultMessage="描述"
+                                    />
+                                }
+                                name="description"
+                            >
                                 <Input />
                             </Form.Item>
-                            <Form.Item label={<FormattedMessage id='pages.dataset.display.cocoStyleLabelFile' defaultMessage='標注文件（MSCOCO 格式）' />} name="label_file" valuePropName="fileList" getValueFromEvent={normFile} rules={[{ required: true, message: <FormattedMessage id='pages.dataset.display.uploadLabelFile' defaultMessage='請上傳標注文件' /> }]}>
-                                <Upload {...jsonUploadProps} >
-                                    <Button><FormattedMessage id='pages.dataset.display.clickToUpload' defaultMessage='點擊上傳' /></Button>
+                            <Form.Item
+                                label={
+                                    <FormattedMessage
+                                        id="pages.dataset.display.cocoStyleLabelFile"
+                                        defaultMessage="標注文件（MSCOCO 格式）"
+                                    />
+                                }
+                                name="label_file"
+                                valuePropName="fileList"
+                                getValueFromEvent={normFile}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: (
+                                            <FormattedMessage
+                                                id="pages.dataset.display.uploadLabelFile"
+                                                defaultMessage="請上傳標注文件"
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            >
+                                <Upload {...jsonUploadProps}>
+                                    <Button>
+                                        <FormattedMessage
+                                            id="pages.dataset.display.clickToUpload"
+                                            defaultMessage="點擊上傳"
+                                        />
+                                    </Button>
                                 </Upload>
                             </Form.Item>
-                            <Form.Item label={<FormattedMessage id='pages.dataset.display.images' defaultMessage='圖片' />} name="image_list" valuePropName="fileList" getValueFromEvent={normFile} rules={[{ required: true, message: <FormattedMessage id='pages.dataset.display.uploadImages' defaultMessage='請上傳圖片' /> }]}>
-                                <Dragger {...imageUploadProps} >
-                                    <p className="ant-upload-drag-icon">
+                            <Form.Item
+                                label={
+                                    <FormattedMessage
+                                        id="pages.dataset.display.images"
+                                        defaultMessage="圖片"
+                                    />
+                                }
+                                name="image_list"
+                                valuePropName="fileList"
+                                getValueFromEvent={normFile}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: (
+                                            <FormattedMessage
+                                                id="pages.dataset.display.uploadImages"
+                                                defaultMessage="請上傳圖片"
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            >
+                                <Dragger {...imageUploadProps}>
+                                    <p className="ant-upload-drag-icon"></p>
+                                    <p className="ant-upload-text">
+                                        <FormattedMessage
+                                            id="pages.dataset.display.clickOrDragToUpload"
+                                            defaultMessage="點擊或拖動上傳"
+                                        />
                                     </p>
-                                    <p className="ant-upload-text"><FormattedMessage id='pages.dataset.display.clickOrDragToUpload' defaultMessage='點擊或拖動上傳' /></p>
                                     <p className="ant-upload-hint">
-                                        <FormattedMessage id='pages.dataset.display.uploadDescription' defaultMessage='支持單個或批量上傳。嚴禁上傳私人數據或其他禁止的文件' />
+                                        <FormattedMessage
+                                            id="pages.dataset.display.uploadDescription"
+                                            defaultMessage="支持單個或批量上傳。嚴禁上傳私人數據或其他禁止的文件"
+                                        />
                                     </p>
                                 </Dragger>
                             </Form.Item>
-                            <Form.Item label={<FormattedMessage id='pages.dataset.display.datasetFormatTitle' defaultMessage='資料集格式（MSCOCO 為默認必選）' />} name="dataset_format" rules={[{ required: true, message: <FormattedMessage id='pages.dataset.display.selectDatasetFormat' defaultMessage='請選擇資料集格式' /> }]}>
+                            <Form.Item
+                                label={
+                                    <FormattedMessage
+                                        id="pages.dataset.display.datasetFormatTitle"
+                                        defaultMessage="資料集格式（MSCOCO 為默認必選）"
+                                    />
+                                }
+                                name="dataset_format"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: (
+                                            <FormattedMessage
+                                                id="pages.dataset.display.selectDatasetFormat"
+                                                defaultMessage="請選擇資料集格式"
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            >
                                 <Select mode="multiple">
                                     <Select.Option value="mscoco">MSCOCO</Select.Option>
                                     <Select.Option value="yolo">YOLO</Select.Option>
@@ -349,23 +722,61 @@ const Dataset: React.FC = () => {
                             </Form.Item>
                             <Form.Item>
                                 <Button type="primary" htmlType="submit">
-                                    <FormattedMessage id='pages.dataset.display.submit' defaultMessage='提交' />
+                                    <FormattedMessage
+                                        id="pages.dataset.display.submit"
+                                        defaultMessage="提交"
+                                    />
                                 </Button>
                             </Form.Item>
                         </Form>
                     </Spin>
                 </Card>
             </Card>
-            <Modal style={{ minWidth: 800 }} title={<FormattedMessage id='pages.dataset.display.datasetDetail' defaultMessage='資料集詳情' />} open={datasetModalOpen} onOk={() => setDatasetModalOpen(false)} onCancel={() => setDatasetModalOpen(false)}>
+            <Modal
+                style={{ minWidth: 800 }}
+                footer={null}
+                title={
+                    <FormattedMessage
+                        id="pages.dataset.display.datasetDetail"
+                        defaultMessage="資料集詳情"
+                    />
+                }
+                open={datasetModalOpen}
+                onOk={() => setDatasetModalOpen(false)}
+                onCancel={handleCancleViewDatasetDetail}
+            >
                 {datasetDetail}
             </Modal>
-            <Modal style={{ minWidth: 200 }} title={<FormattedMessage id='pages.dataset.display.deleteDataset' defaultMessage='刪除資料集' />} open={deleteModalOpen} onOk={() => handleDeleteDataset(deleteDatasetIdRef.current)} onCancel={() => setDeleteModalOpen(false)} >
-
-                <FormattedMessage id='pages.dataset.display.confirmDeleteDataset' defaultMessage='確定要刪除該資料集嗎？此操作將無法還原' />
+            <Modal
+                style={{ minWidth: 200 }}
+                title={
+                    <FormattedMessage
+                        id="pages.dataset.display.deleteDataset"
+                        defaultMessage="刪除資料集"
+                    />
+                }
+                open={deleteModalOpen}
+                onOk={() => handleDeleteDataset(deleteDatasetIdRef.current)}
+                onCancel={() => {
+                    setDeleteModalOpen(false);
+                }}
+            >
+                <FormattedMessage
+                    id="pages.dataset.display.confirmDeleteDataset"
+                    defaultMessage="確定要刪除該資料集嗎？此操作將無法還原"
+                />
+            </Modal>
+            <Modal
+                style={{ minWidth: 600 }}
+                title={imageTitleRef.current}
+                footer={null}
+                onCancel={() => { setImageModalOpen(false); imageRef.current = '' }}
+                open={imageModalOpen}
+            >
+                <Image width={500} src={imageRef.current} />
             </Modal>
         </PageContainer>
-
     );
-}
+};
 
 export default Dataset;

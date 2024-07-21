@@ -97,4 +97,6 @@ export default {
   'pages.dataset.display.clickToUpload': '點擊上傳',
   'pages.dataset.display.submit': '提交',
   'pages.dataset.display.imageList': '圖片列表',
+  'pages.dataset.display.visualizeAnnotations': '視覺化標注',
+  'pages.dataset.display.visualized': '視覺化',
 };

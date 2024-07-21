@@ -32,3 +32,32 @@ export async function deleteDataset(datasetId: string) {
       }
     });
 }
+
+export async function visDataset(datasetId: string) {
+  return request(`/api/datasets/vis/${datasetId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token.get()}`
+    }
+  });
+}
+
+export async function getVisDatasetStatus(taskId: string) {
+  return request(`/api/datasets/vis/${taskId}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token.get()}`
+    }
+  });
+}
+
+export async function checkVisDatasetDirExist(datasetId: string) {
+  return request(`/api/datasets/checkVis/${datasetId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token.get()}`
+    }
+  });
+}
