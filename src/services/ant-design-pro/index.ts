@@ -5,8 +5,12 @@
 import * as api from './api';
 import * as login from './login';
 import * as dataset from './dataset'
+import * as detectType from './detectType'
+import * as datasetFormat from './datasetFormat'
 export default {
   api,
   login,
   dataset,
+  detectType,
+  datasetFormat
 };
