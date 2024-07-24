@@ -15,6 +15,8 @@ import {
     checkVisDatasetDirExist,
     getVisDatasetStatus
 } from '@/services/ant-design-pro/dataset';
+import { listDetectTypes } from '@/services/ant-design-pro/detectType';
+import { listDatasetFormats } from '@/services/ant-design-pro/datasetFormat'
 import { PageContainer } from '@ant-design/pro-components';
 import {
     Typography,
@@ -44,15 +46,16 @@ import {
     CheckOutlined,
     Loading3QuartersOutlined
 } from '@ant-design/icons';
+import { forEach } from 'lodash';
 
 interface DatasetItem {
     _id: string;
     name: string;
-    detect_types: string[];
+    detect_type_id: string;
     created_at: string;
     valid_images_num: number;
     description: string;
-    format: string;
+    dataset_format_ids: string[];
     image_files: string[];
     label_file: string;
 }
@@ -69,6 +72,7 @@ const normFile = (e: any) => {
 
 const Dataset: React.FC = () => {
     const { initialState, setInitialState } = useModel('@@initialState');
+    const [dataLoaded, setDataLoaded] = useState(false);
     const [uploadLoading, setUploadLoading] = useState<boolean>(false);
     const [datasets, setDatasets] = useState<DatasetItem[]>([]);
     const [showDatasets, setShowDatasets] = useState<any[]>([]);
@@ -81,6 +85,8 @@ const Dataset: React.FC = () => {
     const [jsonFile, setJsonFile] = useState<any>(null);
     const [visDatasetLoading, setVisDatasetLoading] = useState<boolean>(false);
     const [visImageList, setVisImageList] = useState<string[]>([]);
+    const [detectTypes, setDetectTypes] = useState<any[]>([]);
+    const [datasetFormats, setDatasetFormats] = useState<any[]>([]);
     const { useToken } = theme;
     const { token } = useToken();
     const deleteDatasetIdRef = useRef<string>('');
@@ -101,18 +107,12 @@ const Dataset: React.FC = () => {
             dataIndex: 'type',
             key: 'type',
             width: 150,
-            render: (types: string[]) => (
-                <>
-                    {types.map((type: string, i: number) => (
-                        <Tag key={`${type}-${i}`}>{type.toUpperCase()}</Tag>
-                    ))}
-                </>
-            ),
+            render: (type: string) => <Tag>{type.toUpperCase()}</Tag>,
         },
         {
             title: <FormattedMessage id='pages.dataset.display.datasetFormat' defaultMessage='資料格式' />,
-            dataIndex: 'dataset_format',
-            key: 'dataset_format',
+            dataIndex: 'datasetFormat',
+            key: 'datasetFormat',
             width: 200,
             render: (formats: string[]) => (
                 <>
@@ -124,14 +124,14 @@ const Dataset: React.FC = () => {
         },
         {
             title: <FormattedMessage id='pages.dataset.display.validImages' defaultMessage='帶標注圖片數量' />,
-            dataIndex: 'norfimage',
-            key: 'norfimage',
+            dataIndex: 'validImagesNum',
+            key: 'validImagesNum',
             width: 120,
         },
         {
             title: <FormattedMessage id='pages.dataset.display.createdAt' defaultMessage='創建日期' />,
-            dataIndex: 'create_date',
-            key: 'create_date',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
             width: 150,
         },
         {
@@ -144,42 +144,35 @@ const Dataset: React.FC = () => {
             key: 'action',
             dataIndex: 'action',
             width: 120,
-            render: (dataset_id: string) => (
+            render: (datasetId: string) => (
                 <>
                     <Button
                         type="text"
                         icon={<InfoCircleOutlined />}
-                        onClick={() => handleEditDataset(dataset_id)}
+                        onClick={() => handleEditDataset(datasetId)}
                     />
                     <Button
                         type="text"
                         danger
                         icon={<DeleteOutlined />}
                         onClick={() => {
-                            deleteDatasetIdRef.current = dataset_id;
+                            deleteDatasetIdRef.current = datasetId;
                             setDeleteModalOpen(true);
                         }}
                     />
-                    {/* <Button
-                        type="text"
-                        icon={<InfoCircleOutlined />}
-                        onClick={() => handleVisDataset(dataset_id)}
-                    /> */}
                 </>
             ),
         },
     ];
 
-    const handleVisDataset = async (dataset_id: string) => {
+    const handleVisDataset = async (datasetId: string) => {
         console.log('Starting visualization task...');
         setVisDatasetLoading(true);
-        const resp = await visDataset(dataset_id);
+        const resp = await visDataset(datasetId);
         const taskId = resp.results;
 
         const fetchTaskProgress = async () => {
             const progressRes = await getVisDatasetStatus(taskId);
-            // const imageListProgress = await checkVisDatasetDirExist(dataset_id);
-            // setVisImageList(imageListProgress.results.files);
             handleEditDataset(currentVisDatasetId.current);
             console.log('Task progress:', progressRes);
             if (progressRes.results === 'SUCCESS' || progressRes.results === 'FAILURE') {
@@ -195,7 +188,7 @@ const Dataset: React.FC = () => {
     };
 
     const handleDisplayVisDatasetLabel = (
-        dataset_id: string,
+        datasetId: string,
         imageFiles: string[],
         visualizedFiles: string[]
     ) => {
@@ -205,7 +198,7 @@ const Dataset: React.FC = () => {
                     size="small"
                     style={{ marginLeft: 15 }}
                     loading={visDatasetLoading}
-                    onClick={() => handleVisDataset(dataset_id)}
+                    onClick={() => handleVisDataset(datasetId)}
                 >
                     <FormattedMessage
                         id="pages.dataset.display.visualizeAnnotations"
@@ -238,9 +231,9 @@ const Dataset: React.FC = () => {
         }
     };
 
-    const handleDisplayImage = (link: string, image_file: string) => {
+    const handleDisplayImage = (link: string, imageFile: string) => {
         imageRef.current = link;
-        imageTitleRef.current = image_file;
+        imageTitleRef.current = imageFile;
         setImageModalOpen(true);
     };
 
@@ -275,13 +268,18 @@ const Dataset: React.FC = () => {
         );
     };
 
-    const handleEditDataset = async (dataset_id: string) => {
-        if (!dataset_id) return;
-        console.log('Editing dataset:', dataset_id);
-        currentVisDatasetId.current = dataset_id;
-        const resp = await checkVisDatasetDirExist(dataset_id);
+    const handleEditDataset = async (datasetId: string) => {
+        if (!datasetId) return;
+        console.log('Editing dataset:', datasetId);
+        currentVisDatasetId.current = datasetId;
+        const resp = await checkVisDatasetDirExist(datasetId);
         const visualizedFiles = resp.results.files;
-        const dataset = datasets.filter((dataset) => dataset._id === dataset_id)[0];
+        const dataset = datasets.filter((dataset) => dataset._id === datasetId)[0];
+        const datasetFormat = dataset.dataset_format_ids.map(id => {
+            const foundItem = datasetFormats.find(item => item._id === id);
+            return foundItem ? foundItem.name : null;
+        });
+        const typeItem = detectTypes.find(item => item._id === dataset.detect_type_id);
 
         const items = [
             {
@@ -304,7 +302,7 @@ const Dataset: React.FC = () => {
                 ),
                 children: (
                     <>
-                        {dataset.format.map((format: string, i: number) => (
+                        {datasetFormat.map((format: string, i: number) => (
                             <Tag key={`${i}-${format}`}>{format.toUpperCase()}</Tag>
                         ))}
                     </>
@@ -340,7 +338,7 @@ const Dataset: React.FC = () => {
                             defaultMessage="圖片列表"
                         />
                         {handleDisplayVisDatasetLabel(
-                            dataset_id,
+                            datasetId,
                             dataset.image_files,
                             visualizedFiles
                         )}
@@ -358,6 +356,16 @@ const Dataset: React.FC = () => {
                 ),
                 children: <p>{dataset.label_file}</p>,
             },
+            {
+                key: 7,
+                label: (
+                    <FormattedMessage
+                        id="pages.dataset.display.detectTypes"
+                        defaultMessage="檢測類型"
+                    />
+                ),
+                children: <Tag>{typeItem.tag_name.toUpperCase()}</Tag> ,
+            },
         ];
         setDatasetDetail(
             <Descriptions title={dataset.name} layout="vertical" bordered items={items} />
@@ -365,8 +373,8 @@ const Dataset: React.FC = () => {
         setDatasetModalOpen(true);
     };
 
-    const handleDeleteDataset = async (dataset_id: string) => {
-        const result = await deleteDataset(dataset_id);
+    const handleDeleteDataset = async (datasetId: string) => {
+        const result = await deleteDataset(datasetId);
         if (result.code === 200) {
             message.success(
                 <FormattedMessage
@@ -422,12 +430,12 @@ const Dataset: React.FC = () => {
         return isImage && isLt200MB;
     };
 
-    const onJsonChange = ({ fileList: newFileList }) => {
+    const onJsonChange = ({ fileList: newFileList }: { fileList: any[] }) => {
         const file = newFileList[newFileList.length - 1];
         setJsonFile(file);
     };
 
-    const onImageChange = ({ fileList: newFileList }) => {
+    const onImageChange = ({ fileList: newFileList }: { fileList: any[] }) => {
         console.log(newFileList);
         setImgList(newFileList);
     };
@@ -489,19 +497,46 @@ const Dataset: React.FC = () => {
     };
 
     useEffect(() => {
+        handleEditDataset(currentVisDatasetId.current);
+    }, [visDatasetLoading, visImageList]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const detectTypesResp = await listDetectTypes();
+                setDetectTypes(detectTypesResp.results);
+                const datasetFormatsResp = await listDatasetFormats();
+                setDatasetFormats(datasetFormatsResp.results);
+                setDataLoaded(true);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, [])
+
+    useEffect(() => {
         const fetchDatasets = async () => {
             try {
+                if (!dataLoaded) return;
                 const result = await listDataset();
-                const datasetList = result.map((dataset: DatasetItem, i: number) => ({
-                    key: `${i}`,
-                    name: dataset.name,
-                    type: dataset.detect_types,
-                    dataset_format: dataset.format,
-                    create_date: moment(dataset.created_at).format('YYYY-MM-DD HH:mm'),
-                    norfimage: dataset.valid_images_num,
-                    description: dataset.description,
-                    action: dataset._id,
-                }));
+                const datasetList = result.map((dataset: DatasetItem, i: number) => {
+                    const datasetFormat = dataset.dataset_format_ids.map(id => {
+                        const foundItem = datasetFormats.find(item => item._id === id);
+                        return foundItem ? foundItem.name : null;
+                    });
+                    const typeItem = detectTypes.find(item => item._id === dataset.detect_type_id);
+                    return {
+                        key: `${i}`,
+                        name: dataset.name,
+                        type: typeItem.tag_name,
+                        datasetFormat,
+                        createdAt: moment(dataset.created_at).format('YYYY-MM-DD HH:mm'),
+                        validImagesNum: dataset.valid_images_num,
+                        description: dataset.description,
+                        action: dataset._id,
+                    }
+            });
                 setDatasets(result);
                 setShowDatasets(datasetList);
             } catch (error) {
@@ -510,11 +545,7 @@ const Dataset: React.FC = () => {
             }
         };
         fetchDatasets();
-    }, [uploadLoading, deleteModalOpen]);
-
-    useEffect(() => {
-        handleEditDataset(currentVisDatasetId.current);
-    }, [visDatasetLoading, visImageList]);
+    }, [uploadLoading, deleteModalOpen, dataLoaded]);
 
     return (
         <PageContainer>
@@ -595,7 +626,7 @@ const Dataset: React.FC = () => {
                                         defaultMessage="檢測類型"
                                     />
                                 }
-                                name="detect_types"
+                                name="detectType"
                                 rules={[
                                     {
                                         required: true,
@@ -608,11 +639,10 @@ const Dataset: React.FC = () => {
                                     },
                                 ]}
                             >
-                                <Select mode="multiple">
-                                    <Select.Option value="det">Detection</Select.Option>
-                                    <Select.Option value="seg">Segmentation</Select.Option>
-                                    <Select.Option value="cls">Classification</Select.Option>
-                                    <Select.Option value="kpts">Keypoints</Select.Option>
+                                <Select>
+                                    {detectTypes.map((data: any, i: number) => 
+                                        <Select.Option key={data._id} value={data._id}>{data.name.toUpperCase()}</Select.Option>
+                                    )}
                                 </Select>
                             </Form.Item>
                             <Form.Item
@@ -633,7 +663,7 @@ const Dataset: React.FC = () => {
                                         defaultMessage="標注文件（MSCOCO 格式）"
                                     />
                                 }
-                                name="label_file"
+                                name="labelFile"
                                 valuePropName="fileList"
                                 getValueFromEvent={normFile}
                                 rules={[
@@ -664,7 +694,7 @@ const Dataset: React.FC = () => {
                                         defaultMessage="圖片"
                                     />
                                 }
-                                name="image_list"
+                                name="imageList"
                                 valuePropName="fileList"
                                 getValueFromEvent={normFile}
                                 rules={[
@@ -702,7 +732,7 @@ const Dataset: React.FC = () => {
                                         defaultMessage="資料集格式（MSCOCO 為默認必選）"
                                     />
                                 }
-                                name="dataset_format"
+                                name="datasetFormat"
                                 rules={[
                                     {
                                         required: true,
@@ -716,8 +746,9 @@ const Dataset: React.FC = () => {
                                 ]}
                             >
                                 <Select mode="multiple">
-                                    <Select.Option value="mscoco">MSCOCO</Select.Option>
-                                    <Select.Option value="yolo">YOLO</Select.Option>
+                                    {datasetFormats.map((data: any, i: number) => 
+                                        <Select.Option key={data._id} value={data._id}>{data.name.toUpperCase()}</Select.Option>
+                                    )}
                                 </Select>
                             </Form.Item>
                             <Form.Item>
