@@ -1,15 +1,37 @@
 import { GlobalOutlined } from '@ant-design/icons';
 import { SelectLang as UmiSelectLang } from '@umijs/max';
-import React from 'react';
 
 export type SiderTheme = 'light' | 'dark';
 
+const langs = [
+  {
+    lang: 'zh-TW',
+    label: '繁體中文',
+    icon: '🇹🇼',
+    title: '語言',
+  },
+  {
+    lang: 'en-US',
+    label: 'English',
+    icon: '🇺🇸',
+    title: 'Language',
+  },
+  {
+    lang: 'zh-CN',
+    label: '简体中文',
+    icon: '🇨🇳',
+    title: '语言',
+  },
+];
+
 export const SelectLang = () => {
+  console.log(UmiSelectLang);
   return (
     <UmiSelectLang
       style={{
         padding: 4,
       }}
+      postLocalesData={() => langs}
     />
   );
 };
