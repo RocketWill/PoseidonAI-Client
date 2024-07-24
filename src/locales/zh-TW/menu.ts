@@ -1,6 +1,7 @@
 export default {
   'menu.welcome': '歡迎',
   'menu.dataset': '資料集管理',
+  'menu.trainingConfiguration': '訓練參數配置',
   'menu.more-blocks': '更多區塊',
   'menu.home': '首頁',
   'menu.admin': '权限',

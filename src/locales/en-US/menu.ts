@@ -1,6 +1,7 @@
 export default {
   'menu.welcome': 'Welcome',
   'menu.dataset': 'Dataset',
+  'menu.trainingConfiguration': 'Training Parameter Configuration',
   'menu.more-blocks': 'More Blocks',
   'menu.home': 'Home',
   'menu.admin': 'Admin',

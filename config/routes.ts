@@ -35,6 +35,12 @@ export default [
     component: './Dataset',
   },
   {
+    path: '/training-configuration',
+    name: 'trainingConfiguration',
+    icon: 'edit',
+    component: './Configuration',
+  },
+  {
     path: '/admin',
     name: 'admin',
     icon: 'crown',
