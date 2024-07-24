@@ -68,7 +68,7 @@ export default {
   'pages.searchTable.batchDeletion': 'batch deletion',
   'pages.searchTable.batchApproval': 'batch approval',
   'pages.dataset.display.name': 'Name',
-  'pages.dataset.display.detectTypes': 'Detection types',
+  'pages.dataset.display.detectTypes': 'Detection type',
   'pages.dataset.display.datasetFormat': 'Dataset format',
   'pages.dataset.display.validImages': 'Number of annotated images',
   'pages.dataset.display.createdAt': 'Created date',
