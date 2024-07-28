@@ -2,7 +2,7 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-25 09:46:30
  * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-07-28 15:31:48
+ * @LastEditTime: 2024-07-28 20:47:37
  * @FilePath: /PoseidonAI-Client/src/pages/Configuration/components/Yolov8Settings.tsx
  * @Description:
  *
@@ -117,7 +117,13 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
         marginTop: 15,
       }}
     >
-      <Title level={4}>YOLOv8 Settings</Title>
+      <Title level={4}>
+        YOLOv8
+        <FormattedMessage
+          id="pages.trainingConfig.trainingSettings"
+          defaultMessage="訓練參數配置"
+        />
+      </Title>
       <Spin tip="Saving" spinning={saving}>
         <Form
           {...layout}
@@ -163,11 +169,21 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
           </Form.Item>
           {/* Training Parameters Section */}
           <Title level={5} style={{ marginBottom: 30 }}>
-            Training Parameters
+            <FormattedMessage
+              id="pages.trainingConfig.trainingParameters"
+              defaultMessage="訓練參數"
+            />
           </Title>
           <Form.Item
             label={
-              <Tooltip title="訓練時間（小時）">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.time"
+                    defaultMessage="訓練時間（小時）"
+                  />
+                }
+              >
                 <span>Time</span>
               </Tooltip>
             }
@@ -195,7 +211,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="提前停止的耐心值">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.patience"
+                    defaultMessage="提前停止的耐心值"
+                  />
+                }
+              >
                 <span>Patience</span>
               </Tooltip>
             }
@@ -223,7 +246,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="批量大小">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.batch"
+                    defaultMessage="批量大小"
+                  />
+                }
+              >
                 <span>Batch Size</span>
               </Tooltip>
             }
@@ -251,7 +281,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="輸入圖像大小">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.imgsz"
+                    defaultMessage="輸入圖像大小"
+                  />
+                }
+              >
                 <span>Image Size</span>
               </Tooltip>
             }
@@ -281,7 +318,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="優化器">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.optimizer"
+                    defaultMessage="優化器"
+                  />
+                }
+              >
                 <span>Optimizer</span>
               </Tooltip>
             }
@@ -299,7 +343,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="隨機種子">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.seed"
+                    defaultMessage="隨機種子"
+                  />
+                }
+              >
                 <span>Seed</span>
               </Tooltip>
             }
@@ -327,7 +378,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="是否使用確定性算法">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.deterministic"
+                    defaultMessage="是否使用確定性算法"
+                  />
+                }
+              >
                 <span>Deterministic</span>
               </Tooltip>
             }
@@ -341,7 +399,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="是否將所有類視為單一類">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.single_cls"
+                    defaultMessage="是否將所有類視為單一類"
+                  />
+                }
+              >
                 <span>Single Class</span>
               </Tooltip>
             }
@@ -355,7 +420,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="是否使用矩形訓練">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.rect"
+                    defaultMessage="是否使用矩形訓練"
+                  />
+                }
+              >
                 <span>Rectangular Training</span>
               </Tooltip>
             }
@@ -369,7 +441,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="是否使用余弦退火學習率調度">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.cos_lr"
+                    defaultMessage="是否使用余弦退火學習率調度"
+                  />
+                }
+              >
                 <span>Cosine LR</span>
               </Tooltip>
             }
@@ -383,7 +462,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="關閉馬賽克增強的輪數">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.close_mosaic"
+                    defaultMessage="關閉馬賽克增強的輪數"
+                  />
+                }
+              >
                 <span>Close Mosaic</span>
               </Tooltip>
             }
@@ -411,7 +497,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="是否使用自動混合精度訓練">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.amp"
+                    defaultMessage="是否使用自動混合精度訓練"
+                  />
+                }
+              >
                 <span>Automatic Mixed Precision</span>
               </Tooltip>
             }
@@ -425,7 +518,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="使用的數據集比例">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.fraction"
+                    defaultMessage="使用的數據集比例"
+                  />
+                }
+              >
                 <span>Dataset Fraction</span>
               </Tooltip>
             }
@@ -455,7 +555,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="是否進行性能分析">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.profile"
+                    defaultMessage="是否進行性能分析"
+                  />
+                }
+              >
                 <span>Performance Profiling</span>
               </Tooltip>
             }
@@ -469,7 +576,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="凍結的層數">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.freeze"
+                    defaultMessage="凍結的層數"
+                  />
+                }
+              >
                 <span>Freeze Layers</span>
               </Tooltip>
             }
@@ -497,7 +611,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="初始學習率">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.lr0"
+                    defaultMessage="初始學習率"
+                  />
+                }
+              >
                 <span>Initial Learning Rate</span>
               </Tooltip>
             }
@@ -527,7 +648,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="最終學習率">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.lrf"
+                    defaultMessage="最終學習率"
+                  />
+                }
+              >
                 <span>Final Learning Rate</span>
               </Tooltip>
             }
@@ -557,7 +685,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="動量因子">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.momentum"
+                    defaultMessage="動量因子"
+                  />
+                }
+              >
                 <span>Momentum</span>
               </Tooltip>
             }
@@ -587,7 +722,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="權重衰減因子">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.weight_decay"
+                    defaultMessage="權重衰減因子"
+                  />
+                }
+              >
                 <span>Weight Decay</span>
               </Tooltip>
             }
@@ -617,7 +759,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="熱身訓練輪數">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.warmup_epochs"
+                    defaultMessage="熱身訓練輪數"
+                  />
+                }
+              >
                 <span>Warmup Epochs</span>
               </Tooltip>
             }
@@ -647,7 +796,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="熱身動量">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.warmup_momentum"
+                    defaultMessage="熱身動量"
+                  />
+                }
+              >
                 <span>Warmup Momentum</span>
               </Tooltip>
             }
@@ -677,7 +833,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="熱身偏置學習率">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.warmup_bias_lr"
+                    defaultMessage="熱身偏置學習率"
+                  />
+                }
+              >
                 <span>Warmup Bias Learning Rate</span>
               </Tooltip>
             }
@@ -707,7 +870,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="邊框損失比重">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.box"
+                    defaultMessage="邊框損失比重"
+                  />
+                }
+              >
                 <span>Box Loss Weight</span>
               </Tooltip>
             }
@@ -737,7 +907,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="分類損失比重">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.cls"
+                    defaultMessage="分類損失比重"
+                  />
+                }
+              >
                 <span>Classification Loss Weight</span>
               </Tooltip>
             }
@@ -767,7 +944,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="分佈聚類損失比重">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.dfl"
+                    defaultMessage="分佈聚類損失比重"
+                  />
+                }
+              >
                 <span>Distribution Focal Loss Weight</span>
               </Tooltip>
             }
@@ -797,7 +981,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="姿態估計損失比重">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.pose"
+                    defaultMessage="姿態估計損失比重"
+                  />
+                }
+              >
                 <span>Pose Estimation Loss Weight</span>
               </Tooltip>
             }
@@ -827,7 +1018,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="關鍵對象損失比重">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.kobj"
+                    defaultMessage="關鍵點損失比重"
+                  />
+                }
+              >
                 <span>Key Object Loss Weight</span>
               </Tooltip>
             }
@@ -857,7 +1055,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="標籤平滑因子">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.label_smoothing"
+                    defaultMessage="標籤平滑因子"
+                  />
+                }
+              >
                 <span>Label Smoothing</span>
               </Tooltip>
             }
@@ -887,7 +1092,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="標準批量大小">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.nbs"
+                    defaultMessage="標準批量大小"
+                  />
+                }
+              >
                 <span>Normal Batch Size</span>
               </Tooltip>
             }
@@ -915,7 +1127,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="是否使用重疊掩碼">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.overlap_mask"
+                    defaultMessage="是否使用重疊掩碼"
+                  />
+                }
+              >
                 <span>Overlap Mask</span>
               </Tooltip>
             }
@@ -929,7 +1148,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="掩碼損失比重">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.mask_ratio"
+                    defaultMessage="掩碼損失比重"
+                  />
+                }
+              >
                 <span>Mask Loss Weight</span>
               </Tooltip>
             }
@@ -959,7 +1185,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="Dropout 概率">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.dropout"
+                    defaultMessage="Dropout 機率"
+                  />
+                }
+              >
                 <span>Dropout Probability</span>
               </Tooltip>
             }
@@ -988,11 +1221,21 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
           </Form.Item>
 
           <Title level={5} style={{ marginBottom: 30 }}>
-            Data Augmentation Settings
+            <FormattedMessage
+              id="pages.trainingConfig.dataAugmentationSettings"
+              defaultMessage="資料增強參數"
+            />
           </Title>
           <Form.Item
             label={
-              <Tooltip title="調整色調的範圍，範圍0.0 - 1.0">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.hsv_h"
+                    defaultMessage="調整色調的範圍，範圍0.0 - 1.0"
+                  />
+                }
+              >
                 <span>HSV Hue</span>
               </Tooltip>
             }
@@ -1022,7 +1265,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="調整飽和度的範圍，範圍0.0 - 1.0">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.hsv_s"
+                    defaultMessage="調整飽和度的範圍，範圍0.0 - 1.0"
+                  />
+                }
+              >
                 <span>HSV Saturation</span>
               </Tooltip>
             }
@@ -1052,7 +1302,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="調整亮度的範圍，範圍0.0 - 1.0">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.hsv_v"
+                    defaultMessage="調整亮度的範圍，範圍0.0 - 1.0"
+                  />
+                }
+              >
                 <span>HSV Value</span>
               </Tooltip>
             }
@@ -1082,7 +1339,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="圖像隨機旋轉的角度範圍，範圍-180 - +180">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.degrees"
+                    defaultMessage="圖像隨機旋轉的角度範圍，範圍-180 - +180"
+                  />
+                }
+              >
                 <span>Degrees</span>
               </Tooltip>
             }
@@ -1112,7 +1376,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="圖像平移的範圍，範圍0.0 - 1.0">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.translate"
+                    defaultMessage="圖像平移的範圍，範圍0.0 - 1.0"
+                  />
+                }
+              >
                 <span>Translate</span>
               </Tooltip>
             }
@@ -1142,7 +1413,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="圖像縮放的增益因子，範圍>=0.0">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.scale"
+                    defaultMessage="圖像縮放的增益因子，範圍>=0.0"
+                  />
+                }
+              >
                 <span>Scale</span>
               </Tooltip>
             }
@@ -1172,7 +1450,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="圖像錯切的角度範圍，範圍-180 - +180">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.shear"
+                    defaultMessage="圖像錯切的角度範圍，範圍-180 - +180"
+                  />
+                }
+              >
                 <span>Shear</span>
               </Tooltip>
             }
@@ -1202,7 +1487,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="隨機透視變換的範圍，範圍0.0 - 0.001">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.perspective"
+                    defaultMessage="隨機透視變換的範圍，範圍0.0 - 0.001"
+                  />
+                }
+              >
                 <span>Perspective</span>
               </Tooltip>
             }
@@ -1232,7 +1524,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="圖像上下翻轉的概率，範圍0.0 - 1.0">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.flipud"
+                    defaultMessage="圖像上下翻轉的概率，範圍0.0 - 1.0"
+                  />
+                }
+              >
                 <span>Flip Up-Down Probability</span>
               </Tooltip>
             }
@@ -1262,7 +1561,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="圖像左右翻轉的概率，範圍0.0 - 1.0">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.fliplr"
+                    defaultMessage="圖像左右翻轉的概率，範圍0.0 - 1.0"
+                  />
+                }
+              >
                 <span>Flip Left-Right Probability</span>
               </Tooltip>
             }
@@ -1292,7 +1598,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="圖像通道從RGB翻轉到BGR的概率，範圍0.0 - 1.0">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.bgr"
+                    defaultMessage="圖像通道從RGB翻轉到BGR的概率，範圍0.0 - 1.0"
+                  />
+                }
+              >
                 <span>BGR Conversion Probability</span>
               </Tooltip>
             }
@@ -1322,7 +1635,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="使用馬賽克數據增強的概率，範圍0.0 - 1.0">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.mosaic"
+                    defaultMessage="使用馬賽克數據增強的概率，範圍0.0 - 1.0"
+                  />
+                }
+              >
                 <span>Mosaic Probability</span>
               </Tooltip>
             }
@@ -1352,7 +1672,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="混合兩張圖像及其標籤的概率，範圍0.0 - 1.0">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.mixup"
+                    defaultMessage="混合兩張圖像及其標籤的概率，範圍0.0 - 1.0"
+                  />
+                }
+              >
                 <span>MixUp Probability</span>
               </Tooltip>
             }
@@ -1382,7 +1709,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="從一張圖像複製對象並粘貼到另一張圖像的概率，範圍0.0 - 1.0">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.copy_paste"
+                    defaultMessage="從一張圖像複製對象並粘貼到另一張圖像的機率，範圍0.0 - 1.0"
+                  />
+                }
+              >
                 <span>Copy-Paste Probability</span>
               </Tooltip>
             }
@@ -1412,7 +1746,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="自動應用預定義的數據增強策略，可選值為'randaugment', 'autoaugment', 'augmix'">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.auto_augment"
+                    defaultMessage="自動應用預定義的資料增強策略，可選值為'randaugment', 'autoaugment', 'augmix'"
+                  />
+                }
+              >
                 <span>Auto Augment</span>
               </Tooltip>
             }
@@ -1430,7 +1771,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="隨機擦除部分圖像的概率，範圍0.0 - 0.9">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.erasing"
+                    defaultMessage="隨機擦除部分圖像的機率，範圍0.0 - 0.9"
+                  />
+                }
+              >
                 <span>Random Erasing Probability</span>
               </Tooltip>
             }
@@ -1460,7 +1808,14 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="裁剪分類圖像的比例，範圍0.1 - 1.0">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.yolov8.crop_fraction"
+                    defaultMessage="裁剪分類圖像的比例，範圍0.1 - 1.0"
+                  />
+                }
+              >
                 <span>Crop Fraction</span>
               </Tooltip>
             }

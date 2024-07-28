@@ -69,7 +69,13 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
         marginTop: 15,
       }}
     >
-      <Title level={4}>Detectron2 Instance Segmentation Settings</Title>
+      <Title level={4}>
+        Detectron2 Instance Segmentation
+        <FormattedMessage
+          id="pages.trainingConfig.trainingSettings"
+          defaultMessage="訓練參數配置"
+        />
+      </Title>
       <Spin tip="Saving" spinning={saving}>
         <Form
           {...layout}
@@ -115,12 +121,22 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
           </Form.Item>
 
           <Title level={5} style={{ marginBottom: 30 }}>
-            Training Parameters
+            <FormattedMessage
+              id="pages.trainingConfig.trainingParameters"
+              defaultMessage="訓練參數"
+            />
           </Title>
 
           <Form.Item
             label={
-              <Tooltip title="錨點生成器大小">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.anchorGeneratorSizes"
+                    defaultMessage="錨點生成器大小"
+                  />
+                }
+              >
                 <span>Anchor Generator Sizes</span>
               </Tooltip>
             }
@@ -136,7 +152,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="錨點生成器長寬比">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.anchorGeneratorAspectRatios"
+                    defaultMessage="錨點生成器長寬比"
+                  />
+                }
+              >
                 <span>Anchor Generator Aspect Ratios</span>
               </Tooltip>
             }
@@ -147,7 +170,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="訓練時NMS之前保留的最大候選區域數">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.rpnPreNmsTopkTrain"
+                    defaultMessage="訓練時NMS之前保留的最大候選區域數"
+                  />
+                }
+              >
                 <span>RPN Pre NMS TopK Train</span>
               </Tooltip>
             }
@@ -175,7 +205,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="測試時NMS之前保留的最大候選區域數">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.rpnPreNmsTopkTest"
+                    defaultMessage="測試時NMS之前保留的最大候選區域數"
+                  />
+                }
+              >
                 <span>RPN Pre NMS TopK Test</span>
               </Tooltip>
             }
@@ -203,7 +240,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="訓練時NMS之後保留的最大候選區域數">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.rpnPostNmsTopkTrain"
+                    defaultMessage="訓練時NMS之後保留的最大候選區域數"
+                  />
+                }
+              >
                 <span>RPN Post NMS TopK Train</span>
               </Tooltip>
             }
@@ -231,7 +275,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="測試時NMS之後保留的最大候選區域數">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.rpnPostNmsTopkTest"
+                    defaultMessage="測試時NMS之後保留的最大候選區域數"
+                  />
+                }
+              >
                 <span>RPN Post NMS TopK Test</span>
               </Tooltip>
             }
@@ -259,7 +310,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="全連接層數量">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.roiBoxHeadNumFc"
+                    defaultMessage="全連接層數量"
+                  />
+                }
+              >
                 <span>ROI Box Head Num FC</span>
               </Tooltip>
             }
@@ -287,7 +345,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="池化解析度">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.roiBoxHeadPoolerResolution"
+                    defaultMessage="池化解析度"
+                  />
+                }
+              >
                 <span>ROI Box Head Pooler Resolution</span>
               </Tooltip>
             }
@@ -315,7 +380,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="卷積層數量">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.roiMaskHeadNumConv"
+                    defaultMessage="卷積層數量"
+                  />
+                }
+              >
                 <span>ROI Mask Head Num Conv</span>
               </Tooltip>
             }
@@ -343,7 +415,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="池化解析度">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.roiMaskHeadPoolerResolution"
+                    defaultMessage="池化解析度"
+                  />
+                }
+              >
                 <span>ROI Mask Head Pooler Resolution</span>
               </Tooltip>
             }
@@ -371,7 +450,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="每批次圖像數量">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.solverImsPerBatch"
+                    defaultMessage="每批次圖像數量"
+                  />
+                }
+              >
                 <span>Solver IMS per Batch</span>
               </Tooltip>
             }
@@ -399,7 +485,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="基礎學習率">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.solverBaseLr"
+                    defaultMessage="基礎學習率"
+                  />
+                }
+              >
                 <span>Solver Base LR</span>
               </Tooltip>
             }
@@ -429,7 +522,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="學習率調整步長">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.solverSteps"
+                    defaultMessage="學習率調整步長"
+                  />
+                }
+              >
                 <span>Solver Steps</span>
               </Tooltip>
             }
@@ -469,7 +569,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="最大迭代次數">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.solverMaxIter"
+                    defaultMessage="最大迭代次數"
+                  />
+                }
+              >
                 <span>Solver Max Iter</span>
               </Tooltip>
             }
@@ -497,7 +604,14 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item
             label={
-              <Tooltip title="訓練時圖像的最小尺寸">
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    id="pages.trainingConfig.d2insseg.inputMinSizeTrain"
+                    defaultMessage="訓練時圖像的最小尺寸"
+                  />
+                }
+              >
                 <span>Input Min Size Train</span>
               </Tooltip>
             }
@@ -508,10 +622,10 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
 
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit">
-              Submit
+              <FormattedMessage id="pages.trainingConfig.submit" defaultMessage="送出" />
             </Button>
             <Button type="default" onClick={handleReset} style={{ marginLeft: '10px' }}>
-              Reset
+              <FormattedMessage id="pages.trainingConfig.reset" defaultMessage="重設" />
             </Button>
           </Form.Item>
         </Form>
