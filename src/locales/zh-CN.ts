@@ -1,7 +1,18 @@
+/*
+ * @Author: Will Cheng chengyong@pku.edu.cn
+ * @Date: 2024-07-24 16:52:06
+ * @LastEditors: Will Cheng chengyong@pku.edu.cn
+ * @LastEditTime: 2024-07-28 15:07:11
+ * @FilePath: /PoseidonAI-Client/src/locales/zh-CN.ts
+ * @Description:
+ *
+ * Copyright (c) 2024 by chengyong@pku.edu.cn, All Rights Reserved.
+ */
 import component from './zh-CN/component';
 import globalHeader from './zh-CN/globalHeader';
 import menu from './zh-CN/menu';
 import pages from './zh-CN/pages';
+import trainingConfigPage from './zh-CN/pagesTrainingConfigurations';
 import pwa from './zh-CN/pwa';
 import settingDrawer from './zh-CN/settingDrawer';
 import settings from './zh-CN/settings';
@@ -21,4 +32,5 @@ export default {
   ...settings,
   ...pwa,
   ...component,
+  ...trainingConfigPage,
 };
