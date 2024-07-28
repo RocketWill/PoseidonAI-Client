@@ -25,7 +25,6 @@ const langs = [
 ];
 
 export const SelectLang = () => {
-  console.log(UmiSelectLang);
   return (
     <UmiSelectLang
       style={{
