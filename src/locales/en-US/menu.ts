@@ -1,7 +1,15 @@
+/*
+ * @Author: Will Cheng (will.cheng@efctw.com)
+ * @Date: 2024-07-29 08:28:24
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-07-29 16:27:15
+ * @FilePath: /PoseidonAI-Client/src/locales/en-US/menu.ts
+ */
 export default {
   'menu.welcome': 'Welcome',
   'menu.dataset': 'Dataset',
   'menu.trainingConfiguration': 'Training Parameter Configuration',
+  'menu.modelTraining': 'Model Training',
   'menu.more-blocks': 'More Blocks',
   'menu.home': 'Home',
   'menu.admin': 'Admin',

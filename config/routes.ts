@@ -41,6 +41,12 @@ export default [
     component: './Configuration',
   },
   {
+    path: '/model-training',
+    name: 'modelTraining',
+    icon: 'car',
+    component: './ModelTraining',
+  },
+  {
     path: '/admin',
     name: 'admin',
     icon: 'crown',
