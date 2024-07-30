@@ -1,0 +1,10 @@
+.gpu-card-container {
+    display: flex;
+    overflow-x: auto;
+    padding: 10px 0;
+    gap: 16px;
+  }
+  
+  .gpu-card {
+    flex: 0 0 auto;
+  }
