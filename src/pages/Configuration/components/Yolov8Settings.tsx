@@ -2,12 +2,13 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-25 09:46:30
  * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-07-28 20:47:37
+ * @LastEditTime: 2024-07-30 20:53:25
  * @FilePath: /PoseidonAI-Client/src/pages/Configuration/components/Yolov8Settings.tsx
  * @Description:
  *
  * Copyright (c) 2024 by chengyong@pku.edu.cn, All Rights Reserved.
  */
+import { generateRandomName } from '@/utils/tools';
 import { FormattedMessage } from '@umijs/max';
 import {
   Button,
@@ -39,6 +40,7 @@ const tailLayout = {
 };
 
 const initialValues = {
+  config_name: `YOLOv8-Config__${generateRandomName()}`,
   // Training parameters
   time: 12,
   patience: 50,
