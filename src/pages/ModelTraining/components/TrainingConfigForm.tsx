@@ -104,6 +104,7 @@ const TrainingConfigForm = () => {
       fetchFrameworksById(trainingFrameworkId, setTrainingConfigsData);
     }
     form.setFieldsValue({ dataset: undefined });
+    form.setFieldsValue({ config: undefined });
   }, [selectedAlgorithm]);
 
   useEffect(() => {
