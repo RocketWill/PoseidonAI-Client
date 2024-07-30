@@ -40,7 +40,7 @@ import {
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 
-interface DatasetItem {
+export interface DatasetItem {
   _id: string;
   name: string;
   detect_type_id: string;
