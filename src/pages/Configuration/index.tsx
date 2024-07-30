@@ -1,8 +1,8 @@
 /*
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-24 19:40:43
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-07-28 15:43:03
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-07-30 14:57:15
  * @FilePath: /PoseidonAI-Client/src/pages/Configuration/index.tsx
  * @Description:
  *
@@ -21,7 +21,7 @@ import CreateConfiguration from './components/CreateConfiguration';
 import ListConfigurations from './components/ListConfigurations';
 
 export interface DatasetFormatItem {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   created_at: string;
