@@ -1,8 +1,8 @@
 /*
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-29 16:39:18
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-07-29 21:23:55
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-07-30 08:25:56
  * @FilePath: /PoseidonAI-Client/src/pages/ModelTraining/components/GpuStatus.tsx
  */
 import { Liquid } from '@ant-design/plots';
@@ -46,21 +46,26 @@ const GpuState: React.FC = () => {
           style: {
             margin: '0 auto',
             outlineBorder: 4,
-            outlineDistance: 8,
+            outlineDistance: 4,
             waveLength: 128,
           },
         };
         return (
-          <Card key={gpu.id} style={{ width: 400, borderRadius: '8px' }}>
+          <Card
+            title={gpu.name}
+            key={gpu.id}
+            style={{ width: 400, borderRadius: '8px' }}
+            size="small"
+          >
             <Row gutter={[16, 16]}>
-              <Col span={24}>
+              {/* <Col span={24}>
                 <Text>{gpu.name}</Text>
-              </Col>
+              </Col> */}
               <Col span={12}>
                 <Liquid {...config} />
               </Col>
               <Col span={12}>
-                <Space direction="vertical">
+                <Space direction="vertical" size={3}>
                   <Text>
                     <strong>GPU Utilization:</strong> {gpu.gpu_utilization}
                   </Text>
