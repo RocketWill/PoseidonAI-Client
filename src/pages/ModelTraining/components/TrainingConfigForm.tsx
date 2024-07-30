@@ -2,6 +2,7 @@
 import { TrainingConfigItem } from '@/pages/Configuration';
 import { listAlgorithms } from '@/services/ant-design-pro/algorithms';
 import { findByFormatAndDetectType } from '@/services/ant-design-pro/dataset';
+import { findByUserAndFramework } from '@/services/ant-design-pro/trainingConfig';
 import { generateRandomName } from '@/utils/tools';
 import { Button, Card, Col, Form, Input, Row, Select, Slider, Tag, Typography } from 'antd';
 import moment from 'moment';
@@ -51,6 +52,14 @@ const fetchDatasetsByFormatAndType = async (
   setDatasetData(data.results);
 };
 
+const fetchFrameworksById = async (
+  trainingFrameworkId: string,
+  setFrameworksData: (data: TrainingConfigItem[]) => void,
+) => {
+  const data = await findByUserAndFramework(trainingFrameworkId);
+  setFrameworksData(data.results);
+};
+
 const TrainingConfigForm = () => {
   const [algorithmData, setAlgorithmData] = useState<AlgorithmItem[]>([]);
   const [form] = Form.useForm();
@@ -59,8 +68,10 @@ const TrainingConfigForm = () => {
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<string>('');
   const [selectedGpu, setSelectedGpu] = useState<number>(0);
   const [datasetData, setDatasetData] = useState<FilteredDatasets | undefined>(undefined);
-  const [trainingConfigData, setTrainingConfigsData] = useState<TrainingConfigItem[]>([]);
-  const taskName = generateRandomName();
+  const [trainingConfigData, setTrainingConfigsData] = useState<TrainingConfigItem[] | undefined>(
+    undefined,
+  );
+  const taskName = `Training-Task__${generateRandomName()}`;
   const handleSubmit = (values: any) => {
     console.log('Form Values:', values);
   };
@@ -90,6 +101,7 @@ const TrainingConfigForm = () => {
       const trainingFrameworkId = selectedAlgoItem.training_framework._id;
       const datasetFormatId = selectedAlgoItem.training_framework.dataset_format._id;
       fetchDatasetsByFormatAndType(datasetFormatId, detectTypeId, setDatasetData);
+      fetchFrameworksById(trainingFrameworkId, setTrainingConfigsData);
     }
     form.setFieldsValue({ dataset: undefined });
   }, [selectedAlgorithm]);
@@ -160,10 +172,9 @@ const TrainingConfigForm = () => {
             <Option value="Dataset2">Dataset2</Option>
             <Option value="Dataset3">Dataset3</Option> */}
             {datasetData &&
-              datasetData.datasets &&
               datasetData.datasets.length &&
               datasetData.datasets.map((item: FilteredDatasetItem) => (
-                <Option key={item._id}>
+                <Option key={item._id} value={item._id}>
                   {item.name}
                   <Tag style={{ marginLeft: 10 }} color="blue">
                     有效圖像 {item.valid_images_num} 張
@@ -178,10 +189,23 @@ const TrainingConfigForm = () => {
           name="config"
           rules={[{ required: true, message: '請選擇模型參數配置' }]}
         >
-          <Select>
-            <Option value="Config1">Config1</Option>
+          <Select
+            disabled={trainingConfigData ? false : true}
+            placeholder={trainingConfigData ? '請選擇訓練配置' : '請先選擇訓練演算法'}
+          >
+            {/* <Option value="Config1">Config1</Option>
             <Option value="Config2">Config2</Option>
-            <Option value="Config3">Config3</Option>
+            <Option value="Config3">Config3</Option> */}
+            {trainingConfigData &&
+              trainingConfigData.length &&
+              trainingConfigData.map((item: TrainingConfigItem) => (
+                <Option key={item._id} value={item._id}>
+                  {item.name}
+                  <Tag style={{ marginLeft: 10 }} color="green">
+                    創建日期 {moment(item.created_at).format('YYYY-MM-DD')}
+                  </Tag>
+                </Option>
+              ))}
           </Select>
         </Form.Item>
         <Form.Item
