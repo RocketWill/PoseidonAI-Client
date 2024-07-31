@@ -35,6 +35,12 @@ export default [
     component: './Dataset',
   },
   {
+    path: '/ndataset',
+    name: 'dataset',
+    icon: 'orderedList',
+    component: './NDataset',
+  },
+  {
     path: '/training-configuration',
     name: 'trainingConfiguration',
     icon: 'edit',
