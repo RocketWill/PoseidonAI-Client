@@ -2,8 +2,8 @@
 /*
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-31 15:34:59
- * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-07-31 17:11:07
+ * @LastEditors: Will Cheng chengyong@pku.edu.cn
+ * @LastEditTime: 2024-07-31 20:10:11
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/index.tsx
  */
 import { PageContainer } from '@ant-design/pro-components';
@@ -15,9 +15,11 @@ import React, { useEffect, useState } from 'react';
 import { listDataset } from '@/services/ant-design-pro/dataset';
 import { listDatasetFormats } from '@/services/ant-design-pro/datasetFormat';
 import { listDetectTypes } from '@/services/ant-design-pro/detectType';
+import ListDatasets from './components/ListDatasets';
 
 export interface DatasetItem {
   _id: string;
+  user_id: string;
   name: string;
   detect_type_id: string;
   detect_type: DetectTypeItem;
@@ -28,6 +30,7 @@ export interface DatasetItem {
   dataset_format: DatasetFormatItem[];
   image_files: string[];
   label_file: string;
+  save_key: string;
 }
 
 export interface DetectTypeItem {
@@ -65,7 +68,6 @@ const NDataset: React.FC = () => {
   const [detectTypeData, setDetectTypeData] = useState<DetectTypeItem[]>([]);
   const [datasetFormatData, setDatasetFormatData] = useState<DatasetFormatItem[]>([]);
   const [datasetData, setDatasetData] = useState<DatasetItem[]>([]);
-  console.log(detectTypeData, datasetFormatData, datasetData);
 
   const items: TabsProps['items'] = [
     {
@@ -73,7 +75,7 @@ const NDataset: React.FC = () => {
       label: (
         <FormattedMessage id="pages.dataset.table.createdDataset" defaultMessage="已創建的資料集" />
       ),
-      children: <>1</>,
+      children: <ListDatasets datasetData={datasetData} />,
     },
     {
       key: '2',
