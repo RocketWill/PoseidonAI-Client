@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-29 16:39:18
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-07-30 16:25:43
+ * @LastEditTime: 2024-07-31 14:38:51
  * @FilePath: /PoseidonAI-Client/src/pages/ModelTraining/components/GPUSelector.tsx
  */
 import { Liquid } from '@ant-design/plots';
@@ -46,27 +46,33 @@ const gpuData = [
   },
 ];
 
+const genConfig = (percent: number) => {
+  return {
+    tooltip: false,
+    title: false,
+    percent,
+    width: 130,
+    height: 130,
+    style: {
+      margin: '0 auto',
+      outlineBorder: 3,
+      outlineDistance: 2,
+      waveLength: 50,
+      fill: percent > 0.65 ? '#FF6969' : '#478CCF',
+      textFill: percent > 0.55 ? '#FFFFFF' : '#5b5b5b',
+      outlineStroke: percent > 0.65 ? '#FF6969' : '#478CCF',
+    },
+  };
+};
+
 const GPUSelector: React.FC<GPUSelectorProps> = ({ onChange, activeId }) => {
   const { useToken } = theme;
   const { token } = useToken();
 
   const getGpuSelections = (gpuData: any) =>
     gpuData.map((gpu: any) => {
-      const config = {
-        tooltip: false,
-        title: false,
-        mouseenter: false,
-        percent: parseFloat(gpu.memory_utilization) / 100,
-        width: 130,
-        height: 130,
-        style: {
-          margin: '0 auto',
-          outlineBorder: 3,
-          outlineDistance: 2,
-          waveLength: 50,
-          textFill: parseFloat(gpu.memory_utilization) / 100 > 0.55 ? '#e5e5e5' : '#5b5b5b',
-        },
-      };
+      const percent = parseFloat(gpu.memory_utilization) / 100;
+      const config = genConfig(percent);
       return (
         <Card
           title={gpu.name}
