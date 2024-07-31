@@ -52,6 +52,14 @@ export interface DatasetItem {
   label_file: string;
 }
 
+export interface DetectTypeItem {
+  _id: string;
+  name: string;
+  tag_name: string;
+  description: string;
+  created_at: string;
+}
+
 const { Title } = Typography;
 const { Dragger } = Upload;
 
@@ -465,7 +473,7 @@ const Dataset: React.FC = () => {
       try {
         if (!dataLoaded) return;
         const result = await listDataset();
-        const datasetList = result.map((dataset: DatasetItem, i: number) => {
+        const datasetList = result.results.map((dataset: DatasetItem, i: number) => {
           const datasetFormat = dataset.dataset_format_ids.map((id) => {
             const foundItem = datasetFormats.find((item) => item._id === id);
             return foundItem ? foundItem.name : null;
@@ -482,7 +490,7 @@ const Dataset: React.FC = () => {
             action: dataset._id,
           };
         });
-        setDatasets(result);
+        setDatasets(result.results);
         setShowDatasets(datasetList);
       } catch (error) {
         console.error('Fetch datasets error:', error);
