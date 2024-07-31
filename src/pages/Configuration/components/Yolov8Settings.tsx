@@ -1,8 +1,8 @@
 /*
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-25 09:46:30
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-07-30 20:53:25
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-07-31 08:16:43
  * @FilePath: /PoseidonAI-Client/src/pages/Configuration/components/Yolov8Settings.tsx
  * @Description:
  *
@@ -41,6 +41,7 @@ const tailLayout = {
 
 const initialValues = {
   config_name: `YOLOv8-Config__${generateRandomName()}`,
+  description: '',
   // Training parameters
   time: 12,
   patience: 50,

@@ -30,6 +30,7 @@ const tailLayout = {
 
 const initialValues = {
   config_name: `D2-INSSEG__${generateRandomName()}`,
+  description: '',
   ANCHOR_GENERATOR_SIZES: [32, 64, 128, 256, 512],
   ANCHOR_GENERATOR_ASPECT_RATIOS: [0.5, 1.0, 2.0],
   RPN_PRE_NMS_TOPK_TRAIN: 2000,
@@ -119,7 +120,7 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
             }
             name="description"
           >
-            <Input />
+            <Input defaultValue="" />
           </Form.Item>
 
           <Title level={5} style={{ marginBottom: 30 }}>
