@@ -2,14 +2,14 @@
 /*
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-31 15:41:18
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-07-31 20:40:49
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-08-01 10:36:14
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/components/ListDatasets.tsx
  */
-
+import { deleteDataset } from '@/services/ant-design-pro/dataset';
 import { DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { FormattedMessage } from '@umijs/max';
-import { Button, Card, Modal, Table, Tag } from 'antd';
+import { Button, Card, Modal, Table, Tag, message } from 'antd';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { DatasetFormatItem, DatasetItem } from '..';
@@ -17,6 +17,7 @@ import DatasetDetails from './DatasetDetails';
 
 interface ListDatasetsProps {
   datasetData: DatasetItem[];
+  setRefreshFlag: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const formatDataset = (datasetData: DatasetItem[]) =>
@@ -31,13 +32,32 @@ const formatDataset = (datasetData: DatasetItem[]) =>
     action: dataset,
   }));
 
-const ListDatasets: React.FC<ListDatasetsProps> = ({ datasetData }) => {
+const ListDatasets: React.FC<ListDatasetsProps> = ({ datasetData, setRefreshFlag }) => {
   const [detailModalOpen, setDetailModalOpen] = useState<boolean>(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [selectedDatasetData, setSelectedDatasetData] = useState<DatasetItem | undefined>();
 
   const handleEditDataset = (dataset: DatasetItem) => {
     setSelectedDatasetData(dataset);
     setDetailModalOpen(true);
+  };
+
+  const handleDeleteDataset = async (datasetId: string | undefined) => {
+    if (!datasetId) return;
+    const result = await deleteDataset(datasetId);
+    if (result.code === 200) {
+      message.success(
+        <FormattedMessage id="pages.dataset.display.deleteSuccess" defaultMessage="刪除成功" />,
+      );
+    } else {
+      message.error(
+        `${(
+          <FormattedMessage id="pages.dataset.display.deleteFail" defaultMessage="刪除失敗" />
+        )}: ${result.msg}`,
+      );
+    }
+    setDeleteModalOpen(false);
+    setRefreshFlag((prev) => !prev);
   };
 
   const columns = [
@@ -105,10 +125,10 @@ const ListDatasets: React.FC<ListDatasetsProps> = ({ datasetData }) => {
             type="text"
             danger
             icon={<DeleteOutlined />}
-            // onClick={() => {
-            //   deleteDatasetIdRef.current = datasetId;
-            //   setDeleteModalOpen(true);
-            // }}
+            onClick={() => {
+              setSelectedDatasetData(dataset);
+              setDeleteModalOpen(true);
+            }}
           />
         </>
       ),
@@ -139,6 +159,22 @@ const ListDatasets: React.FC<ListDatasetsProps> = ({ datasetData }) => {
         onCancel={() => setDetailModalOpen(false)}
       >
         <DatasetDetails dataset={selectedDatasetData} />
+      </Modal>
+      <Modal
+        style={{ minWidth: 200 }}
+        title={
+          <FormattedMessage id="pages.dataset.display.deleteDataset" defaultMessage="刪除資料集" />
+        }
+        open={deleteModalOpen}
+        onOk={() => handleDeleteDataset(selectedDatasetData?._id)}
+        onCancel={() => {
+          setDeleteModalOpen(false);
+        }}
+      >
+        <FormattedMessage
+          id="pages.dataset.display.confirmDeleteDataset"
+          defaultMessage="確定要刪除該資料集嗎？此操作將無法還原"
+        />
       </Modal>
     </>
   );

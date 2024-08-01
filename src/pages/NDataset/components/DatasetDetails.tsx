@@ -1,19 +1,16 @@
 /* eslint-disable */
-/*
- * @Author: Will Cheng (will.cheng@efctw.com)
- * @Date: 2024-07-31 15:41:18
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-07-31 20:46:32
- * @FilePath: /PoseidonAI-Client/src/pages/NDataset/components/DatasetDetails.tsx
- */
-
-import { checkVisDatasetDirExist } from '@/services/ant-design-pro/dataset';
+import {
+  checkVisDatasetDirExist,
+  getVisDatasetStatus,
+  visDataset,
+} from '@/services/ant-design-pro/dataset';
 import { CheckOutlined, Loading3QuartersOutlined } from '@ant-design/icons';
 import { FormattedMessage } from '@umijs/max';
-import { Badge, Button, Descriptions, Space, Tag } from 'antd';
+import { Badge, Button, Descriptions, Modal, Space, Tag } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { DatasetFormatItem, DatasetItem } from '..';
+import DisplayImage from './DisplayImage';
 
 interface DatasetDetailsProps {
   dataset: DatasetItem | undefined;
@@ -28,7 +25,11 @@ const fetchVisualizedFiles = async (
   setVisualizedFiles(visualizedFiles);
 };
 
-const handleDisplayVisDatasetChildren = (dataset: DatasetItem, visualizedFiles: string[]) => {
+const handleDisplayVisDatasetChildren = (
+  dataset: DatasetItem,
+  visualizedFiles: string[],
+  handleDisplayImage: (imageLink: string, title: string) => void,
+) => {
   const imageList = (imageFile: string, i: number) => {
     const userId = dataset.user_id;
     if (visualizedFiles.includes(imageFile)) {
@@ -37,8 +38,7 @@ const handleDisplayVisDatasetChildren = (dataset: DatasetItem, visualizedFiles: 
         <Badge
           key={`${i}-${imageFile}`}
           status="success"
-          text={<a>{imageFile}</a>}
-          // onClick={() => handleDisplayImage(link, imageFile)}
+          text={<a onClick={() => handleDisplayImage(link, imageFile)}>{imageFile}</a>}
         />
       );
     }
@@ -56,14 +56,16 @@ const handleDisplayVisDatasetLabel = (
   datasetId: string,
   imageFiles: string[],
   visualizedFiles: string[],
+  handleVisDataset: (datasetId: string) => void,
+  visDatasetLoading: boolean,
 ) => {
   if (!visualizedFiles.length) {
     return (
       <Button
         size="small"
         style={{ marginLeft: 15 }}
-        // loading={visDatasetLoading}
-        // onClick={() => handleVisDataset(datasetId)}
+        loading={visDatasetLoading}
+        onClick={() => handleVisDataset(datasetId)}
       >
         <FormattedMessage
           id="pages.dataset.display.visualizeAnnotations"
@@ -90,7 +92,14 @@ const handleDisplayVisDatasetLabel = (
   }
 };
 
-const getDatasetDetails = (dataset: DatasetItem, visualizedFiles: string[]) => {
+const getDatasetDetails = (
+  dataset: DatasetItem,
+  visualizedFiles: string[],
+  handleDisplayImage: (imageLink: string, title: string) => void,
+  handleVisDataset: (datasetId: string) => void,
+  taskProgress: string,
+  visDatasetLoading: boolean,
+) => {
   const items = [
     {
       key: 1,
@@ -128,10 +137,16 @@ const getDatasetDetails = (dataset: DatasetItem, visualizedFiles: string[]) => {
       label: (
         <>
           <FormattedMessage id="pages.dataset.display.imageList" defaultMessage="圖片列表" />
-          {handleDisplayVisDatasetLabel(dataset._id, dataset.image_files, visualizedFiles)}
+          {handleDisplayVisDatasetLabel(
+            dataset._id,
+            dataset.image_files,
+            visualizedFiles,
+            handleVisDataset,
+            visDatasetLoading,
+          )}
         </>
       ),
-      children: handleDisplayVisDatasetChildren(dataset, visualizedFiles),
+      children: handleDisplayVisDatasetChildren(dataset, visualizedFiles, handleDisplayImage),
     },
     {
       key: 6,
@@ -149,19 +164,76 @@ const getDatasetDetails = (dataset: DatasetItem, visualizedFiles: string[]) => {
 
 const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
   const [visualizedFiles, setVisualizedFiles] = useState<string[]>([]);
-  if (!dataset) return;
+  const [imageModalOpen, setImageModalOpen] = useState<boolean>(false);
+  const [imageModalTitle, setImageModalTitle] = useState<string>('');
+  const [selectedImage, setSelectedImage] = useState<string>('');
+  const [visDatasetLoading, setVisDatasetLoading] = useState<boolean>(false);
+  const [taskProgress, setTaskProgress] = useState<string>('');
+
+  if (!dataset) return null;
+
+  const handleDisplayImage = (imageLink: string, title: string) => {
+    setImageModalTitle(title);
+    setSelectedImage(imageLink);
+    setImageModalOpen(true);
+  };
+
+  const handleVisDataset = async (datasetId: string) => {
+    console.log('Starting visualization task...');
+    setVisDatasetLoading(true);
+    const resp = await visDataset(datasetId);
+    const taskId = resp.results;
+
+    const fetchTaskProgress = async () => {
+      const progressRes = await getVisDatasetStatus(taskId);
+      console.log('Task progress:', progressRes);
+      setTaskProgress(progressRes.results);
+      if (progressRes.results === 'SUCCESS' || progressRes.results === 'FAILURE') {
+        clearInterval(intervalId);
+        setVisDatasetLoading(false);
+        console.log('Task completed');
+        fetchVisualizedFiles(datasetId, setVisualizedFiles); // Refresh visualized files
+      } else {
+        fetchVisualizedFiles(datasetId, setVisualizedFiles);
+        console.log('Task still in progress');
+      }
+    };
+
+    const intervalId = setInterval(fetchTaskProgress, 2000);
+  };
 
   useEffect(() => {
     fetchVisualizedFiles(dataset._id, setVisualizedFiles);
-  }, []);
+  }, [dataset._id]);
 
   return (
-    <Descriptions
-      title={dataset.name}
-      layout="vertical"
-      bordered
-      items={getDatasetDetails(dataset, visualizedFiles)}
-    />
+    <>
+      <Descriptions
+        title={dataset.name}
+        layout="vertical"
+        bordered
+        items={getDatasetDetails(
+          dataset,
+          visualizedFiles,
+          handleDisplayImage,
+          handleVisDataset,
+          taskProgress,
+          visDatasetLoading,
+        )}
+      />
+      <Modal
+        style={{ minWidth: 600 }}
+        title={imageModalTitle}
+        footer={null}
+        onCancel={() => {
+          setImageModalOpen(false);
+          setImageModalTitle('');
+        }}
+        open={imageModalOpen}
+      >
+        <DisplayImage imageSrc={selectedImage} />
+      </Modal>
+    </>
   );
 };
 

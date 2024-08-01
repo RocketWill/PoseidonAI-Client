@@ -2,8 +2,8 @@
 /*
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-31 15:34:59
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-07-31 20:10:11
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-08-01 10:38:54
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/index.tsx
  */
 import { PageContainer } from '@ant-design/pro-components';
@@ -15,6 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { listDataset } from '@/services/ant-design-pro/dataset';
 import { listDatasetFormats } from '@/services/ant-design-pro/datasetFormat';
 import { listDetectTypes } from '@/services/ant-design-pro/detectType';
+import CreateDatasetForm from './components/CreateDatasetForm';
 import ListDatasets from './components/ListDatasets';
 
 export interface DatasetItem {
@@ -68,6 +69,7 @@ const NDataset: React.FC = () => {
   const [detectTypeData, setDetectTypeData] = useState<DetectTypeItem[]>([]);
   const [datasetFormatData, setDatasetFormatData] = useState<DatasetFormatItem[]>([]);
   const [datasetData, setDatasetData] = useState<DatasetItem[]>([]);
+  const [refreshFlag, setRefreshFlag] = useState(false);
 
   const items: TabsProps['items'] = [
     {
@@ -75,20 +77,26 @@ const NDataset: React.FC = () => {
       label: (
         <FormattedMessage id="pages.dataset.table.createdDataset" defaultMessage="已創建的資料集" />
       ),
-      children: <ListDatasets datasetData={datasetData} />,
+      children: <ListDatasets datasetData={datasetData} setRefreshFlag={setRefreshFlag} />,
     },
     {
       key: '2',
       label: (
         <FormattedMessage id="pages.dataset.table.createDataset" defaultMessage="建立新的資料集" />
       ),
-      children: <>2</>,
+      children: (
+        <CreateDatasetForm
+          detectTypes={detectTypeData}
+          datasetFormats={datasetFormatData}
+          setRefreshFlag={setRefreshFlag}
+        />
+      ),
     },
   ];
 
   useEffect(() => {
     fetchData(setDetectTypeData, setDatasetFormatData, setDatasetData);
-  }, []);
+  }, [refreshFlag]);
 
   return (
     <PageContainer>
