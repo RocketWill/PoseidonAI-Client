@@ -1,10 +1,14 @@
 /* eslint-disable */
 import { TrainingConfigItem } from '@/pages/Configuration';
+import UserConfigDisplay from '@/pages/Configuration/components/UserConfigDisplay';
+import { DatasetItem } from '@/pages/NDataset';
+import DatasetDetails from '@/pages/NDataset/components/DatasetDetails';
 import { listAlgorithms } from '@/services/ant-design-pro/algorithms';
 import { findByFormatAndDetectType } from '@/services/ant-design-pro/dataset';
 import { findByUserAndFramework } from '@/services/ant-design-pro/trainingConfig';
 import { generateRandomName } from '@/utils/tools';
-import { Button, Card, Col, Form, Input, Row, Select, Slider, Tag, Typography } from 'antd';
+import { EyeOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Drawer, Form, Input, Row, Select, Slider, Tag, Typography } from 'antd';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { AlgorithmItem } from '..';
@@ -27,7 +31,7 @@ interface FilteredDatasets {
   dataset_format: {
     name: string;
   };
-  datasets: FilteredDatasetItem[];
+  datasets: DatasetItem[];
   detect_type: {
     name: string;
     tag_name: string;
@@ -46,7 +50,7 @@ const fetchAlgorithmData = async (setAlgorithmData: (data: AlgorithmItem[]) => v
 const fetchDatasetsByFormatAndType = async (
   datasetFormatId: string,
   detectTypeId: string,
-  setDatasetData: (data: FilteredDatasets) => void,
+  setDatasetData: (data: DatasetItem[]) => void,
 ) => {
   const data = await findByFormatAndDetectType(datasetFormatId, detectTypeId);
   setDatasetData(data.results);
@@ -67,10 +71,19 @@ const TrainingConfigForm = () => {
   const [trainValRatio, setTrainValRatio] = useState(0.8);
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<string>('');
   const [selectedGpu, setSelectedGpu] = useState<number>(0);
-  const [datasetData, setDatasetData] = useState<FilteredDatasets | undefined>(undefined);
+  const [datasetData, setDatasetData] = useState<DatasetItem[] | undefined>(undefined);
   const [trainingConfigData, setTrainingConfigsData] = useState<TrainingConfigItem[] | undefined>(
     undefined,
   );
+  const [selectedDataset, setSelectedDataset] = useState<DatasetItem>();
+  const [datasetDetailModalOpen, setDatasetDetailModalOpen] = useState<boolean>(false);
+  const [selectedTrainingConfigData, setSelectedTrainingConfigData] =
+    useState<TrainingConfigItem>();
+  const [trainingConfigModalOpen, setTrainingConfigModalOpen] = useState<boolean>(false);
+  const [formEpochName, setFormEpochName] = useState<'epoch' | 'iter'>('epoch');
+  const [epochRange, setEpochRange] = useState<[number, number]>([30, 150]);
+  const [defaultEpochNum, setDefaultEpochNum] = useState<30 | 15000>(30);
+
   const taskName = `Training-Task__${generateRandomName()}`;
   const handleSubmit = (values: any) => {
     console.log('Form Values:', values);
@@ -84,6 +97,18 @@ const TrainingConfigForm = () => {
   const handleTrainValRatioChange = (value: number) => {
     setTrainValRatio(value);
     form.setFieldsValue({ trainValRatio: value });
+  };
+
+  const handleSelectedDatasetData = (datasetId: string) => {
+    const foundItem = datasetData?.find((item: DatasetItem) => item._id === datasetId);
+    setSelectedDataset(foundItem);
+  };
+
+  const handleSelectTrainingConfigData = (trainingConfingId: string) => {
+    const foundItem = trainingConfigData?.find(
+      (item: TrainingConfigItem) => item._id === trainingConfingId,
+    );
+    setSelectedTrainingConfigData(foundItem);
   };
 
   useEffect(() => {
@@ -105,6 +130,10 @@ const TrainingConfigForm = () => {
     }
     form.setFieldsValue({ dataset: undefined });
     form.setFieldsValue({ config: undefined });
+    setSelectedDataset(undefined);
+    setSelectedTrainingConfigData(undefined);
+
+    // if (selectedAlgoItem?.name === )
   }, [selectedAlgorithm]);
 
   useEffect(() => {
@@ -161,20 +190,32 @@ const TrainingConfigForm = () => {
           />
         </Form.Item>
         <Form.Item
-          label="選擇訓練集數據"
+          label={
+            <>
+              選擇訓練集數據
+              {selectedDataset && (
+                <Button
+                  type="text"
+                  icon={<EyeOutlined />}
+                  onClick={() => setDatasetDetailModalOpen(true)}
+                />
+              )}
+            </>
+          }
           name="dataset"
           rules={[{ required: true, message: '請選擇訓練集數據' }]}
         >
           <Select
             disabled={datasetData ? false : true}
             placeholder={datasetData ? '請選擇資料集' : '請先選擇訓練演算法'}
+            onChange={handleSelectedDatasetData}
           >
             {/* <Option value="Dataset1">Dataset1</Option>
             <Option value="Dataset2">Dataset2</Option>
             <Option value="Dataset3">Dataset3</Option> */}
             {datasetData &&
-              datasetData.datasets.length &&
-              datasetData.datasets.map((item: FilteredDatasetItem) => (
+              datasetData.length &&
+              datasetData.map((item: DatasetItem) => (
                 <Option key={item._id} value={item._id}>
                   {item.name}
                   <Tag style={{ marginLeft: 10 }} color="blue">
@@ -186,17 +227,26 @@ const TrainingConfigForm = () => {
           </Select>
         </Form.Item>
         <Form.Item
-          label="選擇模型參數配置"
+          label={
+            <>
+              選擇模型參數配置
+              {selectedTrainingConfigData && (
+                <Button
+                  type="text"
+                  icon={<EyeOutlined />}
+                  onClick={() => setTrainingConfigModalOpen(true)}
+                />
+              )}
+            </>
+          }
           name="config"
           rules={[{ required: true, message: '請選擇模型參數配置' }]}
         >
           <Select
             disabled={trainingConfigData ? false : true}
             placeholder={trainingConfigData ? '請選擇訓練配置' : '請先選擇訓練演算法'}
+            onChange={handleSelectTrainingConfigData}
           >
-            {/* <Option value="Config1">Config1</Option>
-            <Option value="Config2">Config2</Option>
-            <Option value="Config3">Config3</Option> */}
             {trainingConfigData &&
               trainingConfigData.length &&
               trainingConfigData.map((item: TrainingConfigItem) => (
@@ -276,6 +326,26 @@ const TrainingConfigForm = () => {
           </Button>
         </Form.Item>
       </Form>
+      <Drawer
+        open={datasetDetailModalOpen}
+        title="Dataset Details"
+        footer={null}
+        width={800}
+        // style={{ minWidth: 800 }}
+        onClose={() => setDatasetDetailModalOpen(false)}
+      >
+        {selectedDataset && <DatasetDetails dataset={selectedDataset} />}
+      </Drawer>
+      <Drawer
+        open={trainingConfigModalOpen}
+        title="Training Configurations"
+        footer={null}
+        // style={{ minWidth: 900 }}
+        width={800}
+        onClose={() => setTrainingConfigModalOpen(false)}
+      >
+        {selectedTrainingConfigData && <UserConfigDisplay config={selectedTrainingConfigData} />}
+      </Drawer>
     </Card>
   );
 };
