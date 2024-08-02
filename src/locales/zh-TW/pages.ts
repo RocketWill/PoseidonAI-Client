@@ -95,7 +95,7 @@ export default {
   'pages.dataset.display.deleteDataset': '刪除資料集',
   'pages.dataset.display.confirmDeleteDataset': '確定要刪除該資料集嗎？此操作將無法還原',
   'pages.dataset.display.clickToUpload': '點擊上傳',
-  'pages.dataset.display.submit': '提交',
+  'pages.dataset.display.submit': '送出',
   'pages.dataset.display.imageList': '圖片列表',
   'pages.dataset.display.visualizeAnnotations': '視覺化標注',
   'pages.dataset.display.visualized': '視覺化',
