@@ -29,12 +29,6 @@ export default [
     component: './Welcome',
   },
   {
-    path: '/dataset',
-    name: 'dataset',
-    icon: 'orderedList',
-    component: './Dataset',
-  },
-  {
     path: '/ndataset',
     name: 'dataset',
     icon: 'orderedList',
