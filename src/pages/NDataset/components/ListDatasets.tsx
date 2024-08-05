@@ -7,7 +7,7 @@
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/components/ListDatasets.tsx
  */
 import { deleteDataset } from '@/services/ant-design-pro/dataset';
-import { DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { FormattedMessage } from '@umijs/max';
 import { Button, Card, Modal, Table, Tag, message } from 'antd';
 import moment from 'moment';
@@ -130,11 +130,7 @@ const ListDatasets: React.FC<ListDatasetsProps> = ({ datasetData, setRefreshFlag
       width: 120,
       render: (dataset: DatasetItem) => (
         <>
-          <Button
-            type="text"
-            icon={<InfoCircleOutlined />}
-            onClick={() => handleEditDataset(dataset)}
-          />
+          <Button type="text" icon={<EyeOutlined />} onClick={() => handleEditDataset(dataset)} />
           <Button
             type="text"
             danger
