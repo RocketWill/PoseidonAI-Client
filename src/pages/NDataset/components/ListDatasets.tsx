@@ -3,7 +3,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-31 15:41:18
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-01 10:36:14
+ * @LastEditTime: 2024-08-05 10:05:44
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/components/ListDatasets.tsx
  */
 import { deleteDataset } from '@/services/ant-design-pro/dataset';
@@ -25,6 +25,7 @@ const formatDataset = (datasetData: DatasetItem[]) =>
     key: `${i}`,
     name: dataset.name,
     type: dataset.detect_type.name,
+    classNames: dataset.class_names,
     datasetFormat: dataset.dataset_format.map((item: DatasetFormatItem) => item.name),
     createdAt: moment(dataset.created_at).format('YYYY-MM-DD HH:mm'),
     validImagesNum: dataset.valid_images_num,
@@ -74,6 +75,19 @@ const ListDatasets: React.FC<ListDatasetsProps> = ({ datasetData, setRefreshFlag
       key: 'type',
       width: 150,
       render: (type: string) => <Tag>{type.toUpperCase()}</Tag>,
+    },
+    {
+      title: <FormattedMessage id="pages.dataset.display.classNames" defaultMessage="類別" />,
+      dataIndex: 'classNames',
+      key: 'classNames',
+      width: 150,
+      render: (classNames: string[]) => (
+        <>
+          {classNames.map((className: string) => (
+            <Tag key={className}>{className}</Tag>
+          ))}
+        </>
+      ),
     },
     {
       title: (

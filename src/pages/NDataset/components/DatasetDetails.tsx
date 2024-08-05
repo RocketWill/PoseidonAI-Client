@@ -133,6 +133,17 @@ const getDatasetDetails = (
     },
     {
       key: 5,
+      label: <FormattedMessage id="pages.dataset.display.classNames" defaultMessage="類別" />,
+      children: (
+        <>
+          {dataset.class_names.map((className: string, i: number) => (
+            <Tag key={`${i}-${className}`}>{className}</Tag>
+          ))}
+        </>
+      ),
+    },
+    {
+      key: 6,
       span: { xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 },
       label: (
         <>
@@ -149,12 +160,12 @@ const getDatasetDetails = (
       children: handleDisplayVisDatasetChildren(dataset, visualizedFiles, handleDisplayImage),
     },
     {
-      key: 6,
+      key: 7,
       label: <FormattedMessage id="pages.dataset.display.labelFile" defaultMessage="標注文件" />,
       children: <p>{dataset.label_file}</p>,
     },
     {
-      key: 7,
+      key: 8,
       label: <FormattedMessage id="pages.dataset.display.detectTypes" defaultMessage="檢測類型" />,
       children: <Tag>{dataset.detect_type.tag_name.toUpperCase()}</Tag>,
     },
@@ -212,6 +223,7 @@ const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
         title={dataset.name}
         layout="vertical"
         bordered
+        column={5}
         items={getDatasetDetails(
           dataset,
           visualizedFiles,

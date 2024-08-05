@@ -3,7 +3,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-31 15:34:59
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-01 10:38:54
+ * @LastEditTime: 2024-08-05 09:49:29
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/index.tsx
  */
 import { PageContainer } from '@ant-design/pro-components';
@@ -32,6 +32,7 @@ export interface DatasetItem {
   image_files: string[];
   label_file: string;
   save_key: string;
+  class_names: string[];
 }
 
 export interface DetectTypeItem {
