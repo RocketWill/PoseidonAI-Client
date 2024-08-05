@@ -1,14 +1,15 @@
 /*
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-24 16:52:06
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-07-28 15:07:11
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-08-05 16:54:17
  * @FilePath: /PoseidonAI-Client/src/locales/zh-CN.ts
  * @Description:
  *
  * Copyright (c) 2024 by chengyong@pku.edu.cn, All Rights Reserved.
  */
 import component from './zh-CN/component';
+import createTask from './zh-CN/createTask';
 import globalHeader from './zh-CN/globalHeader';
 import menu from './zh-CN/menu';
 import pages from './zh-CN/pages';
@@ -33,4 +34,5 @@ export default {
   ...pwa,
   ...component,
   ...trainingConfigPage,
+  ...createTask,
 };

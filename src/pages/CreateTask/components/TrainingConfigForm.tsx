@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { createTask, getCreateTaskStatus } from '@/services/ant-design-pro/trainingTask';
 import { EyeOutlined } from '@ant-design/icons';
+import { FormattedMessage } from '@umijs/max';
 import {
   Button,
   Card,
@@ -122,7 +123,12 @@ const TrainingConfigForm = () => {
             setSubmitLoading(false);
             form.setFieldsValue(initialValues);
             console.log('Task completed');
-            message.success('創建訓練任務完成');
+            message.success(
+              <FormattedMessage
+                id="pages.createTask.successMessage"
+                defaultMessage="創建訓練任務完成"
+              />,
+            );
           } else {
             console.log('Task still in progress');
           }
@@ -133,7 +139,10 @@ const TrainingConfigForm = () => {
     } catch (error) {
       setCreateTaskState(undefined);
       setSubmitLoading(false);
-      message.error('創建訓練任務失敗: ' + error);
+      message.error(
+        <FormattedMessage id="pages.createTask.errorMessage" defaultMessage="創建訓練任務失敗" />,
+      );
+      console.error(error);
     }
   };
 
@@ -228,7 +237,11 @@ const TrainingConfigForm = () => {
         marginTop: 15,
       }}
     >
-      <Spin tip="處理中" size="large" spinning={submitLoading}>
+      <Spin
+        tip={<FormattedMessage id="pages.createTask.loadingTip" defaultMessage="處理中" />}
+        size="large"
+        spinning={submitLoading}
+      >
         <Form
           form={form}
           layout="vertical"
@@ -238,19 +251,47 @@ const TrainingConfigForm = () => {
           onValuesChange={handleFormChange}
         >
           <Form.Item
-            label="名稱"
+            label={<FormattedMessage id="pages.createTask.name" defaultMessage="名稱" />}
             name="name"
-            rules={[{ required: true, message: '請輸入任務名稱' }]}
+            rules={[
+              {
+                required: true,
+                message: (
+                  <FormattedMessage
+                    id="pages.createTask.nameRequired"
+                    defaultMessage="請輸入任務名稱"
+                  />
+                ),
+              },
+            ]}
           >
             <Input />
           </Form.Item>
-          <Form.Item label="説明" name="description">
+          <Form.Item
+            label={<FormattedMessage id="pages.createTask.description" defaultMessage="説明" />}
+            name="description"
+          >
             <Input />
           </Form.Item>
           <Form.Item
-            label="選擇訓練的算法"
+            label={
+              <FormattedMessage
+                id="pages.createTask.selectAlgorithm"
+                defaultMessage="選擇訓練的算法"
+              />
+            }
             name="algorithm"
-            rules={[{ required: true, message: '請選擇訓練的算法' }]}
+            rules={[
+              {
+                required: true,
+                message: (
+                  <FormattedMessage
+                    id="pages.createTask.selectAlgorithmRequired"
+                    defaultMessage="請選擇訓練的算法"
+                  />
+                ),
+              },
+            ]}
           >
             <AlgorithmSelector
               data={algorithmData}
@@ -261,7 +302,10 @@ const TrainingConfigForm = () => {
           <Form.Item
             label={
               <>
-                選擇訓練集數據
+                <FormattedMessage
+                  id="pages.createTask.selectDataset"
+                  defaultMessage="選擇訓練集數據"
+                />
                 {selectedDataset && (
                   <Button
                     type="text"
@@ -272,20 +316,50 @@ const TrainingConfigForm = () => {
               </>
             }
             name="dataset"
-            rules={[{ required: true, message: '請選擇訓練集數據' }]}
+            rules={[
+              {
+                required: true,
+                message: (
+                  <FormattedMessage
+                    id="pages.createTask.selectDatasetRequired"
+                    defaultMessage="請選擇訓練集數據"
+                  />
+                ),
+              },
+            ]}
           >
             <Select
               disabled={!datasetData}
-              placeholder={datasetData ? '請選擇資料集' : '請先選擇訓練演算法'}
+              placeholder={
+                datasetData ? (
+                  <FormattedMessage
+                    id="pages.createTask.selectDatasetPlaceholder"
+                    defaultMessage="請選擇資料集"
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="pages.createTask.selectAlgorithmFirst"
+                    defaultMessage="請先選擇訓練演算法"
+                  />
+                )
+              }
               onChange={handleSelectedDatasetData}
             >
               {datasetData?.map((item: DatasetItem) => (
                 <Option key={item._id} value={item._id}>
                   {item.name}
                   <Tag style={{ marginLeft: 10 }} color="blue">
-                    有效圖像 {item.valid_images_num} 張
+                    <FormattedMessage id="pages.createTask.validImages" defaultMessage="有效圖像" />{' '}
+                    {item.valid_images_num}{' '}
+                    <FormattedMessage id="pages.createTask.images" defaultMessage="張" />
                   </Tag>
-                  <Tag color="green">創建日期 {moment(item.created_at).format('YYYY-MM-DD')}</Tag>
+                  <Tag color="green">
+                    <FormattedMessage
+                      id="pages.createTask.creationDate"
+                      defaultMessage="創建日期"
+                    />{' '}
+                    {moment(item.created_at).format('YYYY-MM-DD')}
+                  </Tag>
                 </Option>
               ))}
             </Select>
@@ -293,7 +367,10 @@ const TrainingConfigForm = () => {
           <Form.Item
             label={
               <>
-                選擇模型參數配置
+                <FormattedMessage
+                  id="pages.createTask.selectModelConfig"
+                  defaultMessage="選擇模型參數配置"
+                />
                 {selectedTrainingConfigData && (
                   <Button
                     type="text"
@@ -304,38 +381,93 @@ const TrainingConfigForm = () => {
               </>
             }
             name="config"
-            rules={[{ required: true, message: '請選擇模型參數配置' }]}
+            rules={[
+              {
+                required: true,
+                message: (
+                  <FormattedMessage
+                    id="pages.createTask.selectModelConfigRequired"
+                    defaultMessage="請選擇模型參數配置"
+                  />
+                ),
+              },
+            ]}
           >
             <Select
               disabled={!trainingConfigData}
-              placeholder={trainingConfigData ? '請選擇訓練配置' : '請先選擇訓練演算法'}
+              placeholder={
+                trainingConfigData ? (
+                  <FormattedMessage
+                    id="pages.createTask.selectConfigPlaceholder"
+                    defaultMessage="請選擇訓練配置"
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="pages.createTask.selectAlgorithmFirst"
+                    defaultMessage="請先選擇訓練演算法"
+                  />
+                )
+              }
               onChange={handleSelectTrainingConfigData}
             >
               {trainingConfigData?.map((item: TrainingConfigItem) => (
                 <Option key={item._id} value={item._id}>
                   {item.name}
                   <Tag style={{ marginLeft: 10 }} color="green">
-                    創建日期 {moment(item.created_at).format('YYYY-MM-DD')}
+                    <FormattedMessage
+                      id="pages.createTask.creationDate"
+                      defaultMessage="創建日期"
+                    />{' '}
+                    {moment(item.created_at).format('YYYY-MM-DD')}
                   </Tag>
                 </Option>
               ))}
             </Select>
           </Form.Item>
           <Form.Item
-            label="選擇GPU卡"
+            label={<FormattedMessage id="pages.createTask.selectGPU" defaultMessage="選擇GPU卡" />}
             name="gpu"
-            rules={[{ required: true, message: '請選擇GPU卡' }]}
+            rules={[
+              {
+                required: true,
+                message: (
+                  <FormattedMessage
+                    id="pages.createTask.selectGPURequired"
+                    defaultMessage="請選擇GPU卡"
+                  />
+                ),
+              },
+            ]}
           >
             <GPUSelector onChange={setSelectedGpu} activeId={selectedGpu} />
           </Form.Item>
           {selectedAlgorithm && (
             <>
               <Form.Item
-                label={AlgoProjectSettings[selectedAlgorithm.training_framework.name].models.name}
+                label={
+                  <FormattedMessage id={`pages.createTask.modelSize`} defaultMessage="模型尺寸" />
+                }
                 name="model"
-                rules={[{ required: true, message: '請選擇模型尺寸' }]}
+                rules={[
+                  {
+                    required: true,
+                    message: (
+                      <FormattedMessage
+                        id="pages.createTask.selectModelSize"
+                        defaultMessage="請選擇模型尺寸"
+                      />
+                    ),
+                  },
+                ]}
               >
-                <Select placeholder="請選擇模型尺寸">
+                <Select
+                  placeholder={
+                    <FormattedMessage
+                      id="pages.createTask.selectModelSizePlaceholder"
+                      defaultMessage="請選擇模型尺寸"
+                    />
+                  }
+                >
                   {AlgoProjectSettings[
                     selectedAlgorithm.training_framework.name
                   ].models.weights.map((weight: any) => (
@@ -346,7 +478,12 @@ const TrainingConfigForm = () => {
                 </Select>
               </Form.Item>
               <Form.Item
-                label={AlgoProjectSettings[selectedAlgorithm.training_framework.name].epoch.name}
+                label={
+                  <FormattedMessage
+                    id={`pages.createTask.epochNum`}
+                    defaultMessage="訓練迭代次數"
+                  />
+                }
               >
                 <Row gutter={8}>
                   <Col span={16}>
@@ -373,7 +510,17 @@ const TrainingConfigForm = () => {
                     <Form.Item
                       name="epoch"
                       noStyle
-                      rules={[{ required: true, message: '請設置訓練迭代次數' }]}
+                      rules={[
+                        {
+                          required: true,
+                          message: (
+                            <FormattedMessage
+                              id="pages.createTask.epochRequired"
+                              defaultMessage="請設置訓練迭代次數"
+                            />
+                          ),
+                        },
+                      ]}
                     >
                       <Input
                         type="number"
@@ -389,7 +536,9 @@ const TrainingConfigForm = () => {
                 </Row>
               </Form.Item>
               <Form.Item
-                label={AlgoProjectSettings[selectedAlgorithm.training_framework.name].val.name}
+                label={
+                  <FormattedMessage id={`pages.createTask.valRatio`} defaultMessage="驗證集比例" />
+                }
               >
                 <Row gutter={8}>
                   <Col span={16}>
@@ -416,13 +565,19 @@ const TrainingConfigForm = () => {
                       {selectedDataset && trainValRatio && (
                         <>
                           <Tag color="volcano">
-                            預估訓練集數量{' '}
+                            <FormattedMessage
+                              id="pages.createTask.estimatedTrainSetSize"
+                              defaultMessage="預估訓練集數量"
+                            />{' '}
                             {`${Math.ceil(
                               selectedDataset?.valid_images_num * (1 - trainValRatio),
                             )}`}
                           </Tag>
                           <Tag color="purple">
-                            預估驗證集數量{' '}
+                            <FormattedMessage
+                              id="pages.createTask.estimatedValSetSize"
+                              defaultMessage="預估驗證集數量"
+                            />{' '}
                             {`${Math.floor(selectedDataset?.valid_images_num * trainValRatio)}`}
                           </Tag>
                         </>
@@ -433,7 +588,17 @@ const TrainingConfigForm = () => {
                     <Form.Item
                       name="trainValRatio"
                       noStyle
-                      rules={[{ required: true, message: '請設置驗證集比例' }]}
+                      rules={[
+                        {
+                          required: true,
+                          message: (
+                            <FormattedMessage
+                              id="pages.createTask.valRequired"
+                              defaultMessage="請設置驗證集比例"
+                            />
+                          ),
+                        },
+                      ]}
                     >
                       <Input
                         type="number"
@@ -454,9 +619,20 @@ const TrainingConfigForm = () => {
             </>
           )}
           <Form.Item>
-            <Tooltip title={disableSubmit ? '請確認所有參數都已設置' : ''}>
+            <Tooltip
+              title={
+                disableSubmit ? (
+                  <FormattedMessage
+                    id="pages.createTask.confirmAllParameters"
+                    defaultMessage="請確認所有參數都已設置"
+                  />
+                ) : (
+                  ''
+                )
+              }
+            >
               <Button type="primary" htmlType="submit" disabled={disableSubmit}>
-                創建任務
+                <FormattedMessage id="pages.createTask.createTask" defaultMessage="創建任務" />
               </Button>
             </Tooltip>
             <Button
@@ -468,13 +644,18 @@ const TrainingConfigForm = () => {
                 form.setFieldsValue(initialValues);
               }}
             >
-              重置
+              <FormattedMessage id="pages.createTask.reset" defaultMessage="重置" />
             </Button>
           </Form.Item>
         </Form>
         <Drawer
           open={datasetDetailModalOpen}
-          title="Dataset Details"
+          title={
+            <FormattedMessage
+              id="pages.createTask.datasetDetails"
+              defaultMessage="Dataset Details"
+            />
+          }
           footer={null}
           width={800}
           onClose={() => setDatasetDetailModalOpen(false)}
@@ -483,7 +664,12 @@ const TrainingConfigForm = () => {
         </Drawer>
         <Drawer
           open={trainingConfigModalOpen}
-          title="Training Configurations"
+          title={
+            <FormattedMessage
+              id="pages.createTask.trainingConfigurations"
+              defaultMessage="Training Configurations"
+            />
+          }
           footer={null}
           width={800}
           onClose={() => setTrainingConfigModalOpen(false)}

@@ -2,11 +2,12 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-29 16:39:18
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-07-30 17:04:45
- * @FilePath: /PoseidonAI-Client/src/pages/ModelTraining/components/AlgorithmSelector.tsx
+ * @LastEditTime: 2024-08-05 17:04:00
+ * @FilePath: /PoseidonAI-Client/src/pages/CreateTask/components/AlgorithmSelector.tsx
  */
 import { Badge, Card, Space, Tag, theme, Typography } from 'antd';
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import { AlgorithmItem } from '..';
 
 const { useToken } = theme;
@@ -20,7 +21,7 @@ interface AlgorithmSelectorProps {
 
 const AlgorithmSelector: React.FC<AlgorithmSelectorProps> = ({ data, onChange, activeId }) => {
   const { token } = useToken();
-  if (!data.length) return;
+  if (!data.length) return null;
 
   const handleSelect = (id: string | any) => {
     onChange(id);
@@ -44,18 +45,38 @@ const AlgorithmSelector: React.FC<AlgorithmSelectorProps> = ({ data, onChange, a
           }}
           onClick={() => handleSelect(item._id)}
         >
-          {/* {algo.description} */}
           <Space direction="vertical" size={3}>
             <Space direction="horizontal">
-              <Badge status="default" text="演算法框架" />
+              <Badge
+                status="default"
+                text={
+                  <FormattedMessage
+                    id="pages.createTask.algorithmFramework"
+                    defaultMessage="演算法框架"
+                  />
+                }
+              />
               <Tag>{item.training_framework.name}</Tag>
             </Space>
             <Space direction="horizontal">
-              <Badge status="default" text="檢測類型" />
+              <Badge
+                status="default"
+                text={
+                  <FormattedMessage id="pages.createTask.detectType" defaultMessage="檢測類型" />
+                }
+              />
               <Tag>{item.detect_type.tag_name.toUpperCase()}</Tag>
             </Space>
             <Space direction="horizontal">
-              <Badge status="default" text="資料集格式" />
+              <Badge
+                status="default"
+                text={
+                  <FormattedMessage
+                    id="pages.createTask.datasetFormat"
+                    defaultMessage="資料集格式"
+                  />
+                }
+              />
               <Tag>{item.training_framework.dataset_format.name}</Tag>
             </Space>
             <Paragraph style={{ marginTop: 10 }}>
