@@ -2,10 +2,10 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-29 16:39:18
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-07-31 14:38:51
- * @FilePath: /PoseidonAI-Client/src/pages/ModelTraining/components/GPUSelector.tsx
+ * @LastEditTime: 2024-08-05 17:01:40
+ * @FilePath: /PoseidonAI-Client/src/pages/CreateTask/components/GPUSelector.tsx
  */
-import { Liquid } from '@ant-design/plots';
+import { Liquid } from '@ant-design/charts';
 import { Card, Col, Row, Space, theme, Typography } from 'antd';
 import React from 'react';
 

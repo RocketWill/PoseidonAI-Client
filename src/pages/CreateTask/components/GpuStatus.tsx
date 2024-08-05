@@ -5,7 +5,7 @@
  * @LastEditTime: 2024-07-30 08:25:56
  * @FilePath: /PoseidonAI-Client/src/pages/ModelTraining/components/GpuStatus.tsx
  */
-import { Liquid } from '@ant-design/plots';
+import { Liquid } from '@ant-design/charts';
 import { Card, Col, Row, Space, Typography } from 'antd';
 import React from 'react';
 
