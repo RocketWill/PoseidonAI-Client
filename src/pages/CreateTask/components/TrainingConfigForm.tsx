@@ -194,8 +194,11 @@ const TrainingConfigForm = () => {
 
   useEffect(() => {
     fetchAlgorithmData(setAlgorithmData);
+  }, [form]);
+
+  useEffect(() => {
     form.setFieldsValue({ gpu: selectedGpu });
-  }, [form, selectedGpu]);
+  }, [selectedGpu]);
 
   useEffect(() => {
     if (selectedAlgorithmId) {
