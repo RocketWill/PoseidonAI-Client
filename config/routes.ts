@@ -41,10 +41,16 @@ export default [
     component: './Configuration',
   },
   {
-    path: '/model-training',
-    name: 'modelTraining',
+    path: '/project',
+    name: 'project',
     icon: 'car',
-    component: './ModelTraining',
+    routes: [
+      {
+        path: '/project/create-task',
+        name: 'createTask',
+        component: './CreateTask',
+      },
+    ],
   },
   {
     path: '/admin',

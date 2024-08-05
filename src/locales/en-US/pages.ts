@@ -91,15 +91,18 @@ export default {
   'pages.dataset.display.images': 'Images',
   'pages.dataset.display.uploadImages': 'Please upload images',
   'pages.dataset.display.clickOrDragToUpload': 'Click or drag to upload',
-  'pages.dataset.display.uploadDescription': 'Supports single or batch upload. Uploading private data or other prohibited files is strictly prohibited',
+  'pages.dataset.display.uploadDescription':
+    'Supports single or batch upload. Uploading private data or other prohibited files is strictly prohibited',
   'pages.dataset.display.datasetFormatTitle': 'Dataset format (MSCOCO is default and mandatory)',
   'pages.dataset.display.selectDatasetFormat': 'Please select dataset format',
   'pages.dataset.display.datasetDetail': 'Dataset details',
   'pages.dataset.display.deleteDataset': 'Delete dataset',
-  'pages.dataset.display.confirmDeleteDataset': 'Are you sure you want to delete this dataset? This operation cannot be undone',
+  'pages.dataset.display.confirmDeleteDataset':
+    'Are you sure you want to delete this dataset? This operation cannot be undone',
   'pages.dataset.display.clickToUpload': 'Click to upload',
   'pages.dataset.display.submit': 'Submit',
   'pages.dataset.display.imageList': 'Image list',
   'pages.dataset.display.visualizeAnnotations': 'Visualize Annotations',
   'pages.dataset.display.visualized': 'Visualized',
+  'pages.dataset.display.classNames': 'Class Names',
 };

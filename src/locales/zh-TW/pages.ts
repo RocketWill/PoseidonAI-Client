@@ -99,4 +99,5 @@ export default {
   'pages.dataset.display.imageList': '圖片列表',
   'pages.dataset.display.visualizeAnnotations': '視覺化標注',
   'pages.dataset.display.visualized': '視覺化',
+  'pages.dataset.display.classNames': '類別',
 };
