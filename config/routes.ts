@@ -50,6 +50,17 @@ export default [
         name: 'createTask',
         component: './CreateTask',
       },
+      {
+        path: '/project/training-task',
+        name: 'trainingTask',
+        component: './TrainingTask',
+      },
+      {
+        path: '/project/training-task/:taskId',
+        hideInMenu: true,
+        name: 'taskDetails',
+        component: './TrainingTask/components/TaskDetails',
+      },
     ],
   },
   {
