@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-29 08:28:24
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-05 13:32:35
+ * @LastEditTime: 2024-08-06 09:21:21
  * @FilePath: /PoseidonAI-Client/src/locales/en-US/menu.ts
  */
 export default {
@@ -12,6 +12,8 @@ export default {
   'menu.modelTraining': 'Model Training',
   'menu.project': 'Project',
   'menu.project.createTask': 'Create Training Task',
+  'menu.project.trainingTask': 'Task List',
+  'menu.project.taskDetails': 'Task Details',
   'menu.more-blocks': 'More Blocks',
   'menu.home': 'Home',
   'menu.admin': 'Admin',

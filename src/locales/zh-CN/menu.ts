@@ -5,6 +5,8 @@ export default {
   'menu.modelTraining': '模型训练',
   'menu.project': '项目',
   'menu.project.createTask': '创建训练任务',
+  'menu.project.trainingTask': '任务列表',
+  'menu.project.taskDetails': '任务详情',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',
   'menu.admin': '管理页',
