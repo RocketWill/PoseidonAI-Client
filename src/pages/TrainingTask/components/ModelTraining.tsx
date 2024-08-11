@@ -18,17 +18,21 @@ interface ModelTrainingProps {
 
 // 定義損失數據的類型
 interface LossDataItem {
-  epoch: number[];
+  epoch?: number[];
+  iteration?: number[];
   train_loss: number[];
   val_loss: number[];
 }
 
 // 訓練損失圖表組件
 const TrainLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
-  const totalEpochs = data.epoch.length;
-  if (totalEpochs < 1) return <Skeleton active />;
+  const xAxisData = data.epoch || data.iteration || [];
+  const totalXPoints = xAxisData.length;
+
+  if (totalXPoints < 1) return <Skeleton active />;
+
   const end = 100;
-  const start = totalEpochs > 50 ? ((totalEpochs - 50) / totalEpochs) * 100 : 0;
+  const start = totalXPoints > 50 ? ((totalXPoints - 50) / totalXPoints) * 100 : 0;
 
   const option = {
     title: {
@@ -39,8 +43,8 @@ const TrainLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
     },
     xAxis: {
       type: 'category',
-      data: data.epoch,
-      name: 'Epoch',
+      data: xAxisData,
+      name: data.epoch ? 'Epoch' : 'Iteration',
     },
     yAxis: {
       type: 'value',
@@ -76,12 +80,14 @@ const TrainLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
   return <ReactECharts option={option} style={{ height: '400px', width: '100%' }} />;
 };
 
-// 驗證損失圖表組件
 const ValLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
-  const totalEpochs = data.epoch.length;
-  if (totalEpochs < 1) return <Skeleton active />;
+  const xAxisData = data.epoch || data.iteration || [];
+  const totalXPoints = xAxisData.length;
+
+  if (totalXPoints < 1) return <Skeleton active />;
+
   const end = 100;
-  const start = totalEpochs > 50 ? ((totalEpochs - 50) / totalEpochs) * 100 : 0;
+  const start = totalXPoints > 50 ? ((totalXPoints - 50) / totalXPoints) * 100 : 0;
 
   const option = {
     title: {
@@ -92,8 +98,8 @@ const ValLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
     },
     xAxis: {
       type: 'category',
-      data: data.epoch,
-      name: 'Epoch',
+      data: xAxisData,
+      name: data.epoch ? 'Epoch' : 'Iteration',
     },
     yAxis: {
       type: 'value',
