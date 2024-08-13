@@ -2,21 +2,18 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-06 15:16:17
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-09 16:01:39
+ * @LastEditTime: 2024-08-13 15:44:47
  * @FilePath: /PoseidonAI-Client/src/pages/TrainingTask/components/TaskDetailsDescription.tsx
  */
 
-import { ArrowLeftOutlined } from '@ant-design/icons'; // 引入 Ant Design 的圖標
-import { Button, Card, Descriptions, Space, Tag } from 'antd'; // 引入 Ant Design 的組件
-import moment from 'moment'; // 引入 moment 來處理日期格式化
-import React from 'react'; // 首先引入 React
-import { createBrowserHistory } from 'umi'; // 引入 umi 用來創建瀏覽器歷史
+// 首先引入 React，然後引入其他外部庫和組件
+import moment from 'moment'; // 用於日期格式化
+import React from 'react';
+
+import { Card, Descriptions, Space, Tag } from 'antd'; // Ant Design 的組件
 
 // 引入專案內部的類型和常量
 import { TaskItem, TrainingStatus, TrainingStatusTagMap } from '..';
-
-// 創建瀏覽器歷史對象，便於控制瀏覽器歷史操作
-const history = createBrowserHistory();
 
 // 定義 TaskDetailsDescriptionProps 的接口，描述組件的 props 結構
 interface TaskDetailsDescriptionProps {
@@ -27,16 +24,12 @@ interface TaskDetailsDescriptionProps {
 // 主 TaskDetailsDescription 組件
 const TaskDetailsDescription: React.FC<TaskDetailsDescriptionProps> = ({ taskData, status }) => {
   // 根據傳入的 status 和 taskData 中的狀態確定要顯示的狀態
-  const showStatus = status ? status : (taskData?.task_detail?.status as TrainingStatus);
+  const showStatus: TrainingStatus = status || (taskData?.task_detail?.status as TrainingStatus);
 
   return (
     <Card size="small">
       {/* 使用 Space 組件來水平排列元素 */}
       <Space direction="horizontal">
-        {/* 返回按鈕，點擊後返回上一頁 */}
-        <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => history.back()}>
-          Back
-        </Button>
         {/* 顯示任務詳情的描述列表 */}
         <Descriptions title={taskData?.task_detail?.name} column={4} size="small">
           {/* 顯示任務描述 */}
