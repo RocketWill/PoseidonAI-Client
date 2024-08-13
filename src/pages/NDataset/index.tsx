@@ -3,7 +3,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-31 15:34:59
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-05 09:49:29
+ * @LastEditTime: 2024-08-12 13:32:28
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/index.tsx
  */
 import { PageContainer } from '@ant-design/pro-components';
@@ -17,6 +17,17 @@ import { listDatasetFormats } from '@/services/ant-design-pro/datasetFormat';
 import { listDetectTypes } from '@/services/ant-design-pro/detectType';
 import CreateDatasetForm from './components/CreateDatasetForm';
 import ListDatasets from './components/ListDatasets';
+
+export interface CategoryCountItem {
+  name: string;
+  value: number;
+}
+
+export interface DatasetStatisticsItem {
+  total_images?: number;
+  total_instances?: number;
+  category_counts?: CategoryCountItem[];
+}
 
 export interface DatasetItem {
   _id: string;
@@ -33,6 +44,7 @@ export interface DatasetItem {
   label_file: string;
   save_key: string;
   class_names: string[];
+  statistics: DatasetStatisticsItem;
 }
 
 export interface DetectTypeItem {
