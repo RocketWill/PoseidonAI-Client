@@ -3,13 +3,14 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-31 15:41:18
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-05 10:05:44
+ * @LastEditTime: 2024-08-13 13:12:56
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/components/ListDatasets.tsx
  */
 import { deleteDataset } from '@/services/ant-design-pro/dataset';
+import { getColor } from '@/utils/tools';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { FormattedMessage } from '@umijs/max';
-import { Button, Card, Modal, Table, Tag, message } from 'antd';
+import { Button, Card, message, Modal, Table, Tag } from 'antd';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { DatasetFormatItem, DatasetItem } from '..';
@@ -23,7 +24,7 @@ interface ListDatasetsProps {
 const formatDataset = (datasetData: DatasetItem[]) =>
   datasetData.map((dataset: DatasetItem, i: number) => ({
     key: `${i}`,
-    name: dataset.name,
+    name: dataset,
     type: dataset.detect_type.name,
     classNames: dataset.class_names,
     datasetFormat: dataset.dataset_format.map((item: DatasetFormatItem) => item.name),
@@ -67,7 +68,9 @@ const ListDatasets: React.FC<ListDatasetsProps> = ({ datasetData, setRefreshFlag
       dataIndex: 'name',
       key: 'name',
       width: 150,
-      render: (text: any) => <a>{text}</a>,
+      render: (dataset: DatasetItem) => (
+        <a onClick={() => handleEditDataset(dataset)}>{dataset.name}</a>
+      ),
     },
     {
       title: <FormattedMessage id="pages.dataset.display.detectTypes" defaultMessage="檢測類型" />,
@@ -80,13 +83,15 @@ const ListDatasets: React.FC<ListDatasetsProps> = ({ datasetData, setRefreshFlag
       title: <FormattedMessage id="pages.dataset.display.classNames" defaultMessage="類別" />,
       dataIndex: 'classNames',
       key: 'classNames',
-      width: 150,
+      width: 250, // 调整列宽以确保换行行为在预期范围内
       render: (classNames: string[]) => (
-        <>
-          {classNames.map((className: string) => (
-            <Tag key={className}>{className}</Tag>
+        <div style={{ display: 'flex', flexWrap: 'wrap', maxWidth: '100%' }}>
+          {classNames.map((className: string, index: number) => (
+            <Tag color={getColor(index)} style={{ marginBottom: 4 }} key={className}>
+              {className}
+            </Tag>
           ))}
-        </>
+        </div>
       ),
     },
     {
@@ -159,7 +164,7 @@ const ListDatasets: React.FC<ListDatasetsProps> = ({ datasetData, setRefreshFlag
         <Table dataSource={formatDataset(datasetData)} columns={columns} />
       </Card>
       <Modal
-        style={{ minWidth: 800 }}
+        style={{ minWidth: 1000 }}
         footer={null}
         title={
           <FormattedMessage id="pages.dataset.display.datasetDetail" defaultMessage="資料集詳情" />
