@@ -2,8 +2,8 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-02 08:45:40
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-05 11:21:41
- * @FilePath: /PoseidonAI-Client/src/pages/ModelTraining/modelTrainingParams.tsx
+ * @LastEditTime: 2024-08-13 15:22:58
+ * @FilePath: /PoseidonAI-Client/src/pages/CreateTask/modelTrainingParams.tsx
  */
 import { FormattedMessage } from '@umijs/max';
 
@@ -83,12 +83,12 @@ export const AlgoProjectSettings: AlgoProjectSettingsType = {
         />
       ),
       weights: [
-        { name: 'mask_rcnn_R_50_FPN_1x', disable: true, value: 'mask_rcnn_R_50_FPN_1x' },
-        { name: 'mask_rcnn_R_50_FPN_3x', disable: false, value: 'mask_rcnn_R_50_FPN_3x' },
-        { name: 'mask_rcnn_R_50_C4_1x', disable: true, value: 'mask_rcnn_R_50_C4_1x' },
-        { name: 'mask_rcnn_R_50_C4_3x', disable: true, value: 'mask_rcnn_R_50_C4_3x' },
+        { name: 'Resnet 18', disable: false, value: 'mask_rcnn_R_50_FPN_3x___18' },
+        { name: 'Resnet 34', disable: false, value: 'mask_rcnn_R_50_FPN_3x___34' },
+        { name: 'Resnet 50', disable: false, value: 'mask_rcnn_R_50_FPN_3x___50' },
+        { name: 'Resnet 101', disable: true, value: 'mask_rcnn_R_50_FPN_3x___101' },
       ],
-      defaultValue: 'mask_rcnn_R_50_FPN_3x',
+      defaultValue: 'Resnet 34',
     },
     epoch: {
       name: (
