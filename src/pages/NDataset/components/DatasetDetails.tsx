@@ -1,21 +1,27 @@
 /* eslint-disable */
+import { CheckOutlined, Loading3QuartersOutlined } from '@ant-design/icons'; // 引入 Ant Design 的圖標
+import { FormattedMessage } from '@umijs/max'; // 引入 FormattedMessage 用於多語言支持
+import { Badge, Button, Col, Descriptions, Modal, Row, Tag, Tooltip, Typography } from 'antd'; // 引入 Ant Design 的組件
+import moment from 'moment'; // 引入 moment 來處理日期格式化
+import React, { useEffect, useState } from 'react'; // 首先引入 React 和相關 Hook
+
 import {
   checkVisDatasetDirExist,
   getVisDatasetStatus,
   visDataset,
-} from '@/services/ant-design-pro/dataset';
-import { CheckOutlined, Loading3QuartersOutlined } from '@ant-design/icons';
-import { FormattedMessage } from '@umijs/max';
-import { Badge, Button, Descriptions, Modal, Space, Tag } from 'antd';
-import moment from 'moment';
-import React, { useEffect, useState } from 'react';
-import { DatasetFormatItem, DatasetItem } from '..';
-import DisplayImage from './DisplayImage';
+} from '@/services/ant-design-pro/dataset'; // 引入服務函數
+import { getColor } from '@/utils/tools'; // 引入工具函數
+import { DatasetFormatItem, DatasetItem, DatasetStatisticsItem } from '..'; // 引入專案內部的類型
+import DisplayImage from './DisplayImage'; // 引入內部組件 DisplayImage
+import HorizontalBarChart from './HorizontalBarCharts'; // 引入內部組件 HorizontalBarChart
+import LabelPieCharts from './LabelPieCharts'; // 引入內部組件 LabelPieCharts
 
+// 定義 DatasetDetailsProps 的接口，描述組件的 props 結構
 interface DatasetDetailsProps {
-  dataset: DatasetItem | undefined;
+  dataset: DatasetItem | undefined; // 數據集信息，可為未定義
 }
 
+// 異步函數：獲取已視覺化的文件
 const fetchVisualizedFiles = async (
   datasetId: string,
   setVisualizedFiles: (d: string[]) => void,
@@ -25,6 +31,7 @@ const fetchVisualizedFiles = async (
   setVisualizedFiles(visualizedFiles);
 };
 
+// 處理視覺化數據集的圖片顯示
 const handleDisplayVisDatasetChildren = (
   dataset: DatasetItem,
   visualizedFiles: string[],
@@ -45,13 +52,30 @@ const handleDisplayVisDatasetChildren = (
     return <Badge key={`${i}-${imageFile}`} status="default" text={imageFile} />;
   };
 
+  // 返回一個左對齊且可換行的彈性容器
   return (
-    <Space direction="vertical">
-      {dataset.image_files.map((imageFile: string, i: number) => imageList(imageFile, i))}
-    </Space>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', justifyContent: 'flex-start' }}>
+      {dataset.image_files.map((imageFile, i) => (
+        <Tooltip key={imageFile} title={imageFile}>
+          <div
+            style={{
+              maxWidth: '200px',
+              flexBasis: '200px',
+              flexGrow: 0,
+              whiteSpace: 'nowrap', // 防止文本换行
+              overflow: 'hidden', // 超出部分隐藏
+              textOverflow: 'ellipsis', // 使用省略号显示被隐藏的部分
+            }}
+          >
+            {imageList(imageFile, i)}
+          </div>
+        </Tooltip>
+      ))}
+    </div>
   );
 };
 
+// 處理顯示視覺化數據集標籤
 const handleDisplayVisDatasetLabel = (
   datasetId: string,
   imageFiles: string[],
@@ -92,6 +116,7 @@ const handleDisplayVisDatasetLabel = (
   }
 };
 
+// 獲取數據集詳細信息
 const getDatasetDetails = (
   dataset: DatasetItem,
   visualizedFiles: string[],
@@ -137,14 +162,15 @@ const getDatasetDetails = (
       children: (
         <>
           {dataset.class_names.map((className: string, i: number) => (
-            <Tag key={`${i}-${className}`}>{className}</Tag>
+            <Tag color={getColor(i)} key={`${i}-${className}`}>
+              {className}
+            </Tag>
           ))}
         </>
       ),
     },
     {
       key: 6,
-      span: { xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 },
       label: (
         <>
           <FormattedMessage id="pages.dataset.display.imageList" defaultMessage="圖片列表" />
@@ -158,6 +184,7 @@ const getDatasetDetails = (
         </>
       ),
       children: handleDisplayVisDatasetChildren(dataset, visualizedFiles, handleDisplayImage),
+      span: 5,
     },
     {
       key: 7,
@@ -173,13 +200,38 @@ const getDatasetDetails = (
   return items;
 };
 
+// 獲取數據集統計信息詳細信息
+const getDatasetStatisticsDetails = (datasetStatistics: DatasetStatisticsItem | undefined) => {
+  const items = [
+    {
+      key: 1,
+      label: '標注統計',
+      children: (
+        <Row gutter={12}>
+          <Col span={12}>
+            <LabelPieCharts data={datasetStatistics?.category_counts} />
+          </Col>
+          <Col span={12}>
+            <HorizontalBarChart
+              totalImages={datasetStatistics?.total_images}
+              labeledInstances={datasetStatistics?.total_instances}
+            />
+          </Col>
+        </Row>
+      ),
+    },
+  ];
+  return items;
+};
+
+// 主 DatasetDetails 組件
 const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
-  const [visualizedFiles, setVisualizedFiles] = useState<string[]>([]);
-  const [imageModalOpen, setImageModalOpen] = useState<boolean>(false);
-  const [imageModalTitle, setImageModalTitle] = useState<string>('');
-  const [selectedImage, setSelectedImage] = useState<string>('');
-  const [visDatasetLoading, setVisDatasetLoading] = useState<boolean>(false);
-  const [taskProgress, setTaskProgress] = useState<string>('');
+  const [visualizedFiles, setVisualizedFiles] = useState<string[]>([]); // 已視覺化的文件
+  const [imageModalOpen, setImageModalOpen] = useState<boolean>(false); // 圖片模態框開啟狀態
+  const [imageModalTitle, setImageModalTitle] = useState<string>(''); // 圖片模態框標題
+  const [selectedImage, setSelectedImage] = useState<string>(''); // 選中的圖片
+  const [visDatasetLoading, setVisDatasetLoading] = useState<boolean>(false); // 視覺化加載狀態
+  const [taskProgress, setTaskProgress] = useState<string>(''); // 任務進度
 
   if (!dataset) return null;
 
@@ -203,7 +255,7 @@ const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
         clearInterval(intervalId);
         setVisDatasetLoading(false);
         console.log('Task completed');
-        fetchVisualizedFiles(datasetId, setVisualizedFiles); // Refresh visualized files
+        fetchVisualizedFiles(datasetId, setVisualizedFiles); // 刷新視覺化文件列表
       } else {
         fetchVisualizedFiles(datasetId, setVisualizedFiles);
         console.log('Task still in progress');
@@ -219,8 +271,18 @@ const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
 
   return (
     <>
+      <Typography.Text strong>{dataset.name}</Typography.Text>
       <Descriptions
-        title={dataset.name}
+        layout="vertical"
+        bordered
+        column={2}
+        items={getDatasetStatisticsDetails(dataset.statistics)}
+        style={{
+          marginTop: 15,
+        }}
+      />
+
+      <Descriptions
         layout="vertical"
         bordered
         column={5}
@@ -232,6 +294,9 @@ const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
           taskProgress,
           visDatasetLoading,
         )}
+        style={{
+          marginTop: 15,
+        }}
       />
       <Modal
         style={{ minWidth: 600 }}
