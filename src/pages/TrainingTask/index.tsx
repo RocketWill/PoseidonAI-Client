@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-06 08:56:13
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-09 16:07:04
+ * @LastEditTime: 2024-08-12 15:27:46
  * @FilePath: /PoseidonAI-Client/src/pages/TrainingTask/index.tsx
  */
 import { listUserTasks } from '@/services/ant-design-pro/trainingTask';
@@ -38,6 +38,14 @@ export interface TaskState {
   };
 }
 
+export interface SummaryItem {
+  class_id: number;
+  classname: string;
+  dataset_type: 'train' | 'val';
+  images: number;
+  instances: number;
+}
+
 // 定義任務詳情的接口
 export interface TaskDetail {
   _id: string;
@@ -56,6 +64,7 @@ export interface TaskDetail {
   algorithm: AlgorithmItem;
   status: string;
   save_key: string;
+  summary: SummaryItem[];
 }
 
 // 定義任務項目的接口
