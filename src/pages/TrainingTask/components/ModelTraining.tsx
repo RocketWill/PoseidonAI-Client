@@ -1,19 +1,30 @@
 import {
+  ArrowLeftOutlined,
+  CaretRightOutlined,
+  StopOutlined,
+  UndoOutlined,
+} from '@ant-design/icons'; // 引入 Ant Design 的圖標
+import { Button, Card, Col, Collapse, Row, Skeleton, Space, message } from 'antd'; // 引入 Ant Design 的組件
+import ReactECharts from 'echarts-for-react'; // 引入 ECharts 進行圖表繪製
+import React, { useEffect, useRef, useState } from 'react';
+import { createBrowserHistory } from 'umi'; // 引入 umi 用來創建瀏覽器歷史
+
+import {
   getTrainingStatus,
   startTraining,
   stopTraining,
-} from '@/services/ant-design-pro/trainingTask';
-import { CaretRightOutlined, StopOutlined, UndoOutlined } from '@ant-design/icons';
-import { Button, Card, Col, Row, Skeleton, Space, message } from 'antd';
-import ReactECharts from 'echarts-for-react';
-import React, { useEffect, useRef, useState } from 'react';
-import { TaskItem, TrainingStatus } from '..';
-import TaskDetailsDescription from './TaskDetailsDescription';
+} from '@/services/ant-design-pro/trainingTask'; // 引入訓練相關的服務
+import { TaskItem, TrainingStatus } from '..'; // 引入專案內部的類型
+import DatasetSummary from './DatasetSummary'; // 引入數據集摘要組件
+import TaskDetailsDescription from './TaskDetailsDescription'; // 引入任務詳細描述組件
+
+// 創建瀏覽器歷史對象，便於控制瀏覽器歷史操作
+const history = createBrowserHistory();
 
 // 定義組件的屬性類型
 interface ModelTrainingProps {
-  taskData: TaskItem | undefined;
-  setRefreshFlag: React.Dispatch<React.SetStateAction<boolean>>;
+  taskData: TaskItem | undefined; // 任務數據，可為未定義
+  setRefreshFlag: React.Dispatch<React.SetStateAction<boolean>>; // 用於刷新狀態標記
 }
 
 // 定義損失數據的類型
@@ -74,12 +85,19 @@ const TrainLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
         end,
         handleSize: '100%',
       },
+      {
+        type: 'inside', // 允許鼠標滾輪縮放
+        yAxisIndex: 0,
+        zoomOnMouseWheel: true,
+        moveOnMouseWheel: true,
+      },
     ],
   };
 
   return <ReactECharts option={option} style={{ height: '400px', width: '100%' }} />;
 };
 
+// 驗證損失圖表組件
 const ValLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
   const xAxisData = data.epoch || data.iteration || [];
   const totalXPoints = xAxisData.length;
@@ -129,12 +147,19 @@ const ValLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
         end,
         handleSize: '100%',
       },
+      {
+        type: 'inside', // 允許鼠標滾輪縮放
+        yAxisIndex: 0,
+        zoomOnMouseWheel: true,
+        moveOnMouseWheel: true,
+      },
     ],
   };
 
   return <ReactECharts option={option} style={{ height: '400px', width: '100%' }} />;
 };
 
+// 模型訓練組件
 const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag }) => {
   const [lossData, setLossData] = useState<LossDataItem | null>(null); // 訓練和驗證損失數據
   const [trainingStatus, setTrainingStatus] = useState<TrainingStatus>('IDLE'); // 訓練狀態
@@ -207,7 +232,6 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
       setIsTraining(true); // 開始訓練時設置狀態
       const resp = await startTraining(taskData.task_detail._id);
       if (resp['code'] === 200) {
-        // const taskId = resp['results'];
         if (_id) startFetchingProgress(_id, algoName, frameworkName, saveKey);
       } else {
         setIsTraining(false); // 訓練未能啟動時停止訓練
@@ -253,6 +277,7 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
     }
   }, [isTraining]);
 
+  // 判斷是否禁用重啟按鈕
   const handleDisableRestart = () =>
     !(
       trainingStatus === 'ERROR' ||
@@ -261,8 +286,10 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
       trainingStatus === 'REVOKED'
     );
 
+  // 判斷是否禁用開始按鈕
   const handleDisableStart = () => !(trainingStatus === 'IDLE');
 
+  // 判斷是否禁用停止按鈕
   const handleDisableStop = () => !(trainingStatus === 'PROCESSING');
 
   // 處理停止訓練
@@ -294,11 +321,10 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
 
   return (
     <>
-      <TaskDetailsDescription
-        taskData={taskData}
-        status={isTraining ? trainingStatus : undefined}
-      />
       <Space style={{ marginTop: 15, marginBottom: 15 }}>
+        <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => history.back()}>
+          Back
+        </Button>
         <Button
           loading={restartBtnLoading}
           size="large"
@@ -332,6 +358,19 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
           Stop
         </Button>
       </Space>
+      <TaskDetailsDescription
+        taskData={taskData}
+        status={isTraining ? trainingStatus : undefined}
+      />
+      <div style={{ marginTop: 15 }} />
+      <Collapse
+        size="large"
+        items={[
+          { key: '1', label: 'Dataset Summary', children: <DatasetSummary taskData={taskData} /> },
+        ]}
+        defaultActiveKey={['1']}
+      />
+      <div style={{ marginTop: 15 }} />
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12}>
           {lossData &&
