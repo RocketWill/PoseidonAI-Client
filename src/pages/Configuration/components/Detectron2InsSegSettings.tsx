@@ -1,5 +1,5 @@
-import { generateRandomName } from '@/utils/tools';
-import { FormattedMessage } from '@umijs/max';
+import { generateRandomName } from '@/utils/tools'; // 引入自定義工具函數
+import { FormattedMessage } from '@umijs/max'; // 引入 FormattedMessage 用於多語言支持
 import {
   Button,
   Card,
@@ -13,9 +13,9 @@ import {
   Spin,
   Tooltip,
   Typography,
-} from 'antd';
-import { useState } from 'react';
-import { TrainingFrameworkProps } from './CreateConfiguration';
+} from 'antd'; // 引入 Ant Design 的組件
+import React, { useState } from 'react'; // 首先引入 React 和 useState
+import { TrainingFrameworkProps } from './CreateConfiguration'; // 引入自定義的類型
 
 const { Title } = Typography;
 
@@ -28,8 +28,9 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+// 初始化表單的初始值
 const initialValues = {
-  config_name: `D2-INSSEG__${generateRandomName()}`,
+  config_name: `D2-INSSEG__${generateRandomName()}`, // 配置名稱，包含隨機生成的名稱
   description: '',
   ANCHOR_GENERATOR_SIZES: [32, 64, 128, 256, 512],
   ANCHOR_GENERATOR_ASPECT_RATIOS: [0.5, 1.0, 2.0],
@@ -44,19 +45,21 @@ const initialValues = {
   SOLVER_IMS_PER_BATCH: 16,
   SOLVER_BASE_LR: 0.02,
   SOLVER_STEPS: [210000, 250000],
-  SOLVER_MAX_ITER: 270000,
   INPUT_MIN_SIZE_TRAIN: [640, 672, 704, 736, 768, 800],
 };
 
-const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
-  const { handleSubmitConfig, saving } = props;
-  const [form] = Form.useForm();
-  const [values, setValues] = useState({ ...initialValues });
+// Detectron2 Instance Segmentation 設定組件
+const Detectron2InsSegSettings: React.FC<TrainingFrameworkProps> = (props) => {
+  const { handleSubmitConfig, saving } = props; // 解構傳入的 props
+  const [form] = Form.useForm(); // 初始化表單
+  const [values, setValues] = useState({ ...initialValues }); // 使用 useState 管理表單數據
 
+  // 處理滑塊變化事件
   const handleSliderChange = (name: string, value: any) => {
     setValues({ ...values, [name]: value });
   };
 
+  // 重置表單
   const handleReset = () => {
     form.resetFields();
     setValues(initialValues);
@@ -565,41 +568,6 @@ const Detectron2InsSegSettings = (props: TrainingFrameworkProps) => {
                   onChange={(value) =>
                     handleSliderChange('SOLVER_STEPS', [values.SOLVER_STEPS[0], value])
                   }
-                />
-              </Col>
-            </Row>
-          </Form.Item>
-
-          <Form.Item
-            label={
-              <Tooltip
-                title={
-                  <FormattedMessage
-                    id="pages.trainingConfig.d2insseg.solverMaxIter"
-                    defaultMessage="最大迭代次數"
-                  />
-                }
-              >
-                <span>Solver Max Iter</span>
-              </Tooltip>
-            }
-            name="SOLVER_MAX_ITER"
-          >
-            <Row>
-              <Col span={12}>
-                <Slider
-                  min={1000}
-                  max={500000}
-                  onChange={(value) => handleSliderChange('SOLVER_MAX_ITER', value)}
-                  value={values.SOLVER_MAX_ITER}
-                />
-              </Col>
-              <Col span={4}>
-                <InputNumber
-                  min={1000}
-                  max={500000}
-                  value={values.SOLVER_MAX_ITER}
-                  onChange={(value) => handleSliderChange('SOLVER_MAX_ITER', value)}
                 />
               </Col>
             </Row>
