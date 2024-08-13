@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-02 08:45:40
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-13 15:22:58
+ * @LastEditTime: 2024-08-13 16:30:09
  * @FilePath: /PoseidonAI-Client/src/pages/CreateTask/modelTrainingParams.tsx
  */
 import { FormattedMessage } from '@umijs/max';
@@ -88,7 +88,7 @@ export const AlgoProjectSettings: AlgoProjectSettingsType = {
         { name: 'Resnet 50', disable: false, value: 'mask_rcnn_R_50_FPN_3x___50' },
         { name: 'Resnet 101', disable: true, value: 'mask_rcnn_R_50_FPN_3x___101' },
       ],
-      defaultValue: 'Resnet 34',
+      defaultValue: 'mask_rcnn_R_50_FPN_3x___34',
     },
     epoch: {
       name: (
