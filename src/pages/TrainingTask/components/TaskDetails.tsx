@@ -2,16 +2,20 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-06 15:16:17
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-09 16:02:44
+ * @LastEditTime: 2024-08-13 18:03:32
  * @FilePath: /PoseidonAI-Client/src/pages/TrainingTask/components/TaskDetails.tsx
  */
-
 import { getUserTask } from '@/services/ant-design-pro/trainingTask'; // 引入服務方法用於獲取任務數據
+import { ArrowLeftOutlined } from '@ant-design/icons'; // 引入 Ant Design 的圖標
 import { PageContainer } from '@ant-design/pro-components'; // 引入 Ant Design Pro 的頁面容器組件
+import { Button, Tabs, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react'; // 引入 React 和 Hook
 import { useParams } from 'react-router-dom'; // 引入用於獲取 URL 參數的 Hook
+import { createBrowserHistory } from 'umi'; // 引入 umi 用來創建瀏覽器歷史
 import { TaskItem } from '..'; // 引入項目內部的類型
 import ModelTraining from './ModelTraining'; // 引入 ModelTraining 組件
+
+const history = createBrowserHistory();
 
 // TaskDetails 組件
 const TaskDetails: React.FC = () => {
@@ -21,6 +25,8 @@ const TaskDetails: React.FC = () => {
   const [refreshFlag, setRefreshFlag] = useState<boolean>(false);
   // 從 URL 中提取 taskId
   const { taskId } = useParams();
+
+  const evalMode = taskData?.task_detail.status === 'SUCCESS' ? false : true;
 
   // 獲取任務數據的異步函數
   const fetchTask = async () => {
@@ -41,9 +47,30 @@ const TaskDetails: React.FC = () => {
   }, [refreshFlag]); // 當 refreshFlag 改變時重新獲取數據
 
   return (
-    <PageContainer>
+    <PageContainer
+      subTitle={
+        <Button type="default" icon={<ArrowLeftOutlined />} onClick={() => history.back()}>
+          Back
+        </Button>
+      }
+    >
       {/* 渲染 ModelTraining 組件並傳遞任務數據和刷新標誌的 set 函數 */}
-      <ModelTraining taskData={taskData} setRefreshFlag={setRefreshFlag} />
+      <Tabs
+        defaultActiveKey="1"
+        items={[
+          {
+            label: '模型訓練',
+            key: '1',
+            children: <ModelTraining taskData={taskData} setRefreshFlag={setRefreshFlag} />,
+          },
+          {
+            label: evalMode ? <Tooltip title="請先完成模型訓練">模型評估</Tooltip> : '模型評估',
+            key: '2',
+            children: 'Tab 2',
+            disabled: evalMode,
+          },
+        ]}
+      />
     </PageContainer>
   );
 };
