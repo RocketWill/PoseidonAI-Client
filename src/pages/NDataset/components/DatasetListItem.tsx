@@ -1,4 +1,5 @@
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { FormattedMessage } from '@umijs/max';
 import { Card, List, Space, Tag, Typography } from 'antd';
 import moment from 'moment';
 import React from 'react';
@@ -79,7 +80,8 @@ const DatasetListItem: React.FC<DatasetListItemProps> = ({
             ))}
           </Space>
           <Typography.Text type="secondary" italic style={{ fontSize: '0.9em' }}>
-            更新於 {relativeTime}
+            <FormattedMessage id="pages.dataset.display.uploaded" defaultMessage="上傳於" />{' '}
+            {relativeTime}
           </Typography.Text>
         </Space>
       </Card>

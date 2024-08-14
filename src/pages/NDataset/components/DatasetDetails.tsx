@@ -213,7 +213,12 @@ const getDatasetStatisticsDetails = (datasetStatistics: DatasetStatisticsItem | 
   const items = [
     {
       key: 1,
-      label: '標注統計',
+      label: (
+        <FormattedMessage
+          id="pages.dataset.display.annotatedDataStatistics"
+          defaultMessage="標注資料統計"
+        />
+      ),
       children: (
         <Row gutter={12}>
           <Col span={12}>

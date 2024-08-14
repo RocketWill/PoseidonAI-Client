@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-12 11:43:36
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-14 13:33:31
+ * @LastEditTime: 2024-08-14 13:42:07
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/components/HorizontalBarCharts.tsx
  */
 import ReactECharts from 'echarts-for-react';
@@ -43,7 +43,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     },
     series: [
       {
-        name: '數量',
+        name: 'number',
         type: 'bar',
         data: [labeledInstances, totalImages],
         itemStyle: {

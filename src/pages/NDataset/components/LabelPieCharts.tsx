@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-12 11:08:32
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-14 13:33:56
+ * @LastEditTime: 2024-08-14 13:43:17
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/components/LabelPieCharts.tsx
  */
 import ReactECharts from 'echarts-for-react';
@@ -55,7 +55,7 @@ const LabelPieCharts: React.FC<LabelPieChartsProps> = ({ data }) => {
     ],
     series: [
       {
-        name: '標注數據',
+        name: 'Annotated data',
         type: 'pie',
         radius: '50%',
         data: chartData,
