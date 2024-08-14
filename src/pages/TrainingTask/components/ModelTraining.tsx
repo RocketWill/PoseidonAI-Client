@@ -1,13 +1,7 @@
-import {
-  ArrowLeftOutlined,
-  CaretRightOutlined,
-  StopOutlined,
-  UndoOutlined,
-} from '@ant-design/icons'; // 引入 Ant Design 的圖標
-import { Button, Card, Col, Collapse, Row, Skeleton, Space, message } from 'antd'; // 引入 Ant Design 的組件
+import { CaretRightOutlined, StopOutlined, UndoOutlined } from '@ant-design/icons'; // 引入 Ant Design 的圖標
+import { Affix, Button, Card, Col, Collapse, Row, Skeleton, Space, message } from 'antd'; // 引入 Ant Design 的組件
 import ReactECharts from 'echarts-for-react'; // 引入 ECharts 進行圖表繪製
 import React, { useEffect, useRef, useState } from 'react';
-import { createBrowserHistory } from 'umi'; // 引入 umi 用來創建瀏覽器歷史
 
 import {
   getTrainingStatus,
@@ -19,12 +13,15 @@ import DatasetSummary from './DatasetSummary'; // 引入數據集摘要組件
 import TaskDetailsDescription from './TaskDetailsDescription'; // 引入任務詳細描述組件
 
 // 創建瀏覽器歷史對象，便於控制瀏覽器歷史操作
-const history = createBrowserHistory();
 
 // 定義組件的屬性類型
 interface ModelTrainingProps {
   taskData: TaskItem | undefined; // 任務數據，可為未定義
   setRefreshFlag: React.Dispatch<React.SetStateAction<boolean>>; // 用於刷新狀態標記
+}
+
+interface ActionButtonsProps {
+  buttonFixTop: boolean | undefined;
 }
 
 // 定義損失數據的類型
@@ -167,6 +164,7 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
   const [restartBtnLoading, setRestartBtnLoading] = useState<boolean>(false); // 重啟按鈕加載狀態
   const [startBtnLoading, setStartBtnLoading] = useState<boolean>(false); // 開始按鈕加載狀態
   const [stopBtnLoading, setStopBtnLoading] = useState<boolean>(false); // 停止按鈕加載狀態
+  const [buttonFixTop, setButtonFixTop] = useState<boolean | undefined>(false);
   const intervalId = useRef<NodeJS.Timeout | null>(null); // 用於儲存定時器 ID
   const _id = taskData?.task_detail._id;
 
@@ -319,12 +317,9 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
     }
   };
 
-  return (
-    <>
-      <Space style={{ marginTop: 15, marginBottom: 15 }}>
-        <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => history.back()}>
-          Back
-        </Button>
+  const ActionButtons: React.FC<ActionButtonsProps> = ({ buttonFixTop }) => {
+    const actionsButtons = (
+      <Space size="small">
         <Button
           loading={restartBtnLoading}
           size="large"
@@ -358,6 +353,24 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
           Stop
         </Button>
       </Space>
+    );
+
+    return buttonFixTop ? (
+      <Card size="small" bordered={false} style={{ boxShadow: 'none' }}>
+        {actionsButtons}
+      </Card>
+    ) : (
+      actionsButtons
+    );
+  };
+
+  return (
+    <>
+      <Affix offsetTop={50} onChange={(v: boolean | undefined) => setButtonFixTop(v)}>
+        <Space size="small" style={{ marginBottom: 15 }}>
+          <ActionButtons buttonFixTop={buttonFixTop} />
+        </Space>
+      </Affix>
       <TaskDetailsDescription
         taskData={taskData}
         status={isTraining ? trainingStatus : undefined}
