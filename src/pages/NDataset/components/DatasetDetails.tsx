@@ -10,7 +10,6 @@ import {
   getVisDatasetStatus,
   visDataset,
 } from '@/services/ant-design-pro/dataset'; // 引入服務函數
-import { getColor } from '@/utils/tools'; // 引入工具函數
 import { DatasetFormatItem, DatasetItem, DatasetStatisticsItem } from '..'; // 引入專案內部的類型
 import DisplayImage from './DisplayImage'; // 引入內部組件 DisplayImage
 import HorizontalBarChart from './HorizontalBarCharts'; // 引入內部組件 HorizontalBarChart
@@ -124,6 +123,8 @@ const getDatasetDetails = (
   handleVisDataset: (datasetId: string) => void,
   taskProgress: string,
   visDatasetLoading: boolean,
+  showAllClasses: boolean,
+  setShowAllClasses: (b: boolean) => void,
 ) => {
   const items = [
     {
@@ -161,11 +162,18 @@ const getDatasetDetails = (
       label: <FormattedMessage id="pages.dataset.display.classNames" defaultMessage="類別" />,
       children: (
         <>
-          {dataset.class_names.map((className: string, i: number) => (
-            <Tag color={getColor(i)} key={`${i}-${className}`}>
-              {className}
+          {dataset.class_names
+            .slice(0, showAllClasses ? dataset.class_names.length : 5) // 根據狀態顯示5個或全部
+            .map((className: string, i: number) => (
+              <Tag color="blue" key={`${i}-${className}`}>
+                {className}
+              </Tag>
+            ))}
+          {dataset.class_names.length > 5 && (
+            <Tag onClick={() => setShowAllClasses(!showAllClasses)}>
+              <a>{showAllClasses ? 'Show less' : `+${dataset.class_names.length - 5}`}</a>
             </Tag>
-          ))}
+          )}
         </>
       ),
     },
@@ -224,7 +232,7 @@ const getDatasetStatisticsDetails = (datasetStatistics: DatasetStatisticsItem | 
   return items;
 };
 
-// 主 DatasetDetails 組件
+// 定義 DatasetDetails 組件
 const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
   const [visualizedFiles, setVisualizedFiles] = useState<string[]>([]); // 已視覺化的文件
   const [imageModalOpen, setImageModalOpen] = useState<boolean>(false); // 圖片模態框開啟狀態
@@ -232,6 +240,7 @@ const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
   const [selectedImage, setSelectedImage] = useState<string>(''); // 選中的圖片
   const [visDatasetLoading, setVisDatasetLoading] = useState<boolean>(false); // 視覺化加載狀態
   const [taskProgress, setTaskProgress] = useState<string>(''); // 任務進度
+  const [showAllClasses, setShowAllClasses] = useState<boolean>(false); // 控制類別顯示的狀態
 
   if (!dataset) return null;
 
@@ -293,6 +302,8 @@ const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
           handleVisDataset,
           taskProgress,
           visDatasetLoading,
+          showAllClasses,
+          setShowAllClasses,
         )}
         style={{
           marginTop: 15,
