@@ -3,36 +3,33 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-31 15:41:18
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-13 13:12:56
+ * @LastEditTime: 2024-08-14 13:09:15
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/components/ListDatasets.tsx
  */
-import { deleteDataset } from '@/services/ant-design-pro/dataset';
-import { getColor } from '@/utils/tools';
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+
 import { FormattedMessage } from '@umijs/max';
-import { Button, Card, message, Modal, Table, Tag } from 'antd';
-import moment from 'moment';
+import { List, message, Modal } from 'antd';
 import React, { useState } from 'react';
-import { DatasetFormatItem, DatasetItem } from '..';
+
+import { deleteDataset } from '@/services/ant-design-pro/dataset';
+import { DatasetItem } from '..';
 import DatasetDetails from './DatasetDetails';
+import DatasetListItem from './DatasetListItem';
 
 interface ListDatasetsProps {
   datasetData: DatasetItem[];
   setRefreshFlag: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const formatDataset = (datasetData: DatasetItem[]) =>
-  datasetData.map((dataset: DatasetItem, i: number) => ({
-    key: `${i}`,
-    name: dataset,
-    type: dataset.detect_type.name,
-    classNames: dataset.class_names,
-    datasetFormat: dataset.dataset_format.map((item: DatasetFormatItem) => item.name),
-    createdAt: moment(dataset.created_at).format('YYYY-MM-DD HH:mm'),
-    validImagesNum: dataset.valid_images_num,
-    description: dataset.description,
-    action: dataset,
-  }));
+// 按創建日期將資料集排序
+const sortDatasets = (datasets: DatasetItem[]) =>
+  datasets.sort((a, b) => {
+    const now = new Date().getTime();
+    const timeA = new Date(a.created_at).getTime();
+    const timeB = new Date(b.created_at).getTime();
+
+    return Math.abs(timeA - now) - Math.abs(timeB - now);
+  });
 
 const ListDatasets: React.FC<ListDatasetsProps> = ({ datasetData, setRefreshFlag }) => {
   const [detailModalOpen, setDetailModalOpen] = useState<boolean>(false);
@@ -62,107 +59,35 @@ const ListDatasets: React.FC<ListDatasetsProps> = ({ datasetData, setRefreshFlag
     setRefreshFlag((prev) => !prev);
   };
 
-  const columns = [
-    {
-      title: <FormattedMessage id="pages.dataset.display.name" defaultMessage="名稱" />,
-      dataIndex: 'name',
-      key: 'name',
-      width: 150,
-      render: (dataset: DatasetItem) => (
-        <a onClick={() => handleEditDataset(dataset)}>{dataset.name}</a>
-      ),
-    },
-    {
-      title: <FormattedMessage id="pages.dataset.display.detectTypes" defaultMessage="檢測類型" />,
-      dataIndex: 'type',
-      key: 'type',
-      width: 150,
-      render: (type: string) => <Tag>{type.toUpperCase()}</Tag>,
-    },
-    {
-      title: <FormattedMessage id="pages.dataset.display.classNames" defaultMessage="類別" />,
-      dataIndex: 'classNames',
-      key: 'classNames',
-      width: 250, // 调整列宽以确保换行行为在预期范围内
-      render: (classNames: string[]) => (
-        <div style={{ display: 'flex', flexWrap: 'wrap', maxWidth: '100%' }}>
-          {classNames.map((className: string, index: number) => (
-            <Tag color={getColor(index)} style={{ marginBottom: 4 }} key={className}>
-              {className}
-            </Tag>
-          ))}
-        </div>
-      ),
-    },
-    {
-      title: (
-        <FormattedMessage id="pages.dataset.display.datasetFormat" defaultMessage="資料格式" />
-      ),
-      dataIndex: 'datasetFormat',
-      key: 'datasetFormat',
-      width: 200,
-      render: (formats: string[]) => (
-        <>
-          {formats.map((format: string, i: number) => (
-            <Tag key={`${format}-${i}`}>{format.toUpperCase()}</Tag>
-          ))}
-        </>
-      ),
-    },
-    {
-      title: (
-        <FormattedMessage id="pages.dataset.display.validImages" defaultMessage="帶標注圖片數量" />
-      ),
-      dataIndex: 'validImagesNum',
-      key: 'validImagesNum',
-      width: 120,
-    },
-    {
-      title: <FormattedMessage id="pages.dataset.display.createdAt" defaultMessage="創建日期" />,
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      width: 150,
-    },
-    {
-      title: <FormattedMessage id="pages.dataset.display.description" defaultMessage="描述" />,
-      key: 'description',
-      dataIndex: 'description',
-    },
-    {
-      title: <FormattedMessage id="pages.dataset.display.action" defaultMessage="操作" />,
-      key: 'action',
-      dataIndex: 'action',
-      width: 120,
-      render: (dataset: DatasetItem) => (
-        <>
-          <Button type="text" icon={<EyeOutlined />} onClick={() => handleEditDataset(dataset)} />
-          <Button
-            type="text"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => {
-              setSelectedDatasetData(dataset);
-              setDeleteModalOpen(true);
-            }}
-          />
-        </>
-      ),
-    },
-  ];
-
   return (
     <>
-      <Card
-        style={{
-          padding: '16px 19px',
-          minWidth: '500px',
-          flex: 1,
-          borderRadius: '8px',
-          marginTop: 15,
+      <List
+        itemLayout="vertical"
+        size="small"
+        bordered={false}
+        grid={{
+          gutter: 4,
+          xs: 1,
+          sm: 2,
+          md: 2,
+          lg: 2,
+          xl: 3,
+          xxl: 3,
         }}
-      >
-        <Table dataSource={formatDataset(datasetData)} columns={columns} />
-      </Card>
+        style={{
+          marginTop: 15,
+          maxWidth: 1500,
+        }}
+        dataSource={sortDatasets(datasetData)}
+        renderItem={(item: DatasetItem) => (
+          <DatasetListItem
+            item={item}
+            handleEditDataset={handleEditDataset}
+            setDeleteModalOpen={setDeleteModalOpen}
+            setSelectedDatasetData={setSelectedDatasetData}
+          />
+        )}
+      />
       <Modal
         style={{ minWidth: 1000 }}
         footer={null}
@@ -182,9 +107,7 @@ const ListDatasets: React.FC<ListDatasetsProps> = ({ datasetData, setRefreshFlag
         }
         open={deleteModalOpen}
         onOk={() => handleDeleteDataset(selectedDatasetData?._id)}
-        onCancel={() => {
-          setDeleteModalOpen(false);
-        }}
+        onCancel={() => setDeleteModalOpen(false)}
       >
         <FormattedMessage
           id="pages.dataset.display.confirmDeleteDataset"
