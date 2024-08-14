@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-06 16:56:25
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-13 08:54:06
+ * @LastEditTime: 2024-08-14 11:47:30
  * @FilePath: /PoseidonAI-Client/src/pages/TrainingTask/components/TaskList.tsx
  */
 
@@ -45,11 +45,19 @@ const EmptyList: React.FC = () => (
 // Main TaskList component
 const TaskList: React.FC<TaskListProps> = ({ tasksData }) => {
   if (!tasksData.length) return <EmptyList />;
+  const sortedTasks = tasksData.sort((a, b) => {
+    const now = new Date().getTime();
+    const timeA = new Date(a.created_at).getTime();
+    const timeB = new Date(b.created_at).getTime();
+
+    // 比较两个时间与当前时间的差值，绝对值越小的越接近当前时间
+    return Math.abs(timeA - now) - Math.abs(timeB - now);
+  });
   return (
     <List
       style={{ maxWidth: 1500 }}
       grid={{ gutter: 16, column: 3 }}
-      dataSource={tasksData}
+      dataSource={sortedTasks}
       renderItem={(item: TaskDetail) => (
         <List.Item>
           <Card
