@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-12 11:43:36
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-14 13:24:14
+ * @LastEditTime: 2024-08-14 13:33:31
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/components/HorizontalBarCharts.tsx
  */
 import ReactECharts from 'echarts-for-react';
@@ -62,7 +62,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     ],
   };
 
-  return <ReactECharts option={option} style={{ height: '250px', width: '100%' }} />;
+  return <ReactECharts option={option} style={{ height: '250px', width: '450px' }} />;
 };
 
 export default HorizontalBarChart;

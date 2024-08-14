@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-12 11:08:32
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-14 13:23:56
+ * @LastEditTime: 2024-08-14 13:33:56
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/components/LabelPieCharts.tsx
  */
 import ReactECharts from 'echarts-for-react';
@@ -70,7 +70,7 @@ const LabelPieCharts: React.FC<LabelPieChartsProps> = ({ data }) => {
     ],
   };
 
-  return <ReactECharts option={option} style={{ height: '200px', width: '100%' }} />;
+  return <ReactECharts option={option} style={{ height: '200px', width: '450px' }} />;
 };
 
 export default LabelPieCharts;
