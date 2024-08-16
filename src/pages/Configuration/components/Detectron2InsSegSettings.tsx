@@ -88,7 +88,7 @@ const Detectron2InsSegSettings: React.FC<TrainingFrameworkProps> = (props) => {
           form={form}
           name="detectron2-config"
           initialValues={initialValues}
-          onFinish={(data) => handleSubmitConfig(data, handleReset)}
+          onFinish={() => handleSubmitConfig(values, handleReset)}
           labelAlign="left"
           style={{ maxWidth: 900, marginTop: 40 }}
         >
