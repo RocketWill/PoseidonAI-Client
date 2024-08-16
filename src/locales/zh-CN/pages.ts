@@ -100,4 +100,6 @@ export default {
   'pages.dataset.display.visualizeAnnotations': '可视化标注',
   'pages.dataset.display.visualized': '可视化',
   'pages.dataset.display.classNames': '类别',
+  'pages.dataset.display.uploaded': '上传于',
+  'pages.dataset.display.annotatedDataStatistics': '标注数据统计',
 };

@@ -100,4 +100,5 @@ export default {
   'pages.dataset.display.visualizeAnnotations': '視覺化標注',
   'pages.dataset.display.visualized': '視覺化',
   'pages.dataset.display.classNames': '類別',
+  'pages.dataset.display.uploaded': '上傳於',
 };

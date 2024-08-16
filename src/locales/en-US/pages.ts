@@ -105,4 +105,6 @@ export default {
   'pages.dataset.display.visualizeAnnotations': 'Visualize Annotations',
   'pages.dataset.display.visualized': 'Visualized',
   'pages.dataset.display.classNames': 'Class Names',
+  'pages.dataset.display.uploaded': 'Uploaded',
+  'pages.dataset.display.annotatedDataStatistics': 'Annotated data statistics',
 };
