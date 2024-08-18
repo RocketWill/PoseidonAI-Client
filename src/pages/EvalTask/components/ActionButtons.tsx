@@ -7,12 +7,14 @@ interface ActionButtonCpmponentProps {
   buttonFixTop: boolean | undefined;
   status: EvalStatus | undefined;
   formValues: FormValues;
+  handleStartEval: (body: FormValues) => void;
 }
 
 interface ActionButtonsProps {
   style?: CSSProperties;
   status: EvalStatus | undefined;
   formValues: FormValues;
+  handleStartEval: (body: FormValues) => void;
 }
 
 const handleDisableButton = (
@@ -30,14 +32,11 @@ const handleDisableButton = (
   );
 };
 
-const handleStartEval = (formValues: FormValues) => {
-  console.log('Values: ', formValues);
-};
-
 const ActionButtonCpmponent: React.FC<ActionButtonCpmponentProps> = ({
   buttonFixTop,
   status,
   formValues,
+  handleStartEval,
 }) => {
   const actionsButtons = (
     <Space size="small">
@@ -74,7 +73,12 @@ const ActionButtonCpmponent: React.FC<ActionButtonCpmponentProps> = ({
   );
 };
 
-const ActionButtons: React.FC<ActionButtonsProps> = ({ style, status, formValues }) => {
+const ActionButtons: React.FC<ActionButtonsProps> = ({
+  style,
+  status,
+  formValues,
+  handleStartEval,
+}) => {
   const [buttonFixTop, setButtonFixTop] = useState<boolean | undefined>(false);
 
   return (
@@ -84,6 +88,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ style, status, formValues
           buttonFixTop={buttonFixTop}
           status={status}
           formValues={formValues}
+          handleStartEval={handleStartEval}
         />
       </Space>
     </Affix>
