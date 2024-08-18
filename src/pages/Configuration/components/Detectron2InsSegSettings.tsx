@@ -42,10 +42,13 @@ const initialValues = {
   ROI_BOX_HEAD_POOLER_RESOLUTION: 7,
   ROI_MASK_HEAD_NUM_CONV: 4,
   ROI_MASK_HEAD_POOLER_RESOLUTION: 14,
-  SOLVER_IMS_PER_BATCH: 16,
-  SOLVER_BASE_LR: 0.02,
-  SOLVER_STEPS: [210000, 250000],
-  INPUT_MIN_SIZE_TRAIN: [640, 672, 704, 736, 768, 800],
+  SOLVER_IMS_PER_BATCH: 4,
+  SOLVER_BASE_LR: 0.002,
+  SOLVER_STEPS: [200, 400],
+  INPUT_MIN_SIZE_TRAIN: [480, 640],
+  // SOLVER_BASE_LR: 0.02,
+  // SOLVER_STEPS: [210000, 250000],
+  // INPUT_MIN_SIZE_TRAIN: [640, 672, 704, 736, 768, 800],
 };
 
 // Detectron2 Instance Segmentation 設定組件
@@ -57,6 +60,10 @@ const Detectron2InsSegSettings: React.FC<TrainingFrameworkProps> = (props) => {
   // 處理滑塊變化事件
   const handleSliderChange = (name: string, value: any) => {
     setValues({ ...values, [name]: value });
+  };
+
+  const handleTextInputChange = (name: string, event: any) => {
+    setValues({ ...values, [name]: event.target.value });
   };
 
   // 重置表單
@@ -112,7 +119,7 @@ const Detectron2InsSegSettings: React.FC<TrainingFrameworkProps> = (props) => {
               },
             ]}
           >
-            <Input />
+            <Input onChange={(value) => handleTextInputChange('config_name', value)} />
           </Form.Item>
           <Form.Item
             label={
@@ -123,7 +130,10 @@ const Detectron2InsSegSettings: React.FC<TrainingFrameworkProps> = (props) => {
             }
             name="description"
           >
-            <Input defaultValue="" />
+            <Input
+              defaultValue=""
+              onChange={(value) => handleTextInputChange('description', value)}
+            />
           </Form.Item>
 
           <Title level={5} style={{ marginBottom: 30 }}>
@@ -473,7 +483,7 @@ const Detectron2InsSegSettings: React.FC<TrainingFrameworkProps> = (props) => {
               <Col span={12}>
                 <Slider
                   min={1}
-                  max={64}
+                  max={8}
                   onChange={(value) => handleSliderChange('SOLVER_IMS_PER_BATCH', value)}
                   value={values.SOLVER_IMS_PER_BATCH}
                 />
@@ -481,7 +491,7 @@ const Detectron2InsSegSettings: React.FC<TrainingFrameworkProps> = (props) => {
               <Col span={4}>
                 <InputNumber
                   min={1}
-                  max={64}
+                  max={8}
                   value={values.SOLVER_IMS_PER_BATCH}
                   onChange={(value) => handleSliderChange('SOLVER_IMS_PER_BATCH', value)}
                 />
@@ -545,16 +555,16 @@ const Detectron2InsSegSettings: React.FC<TrainingFrameworkProps> = (props) => {
               <Col span={12}>
                 <Slider
                   range
-                  min={1000}
-                  max={300000}
+                  min={100}
+                  max={1000}
                   onChange={(value) => handleSliderChange('SOLVER_STEPS', value)}
                   value={values.SOLVER_STEPS}
                 />
               </Col>
               <Col span={8}>
                 <InputNumber
-                  min={1000}
-                  max={300000}
+                  min={100}
+                  max={1000}
                   value={values.SOLVER_STEPS[0]}
                   onChange={(value) =>
                     handleSliderChange('SOLVER_STEPS', [value, values.SOLVER_STEPS[1]])
@@ -562,8 +572,8 @@ const Detectron2InsSegSettings: React.FC<TrainingFrameworkProps> = (props) => {
                   style={{ marginRight: 16 }}
                 />
                 <InputNumber
-                  min={1000}
-                  max={300000}
+                  min={100}
+                  max={1000}
                   value={values.SOLVER_STEPS[1]}
                   onChange={(value) =>
                     handleSliderChange('SOLVER_STEPS', [values.SOLVER_STEPS[0], value])
@@ -588,7 +598,12 @@ const Detectron2InsSegSettings: React.FC<TrainingFrameworkProps> = (props) => {
             }
             name="INPUT_MIN_SIZE_TRAIN"
           >
-            <Select mode="tags" open={false} defaultValue={values.INPUT_MIN_SIZE_TRAIN} />
+            <Select
+              mode="tags"
+              open={false}
+              defaultValue={values.INPUT_MIN_SIZE_TRAIN}
+              onChange={(value) => handleSliderChange('INPUT_MIN_SIZE_TRAIN', value)}
+            />
           </Form.Item>
 
           <Form.Item {...tailLayout}>
