@@ -90,3 +90,24 @@ export async function stopTraining(
     },
   });
 }
+
+export async function evaluationTask(taskId: string, body: any) {
+  return request(`/api/training-tasks/evaluation/${taskId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${token.get()}`,
+    },
+    data: body, // 确保将 body 序列化为 JSON 字符串
+  });
+}
+
+export async function getEvaluationStatus(evalId: string, algoName: string, frameworkName: string) {
+  return request(`/api/training-tasks/eval-task-status/${evalId}/${algoName}/${frameworkName}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token.get()}`,
+    },
+  });
+}
