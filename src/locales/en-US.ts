@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-29 08:28:24
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-05 16:55:23
+ * @LastEditTime: 2024-08-21 16:17:15
  * @FilePath: /PoseidonAI-Client/src/locales/en-US.ts
  */
 import component from './en-US/component';
@@ -10,6 +10,7 @@ import createTask from './en-US/createTask';
 import globalHeader from './en-US/globalHeader';
 import menu from './en-US/menu';
 import pages from './en-US/pages';
+import evalTask from './en-US/pagesEvalTask';
 import trainingConfigPage from './en-US/pagesTrainingConfigurations';
 import pwa from './en-US/pwa';
 import settingDrawer from './en-US/settingDrawer';
@@ -32,4 +33,5 @@ export default {
   ...pages,
   ...trainingConfigPage,
   ...createTask,
+  ...evalTask,
 };

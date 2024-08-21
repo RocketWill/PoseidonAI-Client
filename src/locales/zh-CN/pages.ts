@@ -24,6 +24,19 @@ export default {
   'pages.login.registerAccount': '注册账户',
   'pages.welcome.link': '欢迎使用',
   'pages.welcome.alertMessage': '更快更强的重型组件，已经发布。',
+  'page.welcome.learnMore': '了解更多',
+  'page.welcome.title': '欢迎使用 PoseidonAI',
+  'page.welcome.description':
+    'PoseidonAI 是一款由 EFC AI develop team 开发，专为深度学习领域设计的先进工具，旨在帮助开发者和研究人员更高效地进行模型的训练和验证。无论是初学者还是经验丰富的专业人士，PoseidonAI 都提供了直观且强大的功能，以简化复杂的深度学习任务。',
+  'page.welcome.feature1.title': '可视化训练界面',
+  'page.welcome.feature1.desc':
+    'PoseidonAI 提供直观的可视化界面，使用户能够实时监控模型的训练过程和效果。通过图表和动态展示，用户可以轻松了解模型的训练状态和性能变化。',
+  'page.welcome.feature2.title': '多功能工具集成',
+  'page.welcome.feature2.desc':
+    '内建多种功能强大的工具，包括模型调参、数据集管理、实验重现等，帮助用户在同一个平台上完成从模型设计到验证的全过程。',
+  'page.welcome.feature3.title': '性能优化和易用性',
+  'page.welcome.feature3.desc':
+    '设计上注重性能优化，保证高效的计算资源利用，同时简化复杂操作，使得深度学习模型的开发和优化变得更加直观和高效。',
   'pages.404.subTitle': '抱歉，您访问的页面不存在。',
   'pages.404.buttonText': '返回首页',
   'pages.admin.subPage.title': ' 这个页面只有 admin 权限才能查看',

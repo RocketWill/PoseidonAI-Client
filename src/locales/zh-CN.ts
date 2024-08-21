@@ -2,7 +2,7 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-24 16:52:06
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-05 16:54:17
+ * @LastEditTime: 2024-08-21 16:17:44
  * @FilePath: /PoseidonAI-Client/src/locales/zh-CN.ts
  * @Description:
  *
@@ -13,6 +13,7 @@ import createTask from './zh-CN/createTask';
 import globalHeader from './zh-CN/globalHeader';
 import menu from './zh-CN/menu';
 import pages from './zh-CN/pages';
+import evalTask from './zh-CN/pagesEvalTask';
 import trainingConfigPage from './zh-CN/pagesTrainingConfigurations';
 import pwa from './zh-CN/pwa';
 import settingDrawer from './zh-CN/settingDrawer';
@@ -35,4 +36,5 @@ export default {
   ...component,
   ...trainingConfigPage,
   ...createTask,
+  ...evalTask,
 };

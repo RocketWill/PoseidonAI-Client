@@ -25,6 +25,19 @@ export default {
   'pages.login.registerAccount': 'Register Account',
   'pages.welcome.link': 'Welcome',
   'pages.welcome.alertMessage': 'Faster and stronger heavy-duty components have been released.',
+  'page.welcome.learnMore': 'Learn More',
+  'page.welcome.title': 'Welcome to PoseidonAI',
+  'page.welcome.description':
+    "PoseidonAI is an advanced tool developed by the EFC AI develop team, designed specifically for the field of deep learning. It aims to help developers and researchers train and validate models more efficiently. Whether you're a beginner or an experienced professional, PoseidonAI offers intuitive and powerful features to simplify complex deep learning tasks.",
+  'page.welcome.feature1.title': 'Visual Training Interface',
+  'page.welcome.feature1.desc':
+    'PoseidonAI provides an intuitive visual interface that allows users to monitor the training process and outcomes of their models in real-time. With charts and dynamic displays, users can easily understand the training status and performance changes of their models.',
+  'page.welcome.feature2.title': 'Integrated Multifunctional Tools',
+  'page.welcome.feature2.desc':
+    'It comes with a range of powerful built-in tools, including model tuning, dataset management, and experiment reproduction, helping users complete the entire process from model design to validation on a single platform.',
+  'page.welcome.feature3.title': 'Performance Optimization and Usability',
+  'page.welcome.feature3.desc':
+    'Designed with performance optimization in mind, PoseidonAI ensures efficient use of computing resources while simplifying complex operations, making the development and optimization of deep learning models more intuitive and efficient.',
   'pages.404.subTitle': 'Sorry, the page you visited does not exist.',
   'pages.404.buttonText': 'Back Home',
   'pages.admin.subPage.title': 'This page can only be viewed by Admin',

@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-29 08:28:24
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-05 16:49:53
+ * @LastEditTime: 2024-08-21 16:17:58
  * @FilePath: /PoseidonAI-Client/src/locales/zh-TW.ts
  */
 import component from './zh-TW/component';
@@ -10,6 +10,7 @@ import createTask from './zh-TW/createTask';
 import globalHeader from './zh-TW/globalHeader';
 import menu from './zh-TW/menu';
 import pages from './zh-TW/pages';
+import evalTask from './zh-TW/pagesEvalTask';
 import trainingConfigPage from './zh-TW/pagesTrainingConfigurations';
 import pwa from './zh-TW/pwa';
 import settingDrawer from './zh-TW/settingDrawer';
@@ -30,4 +31,5 @@ export default {
   ...component,
   ...trainingConfigPage,
   ...createTask,
+  ...evalTask,
 };

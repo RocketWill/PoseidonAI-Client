@@ -24,6 +24,19 @@ export default {
   'pages.login.registerAccount': '註冊賬戶',
   'pages.welcome.link': '歡迎使用',
   'pages.welcome.alertMessage': '更快更強的重型組件，已經發布。',
+  'page.welcome.learnMore': '了解更多',
+  'page.welcome.title': '歡迎使用 PoseidonAI',
+  'page.welcome.description':
+    'PoseidonAI 是一款由 EFC AI develop team 開發，專為深度學習領域設計的先進工具，旨在幫助開發者和研究人員更高效地進行模型的訓練和驗證。無論是初學者還是經驗豐富的專業人士，PoseidonAI 都提供了直觀且強大的功能，以簡化複雜的深度學習任務。',
+  'page.welcome.feature1.title': '可視化訓練介面',
+  'page.welcome.feature1.desc':
+    'PoseidonAI 提供直觀的可視化介面，使使用者能夠即時監控模型的訓練過程和效果。通過圖表和動態展示，使用者可以輕鬆了解模型的訓練狀態和性能變化。',
+  'page.welcome.feature2.title': '多功能工具整合',
+  'page.welcome.feature2.desc':
+    '內建多種功能強大的工具，包括模型調參、資料集管理、實驗重現等，幫助使用者在同一個平台上完成從模型設計到驗證的全過程。',
+  'page.welcome.feature3.title': '性能優化與易用性',
+  'page.welcome.feature3.desc':
+    '設計上注重性能優化，保證高效的計算資源利用，同時簡化複雜操作，使得深度學習模型的開發和優化變得更加直觀和高效。',
   'pages.404.subTitle': '抱歉，您訪問的頁面不存在。',
   'pages.404.buttonText': '返回首頁',
   'pages.admin.subPage.title': '這個頁面只有 admin 權限才能查看',
