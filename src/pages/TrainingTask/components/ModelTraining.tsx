@@ -8,6 +8,7 @@ import {
   startTraining,
   stopTraining,
 } from '@/services/ant-design-pro/trainingTask'; // 引入訓練相關的服務
+import { FormattedMessage } from '@umijs/max';
 import { TaskItem, TrainingStatus } from '..'; // 引入專案內部的類型
 import DatasetSummary from './DatasetSummary'; // 引入數據集摘要組件
 import TaskDetailsDescription from './TaskDetailsDescription'; // 引入任務詳細描述組件
@@ -321,16 +322,6 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
     const actionsButtons = (
       <Space size="small">
         <Button
-          loading={restartBtnLoading}
-          size="large"
-          icon={<UndoOutlined />}
-          onClick={() => handleStartTraining(true)} // 傳遞 true 表示這是 restart 操作
-          shape="round"
-          disabled={handleDisableRestart()}
-        >
-          Restart
-        </Button>
-        <Button
           loading={startBtnLoading}
           type="primary"
           size="large"
@@ -339,7 +330,7 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
           shape="round"
           disabled={handleDisableStart()}
         >
-          Start
+          <FormattedMessage id="pages.trainingTask.start" defaultMessage="開始訓練" />
         </Button>
         <Button
           loading={stopBtnLoading}
@@ -350,7 +341,17 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
           disabled={handleDisableStop()}
           onClick={handleStopTraining}
         >
-          Stop
+          <FormattedMessage id="pages.trainingTask.stop" defaultMessage="終止訓練" />
+        </Button>
+        <Button
+          loading={restartBtnLoading}
+          size="large"
+          icon={<UndoOutlined />}
+          onClick={() => handleStartTraining(true)} // 傳遞 true 表示這是 restart 操作
+          shape="round"
+          disabled={handleDisableRestart()}
+        >
+          <FormattedMessage id="pages.trainingTask.restart" defaultMessage="重新訓練" />
         </Button>
       </Space>
     );
