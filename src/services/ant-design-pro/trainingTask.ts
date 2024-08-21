@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-05 11:28:13
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-08 16:38:02
+ * @LastEditTime: 2024-08-20 16:05:33
  * @FilePath: /PoseidonAI-Client/src/services/ant-design-pro/trainingTask.ts
  */
 import token from '@/utils/token';
@@ -104,6 +104,16 @@ export async function evaluationTask(taskId: string, body: any) {
 
 export async function getEvaluationStatus(evalId: string, algoName: string, frameworkName: string) {
   return request(`/api/training-tasks/eval-task-status/${evalId}/${algoName}/${frameworkName}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token.get()}`,
+    },
+  });
+}
+
+export async function getEvaluationResults(taskId: string) {
+  return request(`/api/training-tasks/evaluation-results/${taskId}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
