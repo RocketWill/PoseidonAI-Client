@@ -1,20 +1,32 @@
+/*
+ * @Author: Will Cheng (will.cheng@efctw.com)
+ * @Date: 2024-08-20 08:55:03
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-08-21 16:35:15
+ * @FilePath: /PoseidonAI-Client/src/pages/EvalTask/components/ActionButtons.tsx
+ */
 import { CaretRightOutlined, UndoOutlined } from '@ant-design/icons';
+import { FormattedMessage } from '@umijs/max';
 import { Affix, Button, Card, Space } from 'antd';
 import React, { CSSProperties, useState } from 'react';
-import { EvalStatus, FormValues } from '..';
+import { EvalAction, EvalStatus, FormValues } from '..';
 
 interface ActionButtonCpmponentProps {
   buttonFixTop: boolean | undefined;
   status: EvalStatus | undefined;
   formValues: FormValues;
-  handleStartEval: (body: FormValues) => void;
+  handleStartEval: (body: FormValues, action: EvalAction) => void;
+  isEvaling: boolean;
+  currentAction: EvalAction;
 }
 
 interface ActionButtonsProps {
   style?: CSSProperties;
   status: EvalStatus | undefined;
   formValues: FormValues;
-  handleStartEval: (body: FormValues) => void;
+  handleStartEval: (body: FormValues, action: EvalAction) => void;
+  isEvaling: boolean;
+  currentAction: EvalAction;
 }
 
 const handleDisableButton = (
@@ -37,29 +49,31 @@ const ActionButtonCpmponent: React.FC<ActionButtonCpmponentProps> = ({
   status,
   formValues,
   handleStartEval,
+  isEvaling,
+  currentAction,
 }) => {
   const actionsButtons = (
     <Space size="small">
       <Button
-        loading={false}
-        size="large"
-        icon={<UndoOutlined />}
-        onClick={() => handleStartEval(formValues)} // 傳遞 true 表示這是 restart 操作
-        shape="round"
-        disabled={handleDisableButton('restart', status)}
-      >
-        Restart
-      </Button>
-      <Button
-        loading={false}
+        loading={currentAction === 'start' && isEvaling === true ? true : false}
         type="primary"
         size="large"
         icon={<CaretRightOutlined />}
-        onClick={() => handleStartEval(formValues)} // 傳遞 false 表示這是 start 操作
+        onClick={() => handleStartEval(formValues, 'start')} // 傳遞 false 表示這是 start 操作
         shape="round"
         disabled={handleDisableButton('start', status)}
       >
-        Start
+        <FormattedMessage id="pages.trainingTask.start" defaultMessage="Start" />
+      </Button>
+      <Button
+        loading={currentAction === 'restart' && isEvaling === true ? true : false}
+        size="large"
+        icon={<UndoOutlined />}
+        onClick={() => handleStartEval(formValues, 'restart')} // 傳遞 true 表示這是 restart 操作
+        shape="round"
+        disabled={handleDisableButton('restart', status)}
+      >
+        <FormattedMessage id="pages.trainingTask.restart" defaultMessage="Restart" />
       </Button>
     </Space>
   );
@@ -78,6 +92,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   status,
   formValues,
   handleStartEval,
+  isEvaling,
+  currentAction,
 }) => {
   const [buttonFixTop, setButtonFixTop] = useState<boolean | undefined>(false);
 
@@ -89,6 +105,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           status={status}
           formValues={formValues}
           handleStartEval={handleStartEval}
+          isEvaling={isEvaling}
+          currentAction={currentAction}
         />
       </Space>
     </Affix>
