@@ -1,14 +1,15 @@
-/*
+/* eslint-disable */ /*
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-06 15:16:17
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-15 10:25:37
+ * @LastEditTime: 2024-08-21 16:24:52
  * @FilePath: /PoseidonAI-Client/src/pages/TrainingTask/components/TaskDetails.tsx
  */
 import EvalTask from '@/pages/EvalTask';
 import { getUserTask } from '@/services/ant-design-pro/trainingTask'; // 引入服務方法用於獲取任務數據
 import { ArrowLeftOutlined } from '@ant-design/icons'; // 引入 Ant Design 的圖標
 import { PageContainer } from '@ant-design/pro-components'; // 引入 Ant Design Pro 的頁面容器組件
+import { FormattedMessage, useIntl } from '@umijs/max';
 import { Button, Tabs, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react'; // 引入 React 和 Hook
 import { useParams } from 'react-router-dom'; // 引入用於獲取 URL 參數的 Hook
@@ -51,7 +52,7 @@ const TaskDetails: React.FC = () => {
     <PageContainer
       subTitle={
         <Button type="default" icon={<ArrowLeftOutlined />} onClick={() => history.back()}>
-          Back
+          <FormattedMessage id="pages.evalTask.back" defaultMessage="回上頁" />
         </Button>
       }
     >
@@ -60,12 +61,21 @@ const TaskDetails: React.FC = () => {
         defaultActiveKey="1"
         items={[
           {
-            label: '模型訓練',
+            label: <FormattedMessage id="pages.evalTask.trainingModel" defaultMessage="模型訓練" />,
             key: '1',
             children: <ModelTraining taskData={taskData} setRefreshFlag={setRefreshFlag} />,
           },
           {
-            label: evalMode ? <Tooltip title="請先完成模型訓練">模型評估</Tooltip> : '模型評估',
+            label: evalMode ? (
+              <Tooltip
+                title={useIntl().formatMessage({ id: 'pages.evalTask.finishTrainFirst' })}
+                // title={<FormattedMessage id='pages.evalTask.finishTrainFirst' defaultMessage='請先完成模型訓練後再進行評估' />}
+              >
+                {useIntl().formatMessage({ id: 'pages.evalTask.evalModel' })}
+              </Tooltip>
+            ) : (
+              <FormattedMessage id="pages.evalTask.evalModel" defaultMessage="模型評估" />
+            ),
             key: '2',
             children: <EvalTask taskData={taskData} />,
             disabled: evalMode,
