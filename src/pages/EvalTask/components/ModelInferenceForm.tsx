@@ -3,11 +3,11 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-15 10:37:57
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-16 16:30:56
+ * @LastEditTime: 2024-08-21 11:44:50
  * @FilePath: /PoseidonAI-Client/src/pages/EvalTask/components/ModelInferenceForm.tsx
  */
 import GPUSelector from '@/pages/CreateTask/components/GPUSelector';
-import { Card, Col, Form, InputNumber, Row, Select, Slider, Typography } from 'antd';
+import { Card, Col, Form, InputNumber, Row, Select, Slider } from 'antd';
 import React, { CSSProperties } from 'react';
 import { FormValues } from '..';
 
@@ -47,7 +47,7 @@ const ModelInferenceForm: React.FC<ModelInferenceFormPorps> = ({
 
   return (
     <Card style={styles} size="small">
-      <Typography.Title level={5}>Inference and Evaluation settings</Typography.Title>
+      {/* <Typography.Title level={5}>Inference and Evaluation settings</Typography.Title> */}
       <Form layout="vertical" form={form}>
         <Row gutter={16}>
           <Col span={8}>
