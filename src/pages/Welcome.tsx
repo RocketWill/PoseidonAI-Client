@@ -2,6 +2,7 @@ import { PageContainer } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
 import { Card, theme } from 'antd';
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 
 /**
  * 每个单独的卡片，为了复用样式抽成了组件
@@ -9,9 +10,9 @@ import React from 'react';
  * @returns
  */
 const InfoCard: React.FC<{
-  title: string;
+  title: any;
   index: number;
-  desc: string;
+  desc: any;
   href: string;
 }> = ({ title, href, index, desc }) => {
   const { useToken } = theme;
@@ -77,7 +78,7 @@ const InfoCard: React.FC<{
         {desc}
       </div>
       <a href={href} target="_blank" rel="noreferrer">
-        了解更多 {'>'}
+        <FormattedMessage id="page.welcome.learnMore" defaultMessage="了解更多" /> {'>'}
       </a>
     </div>
   );
@@ -116,7 +117,7 @@ const Welcome: React.FC = () => {
               color: token.colorTextHeading,
             }}
           >
-            歡迎使用 PoseidonAI
+            <FormattedMessage id="page.welcome.title" defaultMessage="歡迎使用 PoseidonAI" />
           </div>
           <p
             style={{
@@ -128,8 +129,10 @@ const Welcome: React.FC = () => {
               width: '65%',
             }}
           >
-            PoseidonAI 是一款由 EFC AI develop team 開發，專為深度學習領域設計的先進工具，旨在幫助開發者和研究人員更高效地進行模型的訓練和驗證。
-            無論是初學者還是經驗豐富的專業人士，PoseidonAI 都提供了直觀且強大的功能，以簡化複雜的深度學習任務。
+            <FormattedMessage
+              id="page.welcome.description"
+              defaultMessage="PoseidonAI 是一款由 EFC AI develop team 開發，專為深度學習領域設計的先進工具，旨在幫助開發者和研究人員更高效地進行模型的訓練和驗證。無論是初學者還是經驗豐富的專業人士，PoseidonAI 都提供了直觀且強大的功能，以簡化複雜的深度學習任務。"
+            />
           </p>
           <div
             style={{
@@ -141,20 +144,50 @@ const Welcome: React.FC = () => {
             <InfoCard
               index={1}
               href="https://umijs.org/docs/introduce/introduce"
-              title="可視化訓練界面"
-              desc="PoseidonAI 提供直觀的可視化界面，使用戶能夠實時監控模型的訓練過程和效果。通過圖表和動態展示，用戶可以輕鬆了解模型的訓練狀態和性能變化"
+              title={
+                <FormattedMessage
+                  id="page.welcome.feature1.title"
+                  defaultMessage="可視化訓練界面"
+                />
+              }
+              desc={
+                <FormattedMessage
+                  id="page.welcome.feature1.desc"
+                  defaultMessage="PoseidonAI 提供直觀的可視化界面，使用戶能夠實時監控模型的訓練過程和效果。通過圖表和動態展示，用戶可以輕鬆了解模型的訓練狀態和性能變化"
+                />
+              }
             />
             <InfoCard
               index={2}
-              title="多功能工具集成"
               href="https://ant.design"
-              desc="內建多種功能強大的工具，包括模型調參、資料集管理、實驗重現等，幫助用戶在同一個平台上完成從模型設計到驗證的全過程"
+              title={
+                <FormattedMessage
+                  id="page.welcome.feature2.title"
+                  defaultMessage="多功能工具集成"
+                />
+              }
+              desc={
+                <FormattedMessage
+                  id="page.welcome.feature2.desc"
+                  defaultMessage="內建多種功能強大的工具，包括模型調參、資料集管理、實驗重現等，幫助用戶在同一個平台上完成從模型設計到驗證的全過程"
+                />
+              }
             />
             <InfoCard
               index={3}
-              title="性能優化和易用性"
               href="https://procomponents.ant.design"
-              desc="設計上注重性能優化，保證高效的計算資源利用，同時簡化複雜操作，使得深度學習模型的開發和優化變得更加直觀和高效"
+              title={
+                <FormattedMessage
+                  id="page.welcome.feature3.title"
+                  defaultMessage="性能優化和易用性"
+                />
+              }
+              desc={
+                <FormattedMessage
+                  id="page.welcome.feature3.desc"
+                  defaultMessage="設計上注重性能優化，保證高效的計算資源利用，同時簡化複雜操作，使得深度學習模型的開發和優化變得更加直觀和高效"
+                />
+              }
             />
           </div>
         </div>
