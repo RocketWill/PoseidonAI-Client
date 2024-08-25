@@ -1,5 +1,5 @@
 export default {
-  'pages.layouts.userLayout.title': 'EFC Deep Learning 模型可視化訓練平臺',
+  'pages.layouts.userLayout.title': 'EFC 深度学习模型可视化训练平台',
   'pages.login.accountLogin.tab': '账户密码登录',
   'pages.login.accountLogin.errorMessage': '错误的用户名和密码(admin/ant.design)',
   'pages.login.failure': '登录失败，请重试！',
