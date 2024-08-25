@@ -2,8 +2,8 @@
 /*
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-15 10:37:57
- * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-21 11:44:50
+ * @LastEditors: Will Cheng chengyong@pku.edu.cn
+ * @LastEditTime: 2024-08-25 16:08:35
  * @FilePath: /PoseidonAI-Client/src/pages/EvalTask/components/ModelInferenceForm.tsx
  */
 import GPUSelector from '@/pages/CreateTask/components/GPUSelector';
@@ -51,7 +51,7 @@ const ModelInferenceForm: React.FC<ModelInferenceFormPorps> = ({
       <Form layout="vertical" form={form}>
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="IoU Threshould">
+            <Form.Item label="IoU Threshold">
               <Row gutter={16}>
                 <Col span={16}>
                   <Slider
