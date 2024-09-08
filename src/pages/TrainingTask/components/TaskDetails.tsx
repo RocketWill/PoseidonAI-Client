@@ -6,6 +6,7 @@
  * @FilePath: /PoseidonAI-Client/src/pages/TrainingTask/components/TaskDetails.tsx
  */
 import EvalTask from '@/pages/EvalTask';
+import ExportModel from '@/pages/ExportModel';
 import ViszualizeVal from '@/pages/VisualizeVal';
 import { getUserTask } from '@/services/ant-design-pro/trainingTask'; // 引入服務方法用於獲取任務數據
 import { ArrowLeftOutlined } from '@ant-design/icons'; // 引入 Ant Design 的圖標
@@ -89,6 +90,16 @@ const TaskDetails: React.FC = () => {
             ),
             key: '3',
             children: <ViszualizeVal taskData={taskData} />,
+            disabled: evalMode,
+          },
+          {
+            label: evalMode ? (
+              <Tooltip title="請先完成模型訓練再進行模型導出">模型權重導出</Tooltip>
+            ) : (
+              '模型權重導出'
+            ),
+            key: '4',
+            children: <ExportModel taskData={taskData} />,
             disabled: evalMode,
           },
         ]}
