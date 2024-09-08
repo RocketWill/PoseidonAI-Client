@@ -2,7 +2,7 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-08-24 13:58:39
  * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-08-25 20:22:11
+ * @LastEditTime: 2024-09-08 17:33:24
  * @FilePath: /PoseidonAI-Client/src/pages/VisualizeVal/index.tsx
  * @Description:
  *
@@ -30,7 +30,7 @@ export interface FormValues {
   conf: number;
 }
 
-interface DetectItem {
+export interface DetectItem {
   conf?: number[];
   cls: number[];
   points: number[][];
