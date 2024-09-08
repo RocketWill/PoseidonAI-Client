@@ -1,16 +1,6 @@
-/*
- * @Author: Will Cheng chengyong@pku.edu.cn
- * @Date: 2024-08-25 17:21:13
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-08-25 20:25:35
- * @FilePath: /PoseidonAI-Client/src/pages/VisualizeVal/components/PredCards.tsx
- * @Description:
- *
- * Copyright (c) 2024 by chengyong@pku.edu.cn, All Rights Reserved.
- */
 import { Image as AntdImage, Card, List, Spin } from 'antd';
 import React, { CSSProperties, useEffect, useRef, useState } from 'react';
-import { VisualizationItem } from '..';
+import { DetectItem, VisualizationItem } from '..';
 
 interface PredCardsProps {
   data: VisualizationItem;
@@ -22,11 +12,40 @@ type Annotation = number[]; // [x0, y0, x1, y1, ...] 数组类型
 
 interface ImageWithMergedAnnotationsProps {
   imageUrl: string;
-  annotations1: Annotation[];
-  annotations2: Annotation[];
+  annotations1: DetectItem;
+  annotations2: DetectItem;
+  classNames: { id: number; name: string }[];
 }
 
-const drawShape = (ctx: CanvasRenderingContext2D, points: Annotation, color: string = 'red') => {
+const COLORS = [
+  '#FF5733',
+  '#33FF57',
+  '#3357FF',
+  '#FF33A6',
+  '#FF8333',
+  '#33FFD4',
+  '#D433FF',
+  '#FFC733',
+  '#75FF33',
+  '#FF3357',
+  '#3375FF',
+  '#FF33D4',
+  '#33FF75',
+  '#D4FF33',
+];
+
+const getColorForClass = (clsId: number) => {
+  return COLORS[clsId % COLORS.length];
+};
+
+const drawShapeWithLabel = (
+  ctx: CanvasRenderingContext2D,
+  points: Annotation,
+  classId: number,
+  className: string,
+  color: string,
+) => {
+  // 绘制边框
   ctx.beginPath();
   if (points.length === 4) {
     // 绘制矩形
@@ -39,9 +58,19 @@ const drawShape = (ctx: CanvasRenderingContext2D, points: Annotation, color: str
     }
     ctx.closePath();
   }
+
+  // 绘制边框颜色
   ctx.strokeStyle = color;
   ctx.lineWidth = 4;
   ctx.stroke();
+
+  // 在左上角绘制黑底白字的类名标签
+  ctx.fillStyle = 'black';
+  ctx.fillRect(points[0], points[1] - 20, ctx.measureText(className).width + 10, 20);
+
+  ctx.fillStyle = 'white';
+  ctx.font = '16px Arial';
+  ctx.fillText(className, points[0] + 5, points[1] - 5);
 };
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {
@@ -54,10 +83,11 @@ const loadImage = (src: string): Promise<HTMLImageElement> => {
   });
 };
 
-const mergeImages = async (
+const mergeImagesWithLabels = async (
   imageUrl: string,
-  annotations1: Annotation[],
-  annotations2: Annotation[],
+  annotations1: DetectItem,
+  annotations2: DetectItem,
+  classNames: { id: number; name: string }[],
   setMergedImageUrl: React.Dispatch<React.SetStateAction<string | null>>,
 ) => {
   try {
@@ -80,26 +110,30 @@ const mergeImages = async (
     // 绘制第一张图片
     ctx.drawImage(image1, 0, 0, targetWidth, targetHeight);
 
-    // 在第一张图片旁边绘制第二张图片
-    ctx.drawImage(image2, targetWidth, 0, targetWidth, targetHeight);
-
-    // 在第一张图片上绘制预测标注
-    annotations1.forEach((points) => {
-      const scaledPoints = points.map((point, index) =>
-        index % 2 === 0 ? point * scaleFactor : point * scaleFactor,
+    // 在第一张图片上绘制预测标注（带类别标签）
+    annotations1.points.forEach((points) => {
+      const scaledPoints = points.map((coord, index) =>
+        index % 2 === 0 ? coord * scaleFactor : coord * scaleFactor,
       );
-      drawShape(ctx, scaledPoints, '#E49BFF');
+      const className = classNames.find((c) => c.id === annotations1.cls[0])?.name || 'Unknown';
+      const color = getColorForClass(annotations1.cls[0]);
+      drawShapeWithLabel(ctx, scaledPoints, annotations1.cls[0], className, color);
     });
 
     // 为第二张图片平移画布
     ctx.translate(targetWidth, 0);
 
-    // 在第二张图片上绘制标注结果
-    annotations2.forEach((points) => {
-      const scaledPoints = points.map((point, index) =>
-        index % 2 === 0 ? point * scaleFactor : point * scaleFactor,
+    // 绘制第二张图片
+    ctx.drawImage(image2, 0, 0, targetWidth, targetHeight);
+
+    // 在第二张图片上绘制标注结果（带类别标签）
+    annotations2.points.forEach((points) => {
+      const scaledPoints = points.map((coord, index) =>
+        index % 2 === 0 ? coord * scaleFactor : coord * scaleFactor,
       );
-      drawShape(ctx, scaledPoints, '#F6FB7A');
+      const className = classNames.find((c) => c.id === annotations2.cls[0])?.name || 'Unknown';
+      const color = getColorForClass(annotations2.cls[0]);
+      drawShapeWithLabel(ctx, scaledPoints, annotations2.cls[0], className, color);
     });
 
     // 重置平移
@@ -121,12 +155,13 @@ const ImageWithMergedAnnotations: React.FC<ImageWithMergedAnnotationsProps> = ({
   imageUrl,
   annotations1,
   annotations2,
+  classNames,
 }) => {
   const [mergedImageUrl, setMergedImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    mergeImages(imageUrl, annotations1, annotations2, setMergedImageUrl);
-  }, [imageUrl, annotations1, annotations2]);
+    mergeImagesWithLabels(imageUrl, annotations1, annotations2, classNames, setMergedImageUrl);
+  }, [imageUrl, annotations1, annotations2, classNames]);
 
   return mergedImageUrl ? (
     <AntdImage
@@ -185,8 +220,8 @@ const LazyImageWithMergedAnnotations: React.FC<ImageWithMergedAnnotationsProps> 
 const PredCards: React.FC<PredCardsProps> = ({ data, address, style }) => {
   const items = data.preds.map((pred) => {
     const imageUrl = `${address}/${pred.filename}`;
-    const predictionAnnotations = pred.dt.points;
-    const labelAnnotations = pred.gt.points;
+    const predictionAnnotations = pred.dt;
+    const labelAnnotations = pred.gt;
 
     return (
       <Card
@@ -206,6 +241,7 @@ const PredCards: React.FC<PredCardsProps> = ({ data, address, style }) => {
           imageUrl={imageUrl}
           annotations1={predictionAnnotations}
           annotations2={labelAnnotations}
+          classNames={data.class_names}
         />
       </Card>
     );
