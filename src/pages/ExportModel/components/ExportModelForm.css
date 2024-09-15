@@ -1,0 +1,14 @@
+.custom-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 150px; /* 设置统一的最小高度 */
+  }
+  
+  .card-description {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #888;
+    flex-grow: 1; /* 使得描述部分填满剩余空间 */
+  }
+  
