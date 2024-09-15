@@ -3,17 +3,27 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-09-08 19:54:02
  * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-09-15 16:20:57
+ * @LastEditTime: 2024-09-15 19:56:02
  * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/CSharpDemo.tsx
  * @Description:
  *
  * Copyright (c) 2024 by chengyong@pku.edu.cn, All Rights Reserved.
  */
-import { CopyOutlined } from '@ant-design/icons';
-import { Button, message, Typography } from 'antd';
+import { Tabs } from 'antd';
 import React from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { base16AteliersulphurpoolLight } from 'react-syntax-highlighter/dist/esm/styles/prism'; // 选择一种高亮风格
+import DisplayCode from './DisplayCode';
+import DisplayMarkdown from './DisplayMarkdown';
+
+const markdown = `
+# Hello, Markdown!
+
+This is a simple markdown example displayed in a React component.
+
+- This is a list item
+- Another item
+
+**Bold Text** and *Italic Text*
+`;
 
 const codeString = `using System;
 using System.Runtime.InteropServices;
@@ -195,41 +205,22 @@ class Program
     }
 }`;
 
-// 复制代码的函数
-const handleCopyCode = () => {
-  navigator.clipboard
-    .writeText(codeString)
-    .then(() => {
-      message.success('程式碼已複製到剪貼簿');
-    })
-    .catch(() => {
-      message.error('複製失敗');
-    });
-};
-
 const CSharpDemo: React.FC = () => {
   return (
-    <>
-      <Typography.Title level={5}>
-        示範程式碼
-        <Button
-          icon={<CopyOutlined />}
-          size="small"
-          style={{ marginLeft: '10px' }}
-          onClick={handleCopyCode}
-        >
-          複製程式碼
-        </Button>
-      </Typography.Title>
-      <SyntaxHighlighter
-        language="csharp"
-        style={base16AteliersulphurpoolLight}
-        wrapLines={true}
-        showLineNumbers={true}
-      >
-        {codeString}
-      </SyntaxHighlighter>
-    </>
+    <Tabs
+      items={[
+        {
+          label: '部署說明文檔',
+          key: '0',
+          children: <DisplayMarkdown markdown={markdown} />,
+        },
+        {
+          label: '示範程式碼',
+          key: '1',
+          children: <DisplayCode codeString={codeString} />,
+        },
+      ]}
+    ></Tabs>
   );
 };
 
