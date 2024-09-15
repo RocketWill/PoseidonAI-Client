@@ -1,0 +1,25 @@
+.code-container {
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.5s ease; /* 控制高度的渐变 */
+}
+
+.code-container::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px; /* 透明渐变的高度，可以调整 */
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+    transition: opacity 0.5s ease; /* 渐隐效果 */
+    pointer-events: none; /* 避免影响用户交互 */
+}
+
+.code-container.expanded::after {
+    opacity: 0; /* 展开时隐藏渐变 */
+}
+
+.code-container:not(.expanded)::after {
+    opacity: 1; /* 收起时显示渐变 */
+}
