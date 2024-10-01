@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-29 16:39:18
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-05 17:04:00
+ * @LastEditTime: 2024-10-01 18:11:49
  * @FilePath: /PoseidonAI-Client/src/pages/CreateTask/components/AlgorithmSelector.tsx
  */
 import { Badge, Card, Space, Tag, theme, Typography } from 'antd';
@@ -56,7 +56,7 @@ const AlgorithmSelector: React.FC<AlgorithmSelectorProps> = ({ data, onChange, a
                   />
                 }
               />
-              <Tag>{item.training_framework.name}</Tag>
+              <Tag>{item.training_framework.display_name}</Tag>
             </Space>
             <Space direction="horizontal">
               <Badge

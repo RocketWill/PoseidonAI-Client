@@ -2,7 +2,7 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-24 19:40:43
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-07-30 14:57:15
+ * @LastEditTime: 2024-10-01 17:55:33
  * @FilePath: /PoseidonAI-Client/src/pages/Configuration/index.tsx
  * @Description:
  *
@@ -30,6 +30,7 @@ export interface DatasetFormatItem {
 export interface TrainingFrameworkItem {
   _id: string;
   name: string;
+  display_name: string;
   created_at: string;
   description: string;
   dataset_format_id: string;

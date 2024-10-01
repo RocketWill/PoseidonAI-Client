@@ -2,7 +2,7 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-25 09:46:30
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-07-31 08:16:43
+ * @LastEditTime: 2024-10-01 18:02:41
  * @FilePath: /PoseidonAI-Client/src/pages/Configuration/components/Yolov8Settings.tsx
  * @Description:
  *
@@ -40,7 +40,7 @@ const tailLayout = {
 };
 
 const initialValues = {
-  config_name: `YOLOv8-Config__${generateRandomName()}`,
+  config_name: `EFC-Rapid-Config__${generateRandomName()}`,
   description: '',
   // Training parameters
   time: 12,

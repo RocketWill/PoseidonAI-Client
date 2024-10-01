@@ -1,8 +1,8 @@
 /*
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-28 10:29:50
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-07-28 15:21:02
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-10-01 18:11:14
  * @FilePath: /PoseidonAI-Client/src/pages/Configuration/components/UserConfigDisplay.tsx
  * @Description:
  *
@@ -44,7 +44,7 @@ const UserConfigDisplay = ({ config }: UserConfigDisplayProps) => {
             <FormattedMessage id="pages.trainingConfig.frameworkName" defaultMessage="演算法框架" />
           }
         >
-          <Tag color="cyan">{training_framework.name}</Tag>
+          <Tag color="cyan">{training_framework.display_name}</Tag>
         </Descriptions.Item>
         <Descriptions.Item
           label={

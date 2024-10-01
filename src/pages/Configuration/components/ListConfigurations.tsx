@@ -27,7 +27,7 @@ const formatConfigData = (datas: TrainingConfigItem[]) => {
     return {
       key: data._id,
       name: data.name,
-      training_framework: data.training_framework.name,
+      training_framework: data.training_framework.display_name,
       dataset_format: data.training_framework.dataset_format.name,
       created_at: moment(data.created_at).format('YYYY-MM-DD HH:mm'),
       description: data.description,

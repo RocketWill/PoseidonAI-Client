@@ -30,7 +30,7 @@ const tailLayout = {
 
 // 初始化表單的初始值
 const initialValues = {
-  config_name: `D2-INSSEG__${generateRandomName()}`, // 配置名稱，包含隨機生成的名稱
+  config_name: `EFC-AccurateSeg-Config__${generateRandomName()}`, // 配置名稱，包含隨機生成的名稱
   description: '',
   ANCHOR_GENERATOR_SIZES: [32, 64, 128, 256, 512],
   ANCHOR_GENERATOR_ASPECT_RATIOS: [0.5, 1.0, 2.0],

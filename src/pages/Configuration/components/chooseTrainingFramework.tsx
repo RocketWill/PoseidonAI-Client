@@ -1,8 +1,8 @@
 /*
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-25 09:46:30
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-07-28 15:26:39
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-10-01 17:55:50
  * @FilePath: /PoseidonAI-Client/src/pages/Configuration/components/chooseTrainingFramework.tsx
  * @Description:
  *
@@ -63,7 +63,7 @@ const ChooseTrainingFramework: React.FC<ChooseTrainingFrameworkProps> = (props) 
             <List.Item>
               <Card
                 size="small"
-                title={item.name}
+                title={item.display_name}
                 style={{
                   backgroundColor: token.colorBgContainer,
                   borderRadius: '8px',
