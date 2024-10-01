@@ -1,8 +1,8 @@
 /*
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-05 11:28:13
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-08-25 16:53:32
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-09-19 11:05:42
  * @FilePath: /PoseidonAI-Client/src/services/ant-design-pro/trainingTask.ts
  */
 import token from '@/utils/token';
@@ -149,6 +149,27 @@ export async function getVisualizationStatus(
 
 export async function getVisualizationResults(taskId: string) {
   return request(`/api/training-tasks/visualization-results/${taskId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token.get()}`,
+    },
+  });
+}
+
+export async function exportModel(taskId: string, body: any) {
+  return request(`/api/training-tasks/export/${taskId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${token.get()}`,
+    },
+    data: body, // 确保将 body 序列化为 JSON 字符串
+  });
+}
+
+export async function getExportStatus(exportId: string, algoName: string, frameworkName: string) {
+  return request(`/api/training-tasks/export-status/${exportId}/${algoName}/${frameworkName}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
