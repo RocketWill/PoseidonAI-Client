@@ -2,8 +2,8 @@
 /*
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-09-08 19:54:02
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-09-15 19:56:02
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-09-16 09:29:50
  * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/CSharpDemo.tsx
  * @Description:
  *
@@ -15,14 +15,56 @@ import DisplayCode from './DisplayCode';
 import DisplayMarkdown from './DisplayMarkdown';
 
 const markdown = `
-# Hello, Markdown!
+# EFC DetNet 目標檢測模型 .NET 整合
 
-This is a simple markdown example displayed in a React component.
+此專案展示如何在自訂的 C# 應用程式中整合 EFC DetNet 檢測。應用程式使用 \`EFC_DETNET_runtime.dll\` 來執行 EFC DetNet 模型進行圖像物件檢測。
 
-- This is a list item
-- Another item
+## 先決條件
 
-**Bold Text** and *Italic Text*
+在執行此專案之前，需要確保以下設定：
+
+### 必要條件
+- **NuGet 套件**：
+  - [System.Drawing.Common](https://www.nuget.org/packages/System.Drawing.Common/)
+  - [System.Runtime.InteropServices](https://www.nuget.org/packages/System.Runtime.InteropServices/)
+
+\`\`\`bash
+dotnet add package System.Drawing.Common
+dotnet add package System.Runtime.InteropServices
+\`\`\`
+
+### EFC_DETNET_runtime.dll 依賴項
+\`EFC_DETNET_runtime.dll\` 依賴多個動態連結庫 (DLL) 才能正確運行，這些 DLL 應存放於專案目錄的 \`bin\\x64\\Release\` 資料夾中。請確保所有依賴項 DLL 都放置於此資料夾
+
+### 模型文件
+您需要提供經過訓練的 EFC DetNet 模型，在程式碼中正確設置該模型的路徑，更新 \`Config\` 結構中的 \`modelPath\`。
+
+\`\`\`csharp
+modelPath = "/your/path/to/model";
+\`\`\`
+
+確保該路徑指向實際的 EFC DetNet 模型文件。
+
+### 日誌目錄
+應用程式會將處理過程記錄在由 \`logDir\`、\`logFilename\` 和 \`logLevel\` 定義的日誌文件中。根據您的日誌需求更新這些值。
+
+\`\`\`csharp
+logDir = "/path/to/save/log/files/"; # 注意最後一個 \`/\` 必須加上
+logFilename = "EFC_DETNET_log.txt";
+logLevel = "info";
+\`\`\`
+
+### 使用方式
+
+2. 將 \`EFC_DETNET_runtime.dll\` 放置在正確的目錄中。
+3. 更新程式碼中的 \`modelPath\`、\`logDir\`、\`logFilename\`。
+4. 將輸入圖像放置於 \`Main\` 函數中定義的路徑中。  
+
+\`\`\`csharp
+Bitmap bitmap = new Bitmap("/path/to/image.jpg");
+\`\`\`  
+
+5. 執行應用程式，檢測結果將會在主控台中列印。
 `;
 
 const codeString = `using System;
