@@ -2,8 +2,8 @@
 /*
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-09-08 19:54:02
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-09-15 15:46:44
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-09-18 13:19:40
  * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/Tutorials.tsx
  * @Description:
  *
@@ -28,7 +28,7 @@ const demoContent = {
 };
 
 const Tutorials: React.FC<TutorialsProps> = ({ style }) => {
-  const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguages>('python');
+  const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguages>('csharp');
 
   return (
     <Card style={style}>
