@@ -2,11 +2,11 @@
 /*
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-15 10:37:57
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-08-25 16:13:23
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-08-26 09:32:43
  * @FilePath: /PoseidonAI-Client/src/pages/VisualizeVal/components/ModelVisualizeForm.tsx
  */
-import { Card, Col, Form, InputNumber, Row, Slider } from 'antd';
+import { Card, Col, Form, InputNumber, Row, Slider, Typography } from 'antd';
 import React, { CSSProperties } from 'react';
 import { FormValues } from '..';
 
@@ -39,7 +39,7 @@ const ModelVisualizeForm: React.FC<ModelVisualizeFormProps> = ({
 
   return (
     <Card style={style} size="small">
-      {/* <Typography.Title level={5}>Inference and Evaluation settings</Typography.Title> */}
+      <Typography.Title level={5}>Validation set visualization settings</Typography.Title>
       <Form layout="vertical" form={form}>
         <Row gutter={16}>
           <Col span={8}>
