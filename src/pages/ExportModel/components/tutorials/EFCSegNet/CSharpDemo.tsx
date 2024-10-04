@@ -3,7 +3,7 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-09-08 19:54:02
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-04 16:00:04
+ * @LastEditTime: 2024-10-04 17:14:51
  * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/EFCSegNet/CSharpDemo.tsx
  * @Description:
  *
@@ -257,7 +257,7 @@ const CSharpDemo: React.FC = () => {
         {
           label: '部署說明文檔',
           key: '0',
-          children: <DisplayMarkdown markdown={markdown} />,
+          children: <DisplayMarkdown>{markdown}</DisplayMarkdown>,
         },
         {
           label: '示範程式碼',
