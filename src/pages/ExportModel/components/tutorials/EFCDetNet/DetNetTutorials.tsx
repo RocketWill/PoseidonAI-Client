@@ -3,8 +3,8 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-09-08 19:54:02
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-09-18 13:19:40
- * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/Tutorials.tsx
+ * @LastEditTime: 2024-10-04 16:02:09
+ * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/EFCDetNet/DetNetTutorials.tsx
  * @Description:
  *
  * Copyright (c) 2024 by chengyong@pku.edu.cn, All Rights Reserved.
@@ -27,7 +27,7 @@ const demoContent = {
   cpp: <CppDemo />,
 };
 
-const Tutorials: React.FC<TutorialsProps> = ({ style }) => {
+const DetNetTutorials: React.FC<TutorialsProps> = ({ style }) => {
   const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguages>('csharp');
 
   return (
@@ -57,4 +57,4 @@ const Tutorials: React.FC<TutorialsProps> = ({ style }) => {
   );
 };
 
-export default Tutorials;
+export default DetNetTutorials;

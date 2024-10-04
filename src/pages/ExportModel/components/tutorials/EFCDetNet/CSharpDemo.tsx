@@ -3,16 +3,16 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-09-08 19:54:02
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-09-16 09:29:50
- * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/CSharpDemo.tsx
+ * @LastEditTime: 2024-10-04 16:33:32
+ * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/EFCDetNet/CSharpDemo.tsx
  * @Description:
  *
  * Copyright (c) 2024 by chengyong@pku.edu.cn, All Rights Reserved.
  */
 import { Tabs } from 'antd';
 import React from 'react';
-import DisplayCode from './DisplayCode';
-import DisplayMarkdown from './DisplayMarkdown';
+import DisplayCode from '../DisplayCode';
+import DisplayMarkdown from '../DisplayMarkdown';
 
 const markdown = `
 # EFC DetNet 目標檢測模型 .NET 整合
@@ -254,7 +254,7 @@ const CSharpDemo: React.FC = () => {
         {
           label: '部署說明文檔',
           key: '0',
-          children: <DisplayMarkdown markdown={markdown} />,
+          children: <DisplayMarkdown>{markdown}</DisplayMarkdown>,
         },
         {
           label: '示範程式碼',
