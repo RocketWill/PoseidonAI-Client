@@ -2,7 +2,7 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-09-15 14:55:43
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-04 16:22:13
+ * @LastEditTime: 2024-10-04 17:14:31
  * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/EFCSegNet/PythonDemo.tsx
  * @Description:
  *
@@ -209,7 +209,7 @@ const PythonDemo: React.FC = () => {
         {
           label: '部署說明文檔',
           key: '0',
-          children: <DisplayMarkdown markdown={readme} />,
+          children: <DisplayMarkdown>{readme}</DisplayMarkdown>,
         },
         {
           label: '示範程式碼',
