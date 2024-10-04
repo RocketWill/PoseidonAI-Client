@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-30 13:04:24
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-13 15:39:51
+ * @LastEditTime: 2024-10-04 14:54:41
  * @FilePath: /PoseidonAI-Client/src/utils/tools.ts
  */
 
@@ -92,3 +92,10 @@ export const getRandomColor = (): string => {
 
 // 工具函數：根據索引選取對應顏色，支持索引超出範圍時循環使用顏色
 export const getColor = (index: number): string => tagColors[index % tagColors.length];
+
+export const capitalizeWords = (str: string): string => {
+  return str
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
