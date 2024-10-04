@@ -2,7 +2,7 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-09-15 10:52:46
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-09-19 17:12:11
+ * @LastEditTime: 2024-10-04 14:56:28
  * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/ExportModelForm.tsx
  * @Description:
  *
@@ -10,6 +10,7 @@
  */
 import { TaskItem } from '@/pages/TrainingTask';
 import { exportModel, getExportStatus } from '@/services/ant-design-pro/trainingTask';
+import { capitalizeWords } from '@/utils/tools';
 import { DownloadOutlined } from '@ant-design/icons';
 import {
   Button,
@@ -49,10 +50,12 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
   const [api, contextHolder] = notification.useNotification();
   const [exportId, setExportId] = useState<string>();
   const [isExporting, setIsExporting] = useState<boolean>(false);
+  console.log(taskData);
 
   const algoName: string = taskData?.task_detail.algorithm.name.replace(/\s+/g, '') || '';
   const frameworkName: string =
     taskData?.task_detail.algorithm.training_framework.name.replace(/\s+/g, '') || '';
+  const detectTypeName: string = taskData?.task_detail.algorithm.detect_type.name || '';
   const address = `http://localhost:5000/static`;
 
   const handleFinish = async (values: any) => {
@@ -215,7 +218,9 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
                   <Card hoverable className="custom-card">
                     <Radio value="model_runtime">模型 + EFC Runtime 運行庫</Radio>
                     <div className="card-description">
-                      包含模型和 EFC Deep Learning Runtime Object Detection 運行庫
+                      {`包含模型和 EFC Deep Learning Runtime ${capitalizeWords(
+                        detectTypeName,
+                      )} 運行庫`}
                     </div>
                   </Card>
                 </Col>
@@ -223,8 +228,9 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
                   <Card hoverable className="custom-card">
                     <Radio value="model_runtime_deps">模型 + EFC Runtime 運行庫 + 其他依賴</Radio>
                     <div className="card-description">
-                      包含模型和 EFC Deep Learning Runtime Object Detection 運行庫和其他依賴庫
-                      (OpenCV, Spd日誌等)
+                      {`包含模型和 EFC Deep Learning Runtime ${capitalizeWords(
+                        detectTypeName,
+                      )} 運行庫和其他依賴庫 (OpenCV, Spd日誌等)`}
                     </div>
                   </Card>
                 </Col>
