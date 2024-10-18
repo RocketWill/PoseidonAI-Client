@@ -3,9 +3,10 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-15 10:37:57
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-26 09:32:43
+ * @LastEditTime: 2024-10-09 15:39:56
  * @FilePath: /PoseidonAI-Client/src/pages/VisualizeVal/components/ModelVisualizeForm.tsx
  */
+import { DetectTypeItem } from '@/pages/CreateTask';
 import { Card, Col, Form, InputNumber, Row, Slider, Typography } from 'antd';
 import React, { CSSProperties } from 'react';
 import { FormValues } from '..';
@@ -14,12 +15,14 @@ interface ModelVisualizeFormProps {
   style?: CSSProperties;
   formValues: FormValues;
   setFormValues: (d: FormValues) => void;
+  detectType: DetectTypeItem;
 }
 
 const ModelVisualizeForm: React.FC<ModelVisualizeFormProps> = ({
   style,
   formValues,
   setFormValues,
+  detectType,
 }) => {
   // State to manage form values
   const [form] = Form.useForm();
@@ -52,6 +55,7 @@ const ModelVisualizeForm: React.FC<ModelVisualizeFormProps> = ({
                     step={0.01}
                     value={formValues?.iou}
                     onChange={(value: number) => setFormValues({ ...formValues, iou: value })}
+                    disabled={detectType.tag_name === 'classify' ? true : false}
                   />
                 </Col>
                 <Col span={8}>
@@ -64,6 +68,7 @@ const ModelVisualizeForm: React.FC<ModelVisualizeFormProps> = ({
                       setFormValues({ ...formValues, iou: value || 0.7 })
                     }
                     style={{ width: '100%' }}
+                    disabled={detectType.tag_name === 'classify' ? true : false}
                   />
                 </Col>
               </Row>
@@ -79,6 +84,7 @@ const ModelVisualizeForm: React.FC<ModelVisualizeFormProps> = ({
                     step={0.01}
                     value={formValues.conf}
                     onChange={(value: number) => setFormValues({ ...formValues, conf: value })}
+                    disabled={detectType.tag_name === 'classify' ? true : false}
                   />
                 </Col>
                 <Col span={8}>
@@ -91,6 +97,7 @@ const ModelVisualizeForm: React.FC<ModelVisualizeFormProps> = ({
                       setFormValues({ ...formValues, conf: value || 0.01 })
                     }
                     style={{ width: '100%' }}
+                    disabled={detectType.tag_name === 'classify' ? true : false}
                   />
                 </Col>
               </Row>
