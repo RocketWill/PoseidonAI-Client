@@ -83,7 +83,7 @@ const Detectron2InsSegSettings: React.FC<TrainingFrameworkProps> = (props) => {
       }}
     >
       <Title level={4}>
-        Detectron2 Instance Segmentation
+        {props.framework.display_name}
         <FormattedMessage
           id="pages.trainingConfig.trainingSettings"
           defaultMessage="訓練參數配置"
