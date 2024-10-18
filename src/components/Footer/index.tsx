@@ -1,4 +1,11 @@
-import { GithubOutlined } from '@ant-design/icons';
+/*
+ * @Author: Will Cheng (will.cheng@efctw.com)
+ * @Date: 2024-07-29 08:28:24
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-10-18 11:57:28
+ * @FilePath: /PoseidonAI-Client/src/components/Footer/index.tsx
+ */
+import { FireOutlined } from '@ant-design/icons';
 import { DefaultFooter } from '@ant-design/pro-components';
 import React from 'react';
 
@@ -12,19 +19,19 @@ const Footer: React.FC = () => {
         {
           key: 'PoseidonAI',
           title: 'PoseidonAI',
-          href: 'https://pro.ant.design',
+          href: '',
           blankTarget: true,
         },
         {
           key: 'github',
-          title: <GithubOutlined />,
-          href: 'https://github.com/ant-design/ant-design-pro',
+          title: <FireOutlined />,
+          href: '',
           blankTarget: true,
         },
         {
           key: 'EFC AI Develop Team',
           title: 'EFC AI Develop Team',
-          href: 'https://ant.design',
+          href: '',
           blankTarget: true,
         },
       ]}
