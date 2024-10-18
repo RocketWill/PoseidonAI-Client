@@ -3,7 +3,7 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-09-08 19:54:02
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-04 16:10:05
+ * @LastEditTime: 2024-10-16 09:39:26
  * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/index.tsx
  * @Description:
  *
@@ -12,6 +12,7 @@
 import React from 'react';
 import { TaskItem } from '../TrainingTask';
 import ExportModelForm from './components/ExportModelForm';
+import ClsNetTutorials from './components/tutorials/EFCClsNet/ClsNetTutorials';
 import DetNetTutorials from './components/tutorials/EFCDetNet/DetNetTutorials';
 import SetNetTutorials from './components/tutorials/EFCSegNet/SegNetTutorials';
 
@@ -23,10 +24,13 @@ const ExportModel: React.FC<ExportModelProps> = ({ taskData }) => {
   const detectTypeName: string = taskData?.task_detail.algorithm.detect_type.tag_name || '';
   let tutorialsComponent;
   switch (detectTypeName) {
-    case 'det':
+    case 'classify':
+      tutorialsComponent = <ClsNetTutorials style={{ marginTop: 20, maxWidth: 900 }} />;
+      break;
+    case 'detect':
       tutorialsComponent = <DetNetTutorials style={{ marginTop: 20, maxWidth: 900 }} />;
       break;
-    case 'seg':
+    case 'segment':
       tutorialsComponent = <SetNetTutorials style={{ marginTop: 20, maxWidth: 900 }} />;
       break;
     default:
