@@ -2,7 +2,7 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-25 09:46:30
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-01 18:02:41
+ * @LastEditTime: 2024-10-17 15:52:39
  * @FilePath: /PoseidonAI-Client/src/pages/Configuration/components/Yolov8Settings.tsx
  * @Description:
  *
@@ -121,7 +121,7 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
       }}
     >
       <Title level={4}>
-        YOLOv8
+        {props.framework.display_name}
         <FormattedMessage
           id="pages.trainingConfig.trainingSettings"
           defaultMessage="訓練參數配置"
@@ -300,7 +300,7 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
             <Row>
               <Col span={12}>
                 <Slider
-                  min={320}
+                  min={128}
                   max={1280}
                   step={32}
                   onChange={(value) => handleSliderChange('imgsz', value)}
@@ -309,7 +309,7 @@ const YoloV8Settings = (props: TrainingFrameworkProps) => {
               </Col>
               <Col span={4}>
                 <InputNumber
-                  min={320}
+                  min={128}
                   max={1280}
                   step={32}
                   value={values.imgsz}
