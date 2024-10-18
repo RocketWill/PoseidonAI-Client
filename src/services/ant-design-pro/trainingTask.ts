@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-05 11:28:13
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-09-19 11:05:42
+ * @LastEditTime: 2024-10-18 11:01:34
  * @FilePath: /PoseidonAI-Client/src/services/ant-design-pro/trainingTask.ts
  */
 import token from '@/utils/token';
@@ -42,6 +42,16 @@ export async function listUserTasks() {
 export async function getUserTask(taskId: string) {
   return request(`/api/training-tasks/list/${taskId}`, {
     method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token.get()}`,
+    },
+  });
+}
+
+export async function deleteUserTask(taskId: string) {
+  return request(`/api/training-tasks/${taskId}`, {
+    method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token.get()}`,
