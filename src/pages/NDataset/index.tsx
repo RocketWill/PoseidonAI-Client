@@ -3,7 +3,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-31 15:34:59
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-12 13:32:28
+ * @LastEditTime: 2024-10-07 09:20:58
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/index.tsx
  */
 import { PageContainer } from '@ant-design/pro-components';
@@ -15,8 +15,8 @@ import React, { useEffect, useState } from 'react';
 import { listDataset } from '@/services/ant-design-pro/dataset';
 import { listDatasetFormats } from '@/services/ant-design-pro/datasetFormat';
 import { listDetectTypes } from '@/services/ant-design-pro/detectType';
-import CreateDatasetForm from './components/CreateDatasetForm';
 import ListDatasets from './components/ListDatasets';
+import NCreateDatasetForm from './components/NCreateDatasetForm';
 
 export interface CategoryCountItem {
   name: string;
@@ -98,7 +98,7 @@ const NDataset: React.FC = () => {
         <FormattedMessage id="pages.dataset.table.createDataset" defaultMessage="建立新的資料集" />
       ),
       children: (
-        <CreateDatasetForm
+        <NCreateDatasetForm
           detectTypes={detectTypeData}
           datasetFormats={datasetFormatData}
           setRefreshFlag={setRefreshFlag}
