@@ -3,7 +3,7 @@ import { FormattedMessage } from '@umijs/max';
 import { Card, List, Space, Tag, Typography } from 'antd';
 import moment from 'moment';
 import React from 'react';
-import { DatasetFormatItem, DatasetItem } from '..';
+import { DatasetItem } from '..';
 import './DatasetListItem.css';
 
 interface DatasetListItemProps {
@@ -73,11 +73,11 @@ const DatasetListItem: React.FC<DatasetListItemProps> = ({
               <span style={{ fontWeight: 500 }}>{item.image_files.length}</span>{' '}
               {item.image_files.length === 1 ? 'image' : 'images'}
             </Tag>
-            {item.dataset_format.map((format: DatasetFormatItem) => (
+            {/* {item.dataset_format.map((format: DatasetFormatItem) => (
               <Tag key={format._id} bordered={false} color="blue">
                 {format.name}
               </Tag>
-            ))}
+            ))} */}
           </Space>
           <Typography.Text type="secondary" italic style={{ fontSize: '0.9em' }}>
             <FormattedMessage id="pages.dataset.display.uploaded" defaultMessage="上傳於" />{' '}
