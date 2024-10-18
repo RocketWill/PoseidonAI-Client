@@ -10,7 +10,7 @@ import {
   getVisDatasetStatus,
   visDataset,
 } from '@/services/ant-design-pro/dataset'; // 引入服務函數
-import { DatasetFormatItem, DatasetItem, DatasetStatisticsItem } from '..'; // 引入專案內部的類型
+import { DatasetItem, DatasetStatisticsItem } from '..'; // 引入專案內部的類型
 import DisplayImage from './DisplayImage'; // 引入內部組件 DisplayImage
 import HorizontalBarChart from './HorizontalBarCharts'; // 引入內部組件 HorizontalBarChart
 import LabelPieCharts from './LabelPieCharts'; // 引入內部組件 LabelPieCharts
@@ -132,33 +132,33 @@ const getDatasetDetails = (
       label: <FormattedMessage id="pages.dataset.display.createdAt" defaultMessage="創建日期" />,
       children: moment(dataset.created_at).format('YYYY-MM-DD HH:mm'),
     },
+    // {
+    //   key: 2,
+    //   label: (
+    //     <FormattedMessage id="pages.dataset.display.datasetFormat" defaultMessage="資料格式" />
+    //   ),
+    //   children: (
+    //     <>
+    //       {dataset.dataset_format.map((format: DatasetFormatItem, i: number) => (
+    //         <Tag key={`${i}-${format}`}>{format.name.toUpperCase()}</Tag>
+    //       ))}
+    //     </>
+    //   ),
+    // },
     {
       key: 2,
-      label: (
-        <FormattedMessage id="pages.dataset.display.datasetFormat" defaultMessage="資料格式" />
-      ),
-      children: (
-        <>
-          {dataset.dataset_format.map((format: DatasetFormatItem, i: number) => (
-            <Tag key={`${i}-${format}`}>{format.name.toUpperCase()}</Tag>
-          ))}
-        </>
-      ),
-    },
-    {
-      key: 3,
       label: <FormattedMessage id="pages.dataset.display.description" defaultMessage="描述" />,
       children: dataset.description,
     },
     {
-      key: 4,
+      key: 3,
       label: (
         <FormattedMessage id="pages.dataset.display.validImages" defaultMessage="帶標注圖片數量" />
       ),
       children: dataset.valid_images_num,
     },
     {
-      key: 5,
+      key: 4,
       label: <FormattedMessage id="pages.dataset.display.classNames" defaultMessage="類別" />,
       children: (
         <>
@@ -178,7 +178,7 @@ const getDatasetDetails = (
       ),
     },
     {
-      key: 6,
+      key: 5,
       label: (
         <>
           <FormattedMessage id="pages.dataset.display.imageList" defaultMessage="圖片列表" />
@@ -192,15 +192,15 @@ const getDatasetDetails = (
         </>
       ),
       children: handleDisplayVisDatasetChildren(dataset, visualizedFiles, handleDisplayImage),
-      span: 5,
+      span: 12,
     },
     {
-      key: 7,
+      key: 6,
       label: <FormattedMessage id="pages.dataset.display.labelFile" defaultMessage="標注文件" />,
       children: <p>{dataset.label_file}</p>,
     },
     {
-      key: 8,
+      key: 7,
       label: <FormattedMessage id="pages.dataset.display.detectTypes" defaultMessage="檢測類型" />,
       children: <Tag>{dataset.detect_type.tag_name.toUpperCase()}</Tag>,
     },
@@ -299,7 +299,7 @@ const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
       <Descriptions
         layout="vertical"
         bordered
-        column={5}
+        column={3}
         items={getDatasetDetails(
           dataset,
           visualizedFiles,

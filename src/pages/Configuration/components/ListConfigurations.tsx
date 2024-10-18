@@ -1,8 +1,8 @@
 /*
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-24 19:40:43
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-07-28 15:00:43
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-10-18 13:16:48
  * @FilePath: /PoseidonAI-Client/src/pages/Configuration/components/ListConfigurations.tsx
  * @Description:
  *
@@ -11,15 +11,26 @@
 import { deleteTrainingConfig } from '@/services/ant-design-pro/trainingConfig';
 import { DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { FormattedMessage } from '@umijs/max';
-import { Button, Card, Modal, Table, Tag, message, theme } from 'antd';
+import { Card, List, Modal, Typography, message } from 'antd';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { TrainingConfigItem } from '..';
+import './ListConfigurations.css';
 import UserConfigDisplay from './UserConfigDisplay';
 
 interface ListConfigurationsProps {
   data: TrainingConfigItem[];
   setRefresh: (s: boolean) => void;
+}
+
+interface ConfigItem {
+  key: string;
+  name: string;
+  training_framework: string;
+  dataset_format: string;
+  created_at: string;
+  description: string;
+  action: string;
 }
 
 const formatConfigData = (datas: TrainingConfigItem[]) => {
@@ -37,14 +48,16 @@ const formatConfigData = (datas: TrainingConfigItem[]) => {
 };
 
 const ListConfigurations: React.FC<ListConfigurationsProps> = ({ data, setRefresh }) => {
-  const { useToken } = theme;
-  const { token } = useToken();
   const [userConfigDisplayModelOpen, setUserConfigDisplayModelOpen] = useState<boolean>(false);
   const [userConfigDisplayData, setUserConfigDisplayData] = useState<
     TrainingConfigItem | undefined
   >();
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [selectedConfigId, setSelectedConfigId] = useState<string>('');
+  const dataSource = formatConfigData(data).sort(
+    (a: ConfigItem, b: ConfigItem) =>
+      moment(b.created_at).valueOf() - moment(a.created_at).valueOf(),
+  );
 
   const handleDisplayDetails = (_id: string) => {
     const foundItem = data?.find((item) => item._id === _id);
@@ -84,74 +97,62 @@ const ListConfigurations: React.FC<ListConfigurationsProps> = ({ data, setRefres
     setRefresh(true);
   };
 
-  const columns = [
-    {
-      title: <FormattedMessage id="pages.trainingConfig.configName" defaultMessage="名稱" />,
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: (
-        <FormattedMessage id="pages.trainingConfig.frameworkName" defaultMessage="演算法框架" />
-      ),
-      dataIndex: 'training_framework',
-      key: 'training_framework',
-      render: (frameworkName: string) => <Tag color="cyan">{frameworkName}</Tag>,
-    },
-    {
-      title: (
-        <FormattedMessage id="pages.trainingConfig.datasetFormat" defaultMessage="資料集格式" />
-      ),
-      dataIndex: 'dataset_format',
-      key: 'dataset_format',
-      render: (formatName: string) => <Tag color="geekblue">{formatName}</Tag>,
-    },
-    {
-      title: <FormattedMessage id="pages.trainingConfig.description" defaultMessage="描述" />,
-      dataIndex: 'description',
-      key: 'description',
-    },
-    {
-      title: <FormattedMessage id="pages.trainingConfig.creaedDate" defaultMessage="創建日期" />,
-      dataIndex: 'created_at',
-      key: 'created_at',
-    },
-    {
-      title: <FormattedMessage id="pages.trainingConfig.actions" defaultMessage="操作" />,
-      dataIndex: 'action',
-      key: 'action',
-      render: (_id: string) => (
-        <>
-          <Button
-            type="text"
-            icon={<InfoCircleOutlined />}
-            onClick={() => handleDisplayDetails(_id)}
-          />
-          <Button
-            type="text"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleConfirmDeleteConfig(_id)}
-          />
-        </>
-      ),
-    },
-  ];
-
   return (
     <>
-      <Card
-        style={{
-          padding: '16px 19px',
-          minWidth: '220px',
-          flex: 1,
-          backgroundColor: token.colorBgContainer,
-          borderRadius: '8px',
-          color: token.colorTextSecondary,
+      <List
+        itemLayout="vertical"
+        size="small"
+        bordered={false}
+        grid={{
+          gutter: 4,
+          xs: 1,
+          sm: 2,
+          md: 2,
+          lg: 2,
+          xl: 3,
+          xxl: 3,
         }}
-      >
-        {data && <Table dataSource={formatConfigData(data)} columns={columns} />}
-      </Card>
+        style={{
+          marginTop: 15,
+          maxWidth: 1500,
+        }}
+        dataSource={dataSource}
+        renderItem={(item: ConfigItem) => (
+          <List.Item>
+            <Card
+              className="config-card"
+              style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+              onClick={() => handleDisplayDetails(item.action)}
+              cover={
+                <div className="preview-image">
+                  <Typography.Text style={{ fontWeight: 500 }} className="tag-top-right">
+                    {item.training_framework}
+                  </Typography.Text>
+                  <img alt="preview" width="100%" src="/config-cover.webp" loading="lazy" />
+                </div>
+              }
+              hoverable
+              actions={[
+                <InfoCircleOutlined key="view" onClick={() => handleDisplayDetails(item.action)} />,
+                <DeleteOutlined
+                  key="delete"
+                  style={{ color: '#EF5A6F' }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleConfirmDeleteConfig(item.action);
+                  }}
+                />,
+              ]}
+            >
+              <Card.Meta title={item.name} description={item.description} style={{ height: 60 }} />
+              <Typography.Text type="secondary" italic style={{ fontSize: '0.9em', marginTop: 10 }}>
+                <FormattedMessage id="pages.dataset.display.uploaded" defaultMessage="上傳於" />{' '}
+                {moment(item.created_at).fromNow()}
+              </Typography.Text>
+            </Card>
+          </List.Item>
+        )}
+      />
       <Modal
         style={{ minWidth: 900 }}
         title={

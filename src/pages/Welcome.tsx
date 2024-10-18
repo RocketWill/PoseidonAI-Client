@@ -143,7 +143,7 @@ const Welcome: React.FC = () => {
           >
             <InfoCard
               index={1}
-              href="https://umijs.org/docs/introduce/introduce"
+              href=""
               title={
                 <FormattedMessage
                   id="page.welcome.feature1.title"
@@ -159,7 +159,7 @@ const Welcome: React.FC = () => {
             />
             <InfoCard
               index={2}
-              href="https://ant.design"
+              href=""
               title={
                 <FormattedMessage
                   id="page.welcome.feature2.title"
@@ -175,7 +175,7 @@ const Welcome: React.FC = () => {
             />
             <InfoCard
               index={3}
-              href="https://procomponents.ant.design"
+              href=""
               title={
                 <FormattedMessage
                   id="page.welcome.feature3.title"

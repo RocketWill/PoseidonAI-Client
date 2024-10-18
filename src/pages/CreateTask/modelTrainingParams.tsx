@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-02 08:45:40
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-13 16:30:09
+ * @LastEditTime: 2024-10-08 18:00:20
  * @FilePath: /PoseidonAI-Client/src/pages/CreateTask/modelTrainingParams.tsx
  */
 import { FormattedMessage } from '@umijs/max';
@@ -44,12 +44,12 @@ export const AlgoProjectSettings: AlgoProjectSettingsType = {
         />
       ),
       weights: [
-        { name: 'YOLOv8n', disable: false, value: 'yolov8n.pt' },
-        { name: 'YOLOv8s', disable: false, value: 'yolov8s.pt' },
-        { name: 'YOLOv8m', disable: false, value: 'yolov8m.pt' },
-        { name: 'YOLOv8l', disable: false, value: 'yolov8l.pt' },
+        { name: 'ShortStory', disable: false, value: 'ShortStory' },
+        { name: 'Novella', disable: false, value: 'Novella' },
+        { name: 'Novel', disable: false, value: 'Novel' },
+        { name: 'Epic', disable: false, value: 'Epic' },
       ],
-      defaultValue: 'yolov8n.pt',
+      defaultValue: 'ShortStory',
     },
     epoch: {
       name: (

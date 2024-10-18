@@ -38,13 +38,44 @@ const getColorForClass = (clsId: number) => {
   return COLORS[clsId % COLORS.length];
 };
 
-const drawShapeWithLabel = (
+const drawClassificationLabel = (
   ctx: CanvasRenderingContext2D,
-  points: Annotation,
   classId: number,
   className: string,
   color: string,
+  x: number,
+  y: number,
 ) => {
+  // 设置字体和测量文本宽度
+  ctx.font = '20px Arial';
+  const textWidth = ctx.measureText(className).width;
+  const textHeight = 24; // 大约的高度，可以根据实际情况调整
+
+  // 绘制黑色背景框
+  ctx.fillStyle = 'black';
+  ctx.fillRect(x - 5, y - textHeight, textWidth + 10, textHeight);
+
+  // 绘制文本
+  ctx.fillStyle = color;
+  ctx.fillText(className, x, y - 5);
+};
+
+const drawShapeWithLabel = (
+  ctx: CanvasRenderingContext2D,
+  points: Annotation | null,
+  classId: number,
+  className: string,
+  color: string,
+  isClassification: boolean = false,
+) => {
+  if (isClassification) {
+    // 如果是分类任务，直接在左上角显示类别名称
+    drawClassificationLabel(ctx, classId, className, color, 10, 30);
+    return;
+  }
+
+  if (!points || points.length === 0) return;
+
   // 绘制边框
   ctx.beginPath();
   if (points.length === 4) {
@@ -91,15 +122,12 @@ const mergeImagesWithLabels = async (
   setMergedImageUrl: React.Dispatch<React.SetStateAction<string | null>>,
 ) => {
   try {
-    // 加载两张图片
     const [image1, image2] = await Promise.all([loadImage(imageUrl), loadImage(imageUrl)]);
 
-    // 确保图片宽度为800px，高度按比例缩放
     const targetWidth = 800;
     const scaleFactor = targetWidth / image1.width;
     const targetHeight = image1.height * scaleFactor;
 
-    // 创建画布并设置宽度为两个图像的宽度之和
     const canvas = document.createElement('canvas');
     canvas.width = targetWidth * 2;
     canvas.height = targetHeight;
@@ -107,39 +135,44 @@ const mergeImagesWithLabels = async (
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // 绘制第一张图片
     ctx.drawImage(image1, 0, 0, targetWidth, targetHeight);
 
-    // 在第一张图片上绘制预测标注（带类别标签）
-    annotations1.points.forEach((points) => {
-      const scaledPoints = points.map((coord, index) =>
-        index % 2 === 0 ? coord * scaleFactor : coord * scaleFactor,
-      );
-      const className = classNames.find((c) => c.id === annotations1.cls[0])?.name || 'Unknown';
-      const color = getColorForClass(annotations1.cls[0]);
-      drawShapeWithLabel(ctx, scaledPoints, annotations1.cls[0], className, color);
-    });
+    if (annotations1.points === -1) {
+      // 处理分类任务：显示分类标签
+      const className = classNames.find((c) => c.id === annotations1.cls)?.name || 'Unknown';
+      const color = getColorForClass(annotations1.cls);
+      drawShapeWithLabel(ctx, null, annotations1.cls, className, color, true);
+    } else {
+      // 处理检测任务：显示检测框
+      annotations1.points.forEach((points) => {
+        const scaledPoints = points.map((coord, index) =>
+          index % 2 === 0 ? coord * scaleFactor : coord * scaleFactor,
+        );
+        const className = classNames.find((c) => c.id === annotations1.cls[0])?.name || 'Unknown';
+        const color = getColorForClass(annotations1.cls[0]);
+        drawShapeWithLabel(ctx, scaledPoints, annotations1.cls[0], className, color);
+      });
+    }
 
-    // 为第二张图片平移画布
     ctx.translate(targetWidth, 0);
-
-    // 绘制第二张图片
     ctx.drawImage(image2, 0, 0, targetWidth, targetHeight);
 
-    // 在第二张图片上绘制标注结果（带类别标签）
-    annotations2.points.forEach((points) => {
-      const scaledPoints = points.map((coord, index) =>
-        index % 2 === 0 ? coord * scaleFactor : coord * scaleFactor,
-      );
-      const className = classNames.find((c) => c.id === annotations2.cls[0])?.name || 'Unknown';
-      const color = getColorForClass(annotations2.cls[0]);
-      drawShapeWithLabel(ctx, scaledPoints, annotations2.cls[0], className, color);
-    });
+    if (annotations2.points === -1) {
+      const className = classNames.find((c) => c.id === annotations2.cls)?.name || 'Unknown';
+      const color = getColorForClass(annotations2.cls);
+      drawShapeWithLabel(ctx, null, annotations2.cls, className, color, true);
+    } else {
+      annotations2.points.forEach((points) => {
+        const scaledPoints = points.map((coord, index) =>
+          index % 2 === 0 ? coord * scaleFactor : coord * scaleFactor,
+        );
+        const className = classNames.find((c) => c.id === annotations2.cls[0])?.name || 'Unknown';
+        const color = getColorForClass(annotations2.cls[0]);
+        drawShapeWithLabel(ctx, scaledPoints, annotations2.cls[0], className, color);
+      });
+    }
 
-    // 重置平移
     ctx.translate(-targetWidth, 0);
-
-    // 将画布转换为 Object URL
     canvas.toBlob((blob) => {
       if (blob) {
         const url = URL.createObjectURL(blob);

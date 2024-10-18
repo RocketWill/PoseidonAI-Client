@@ -1,8 +1,8 @@
 /*
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-08-24 13:58:39
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-09-08 17:33:24
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-10-09 15:38:25
  * @FilePath: /PoseidonAI-Client/src/pages/VisualizeVal/index.tsx
  * @Description:
  *
@@ -31,9 +31,9 @@ export interface FormValues {
 }
 
 export interface DetectItem {
-  conf?: number[];
-  cls: number[];
-  points: number[][];
+  conf?: number[] | any;
+  cls: number[] | any;
+  points: number[][] | any;
 }
 
 export interface PredItem {
@@ -167,6 +167,7 @@ const ViszualizeVal: React.FC<ViszualizeValProps> = ({ taskData }) => {
         formValues={formValues}
         setFormValues={setFormValues}
         style={{ marginTop: 15 }}
+        detectType={taskData.task_detail.algorithm.detect_type}
       />
       {visualization && (
         <PredCards data={visualization} address={address} style={{ marginTop: 15 }} />

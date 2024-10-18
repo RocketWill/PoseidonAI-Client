@@ -66,7 +66,9 @@ const TaskDetailsDescription: React.FC<TaskDetailsDescriptionProps> = ({ taskDat
           </Descriptions.Item>
           {/* 顯示使用的框架 */}
           <Descriptions.Item label="Framework">
-            <Tag color="green">{taskData?.task_detail?.algorithm.training_framework.name}</Tag>
+            <Tag color="green">
+              {taskData?.task_detail?.algorithm.training_framework.display_name}
+            </Tag>
           </Descriptions.Item>
         </Descriptions>
       </Space>

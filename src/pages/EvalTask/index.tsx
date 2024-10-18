@@ -8,6 +8,7 @@ import React, { useEffect, useState } from 'react';
 import { TaskItem } from '../TrainingTask';
 import TaskDetailsDescription from '../TrainingTask/components/TaskDetailsDescription';
 import ActionButtons from './components/ActionButtons';
+import ClassifyResultChart from './components/Charts/ClassifyResultChart';
 import F1ConfidenceChart from './components/Charts/F1ConfidenceChart';
 import PRChart from './components/Charts/PRCurves';
 import PrecisionConfidenceChart from './components/Charts/PrecisionConfidenceChart ';
@@ -115,6 +116,7 @@ const EvalTask: React.FC<EvalTaskProps> = ({ taskData }) => {
     /\s+/g,
     '',
   );
+  const detectType: string = taskData.task_detail.algorithm.detect_type.tag_name;
 
   // 使用 useEffect 進行狀態輪詢
   useEffect(() => {
@@ -187,13 +189,19 @@ const EvalTask: React.FC<EvalTaskProps> = ({ taskData }) => {
           {
             key: '1',
             label: 'Inference and Evaluation settings',
-            children: <ModelInferenceForm formValues={formValues} setFormValues={setFormValues} />,
+            children: (
+              <ModelInferenceForm
+                formValues={formValues}
+                setFormValues={setFormValues}
+                detectType={taskData.task_detail.algorithm.detect_type}
+              />
+            ),
           },
         ]}
         style={{ marginTop: 15 }}
       />
 
-      {metrics && (
+      {metrics && detectType !== 'classify' && (
         <>
           <Row gutter={16} style={{ marginTop: 15, minWidth: 1000 }}>
             <Col span={12}>
@@ -213,6 +221,13 @@ const EvalTask: React.FC<EvalTaskProps> = ({ taskData }) => {
             </Col>
           </Row>
         </>
+      )}
+      {metrics && detectType === 'classify' && (
+        <Row gutter={16} style={{ marginTop: 15, minWidth: 1000 }}>
+          <Col span={24}>
+            <ClassifyResultChart metrics={metrics} />
+          </Col>
+        </Row>
       )}
     </>
   );

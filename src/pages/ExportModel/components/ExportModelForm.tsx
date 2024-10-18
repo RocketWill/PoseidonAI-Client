@@ -2,7 +2,7 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-09-15 10:52:46
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-04 14:56:28
+ * @LastEditTime: 2024-10-16 09:07:32
  * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/ExportModelForm.tsx
  * @Description:
  *
@@ -50,7 +50,7 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
   const [api, contextHolder] = notification.useNotification();
   const [exportId, setExportId] = useState<string>();
   const [isExporting, setIsExporting] = useState<boolean>(false);
-  console.log(taskData);
+  const detectType = taskData?.task_detail.algorithm.detect_type;
 
   const algoName: string = taskData?.task_detail.algorithm.name.replace(/\s+/g, '') || '';
   const frameworkName: string =
@@ -170,7 +170,10 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
           form={form}
           layout="vertical"
           onFinish={handleFinish}
-          initialValues={{ format: 'typescript', content: 'model' }}
+          initialValues={{
+            format: detectType?.tag_name === 'classify' ? 'openvino' : 'torchscript',
+            content: 'model',
+          }}
         >
           {/* 导出格式 */}
           <Form.Item
@@ -179,11 +182,16 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
             rules={[{ required: true, message: '請選擇導出格式' }]}
           >
             <Select placeholder="請選擇導出格式">
-              <Option value="typescript">Typescript</Option>
+              <Option
+                value="torchscript"
+                disabled={detectType?.tag_name === 'classify' ? true : false}
+              >
+                TorchSript
+              </Option>
               <Option value="onnx" disabled>
                 ONNX
               </Option>
-              <Option value="openvino" disabled>
+              <Option value="openvino" disabled={detectType?.tag_name === 'segment' ? true : false}>
                 OpenVINO
               </Option>
               <Option value="ncnn" disabled>

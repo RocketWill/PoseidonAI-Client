@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-06 08:56:13
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-12 15:27:46
+ * @LastEditTime: 2024-10-18 11:39:34
  * @FilePath: /PoseidonAI-Client/src/pages/TrainingTask/index.tsx
  */
 import { listUserTasks } from '@/services/ant-design-pro/trainingTask';
@@ -117,15 +117,16 @@ const fetchTasks = async (setTaskData: (d: TaskDetail[]) => void): Promise<void>
 // 主 TrainingTask 組件
 const TrainingTask: React.FC = () => {
   const [tasksData, setTasksData] = useState<TaskDetail[]>([]); // 用於存儲任務數據
+  const [refreshFlag, setRefreshFlag] = useState<boolean>(false);
 
   // 使用 useEffect 在組件掛載時獲取任務列表
   useEffect(() => {
     fetchTasks(setTasksData);
-  }, []);
+  }, [refreshFlag]);
 
   return (
     <PageContainer>
-      <TaskList tasksData={tasksData} /> {/* 渲染任務列表 */}
+      <TaskList tasksData={tasksData} setRefreshFlag={setRefreshFlag} /> {/* 渲染任務列表 */}
     </PageContainer>
   );
 };

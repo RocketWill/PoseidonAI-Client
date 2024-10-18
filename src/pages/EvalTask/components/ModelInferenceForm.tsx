@@ -2,10 +2,11 @@
 /*
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-15 10:37:57
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-08-25 16:08:35
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-10-09 11:49:33
  * @FilePath: /PoseidonAI-Client/src/pages/EvalTask/components/ModelInferenceForm.tsx
  */
+import { DetectTypeItem } from '@/pages/CreateTask';
 import GPUSelector from '@/pages/CreateTask/components/GPUSelector';
 import { Card, Col, Form, InputNumber, Row, Select, Slider } from 'antd';
 import React, { CSSProperties } from 'react';
@@ -17,12 +18,14 @@ interface ModelInferenceFormPorps {
   styles?: CSSProperties;
   formValues: FormValues;
   setFormValues: (d: FormValues) => void;
+  detectType: DetectTypeItem;
 }
 
 const ModelInferenceForm: React.FC<ModelInferenceFormPorps> = ({
   styles,
   formValues,
   setFormValues,
+  detectType,
 }) => {
   // State to manage form values
   const [form] = Form.useForm();
@@ -60,6 +63,7 @@ const ModelInferenceForm: React.FC<ModelInferenceFormPorps> = ({
                     step={0.01}
                     value={formValues?.iou}
                     onChange={(value: number) => setFormValues({ ...formValues, iou: value })}
+                    disabled={detectType.tag_name === 'classify' ? true : false}
                   />
                 </Col>
                 <Col span={8}>
@@ -72,6 +76,7 @@ const ModelInferenceForm: React.FC<ModelInferenceFormPorps> = ({
                       setFormValues({ ...formValues, iou: value || 0.3 })
                     }
                     style={{ width: '100%' }}
+                    disabled={detectType.tag_name === 'classify' ? true : false}
                   />
                 </Col>
               </Row>
