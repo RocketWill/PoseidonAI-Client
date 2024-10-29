@@ -35,9 +35,17 @@ import { AlgoProjectSettings } from '../modelTrainingParams';
 import AlgorithmSelector from './AlgorithmSelector';
 import GPUSelector from './GPUSelector';
 
+import { LogActionCreateTask } from '@/utils/LogActions'; // 导入 LogActionCreateTask
+import { LogLevel } from '@/utils/LogLevels'; // 导入 LogLevel
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 导入日志钩子
+
 import './TrainingConfigForm.css';
 
 const { Option } = Select;
+
+// 定义日志记录函数
+// 假设 useUserActionLogger 提供 logAction 函数
+// 你需要根据实际路径调整导入路径
 
 const fetchAlgorithmData = async (setAlgorithmData: (data: AlgorithmItem[]) => void) => {
   try {
@@ -105,38 +113,70 @@ const TrainingConfigForm = () => {
   );
   const [submitLoading, setSubmitLoading] = useState<boolean>(false);
 
+  const { logAction } = useUserActionLogger(); // 获取日志记录函数
+
+  // 监听算法数据变化并记录日志（可选）
+  useEffect(() => {
+    // 如果需要，可以在这里记录算法数据加载完成的日志
+  }, [algorithmData]);
+
+  // 处理表单提交
   const handleSubmit = async (values: any) => {
+    logAction(LogLevel.INFO, LogActionCreateTask.TRAINING_CONFIG_SUBMIT_START, {
+      formValues: values,
+    });
     setSubmitLoading(true);
     try {
       const resp = await createTask(values);
       if (resp['code'] === 200) {
         const taskId = resp['results'];
-        console.log(taskId);
+        logAction(LogLevel.INFO, LogActionCreateTask.TRAINING_CONFIG_SUBMIT_SUCCESS, {
+          taskId,
+          formValues: values,
+        });
 
         const fetchTaskProgress = async () => {
-          const progressRes = await getCreateTaskStatus(taskId);
-          // console.log('Task progress:', progressRes);
-          setCreateTaskState(progressRes.results);
-          if (progressRes.results.state === 'SUCCESS' || progressRes.results === 'FAILURE') {
-            clearInterval(intervalId);
-            setCreateTaskState(undefined);
-            setSubmitLoading(false);
-            form.setFieldsValue(initialValues);
-            console.log('Task completed');
-            message.success(
-              <FormattedMessage
-                id="pages.createTask.successMessage"
-                defaultMessage="創建訓練任務完成"
-              />,
-            );
-          } else {
-            console.log('Task still in progress');
+          try {
+            const progressRes = await getCreateTaskStatus(taskId);
+            setCreateTaskState(progressRes.results);
+            if (
+              progressRes.results.state === 'SUCCESS' ||
+              progressRes.results.state === 'FAILURE'
+            ) {
+              clearInterval(intervalId);
+              setCreateTaskState(undefined);
+              setSubmitLoading(false);
+              form.setFieldsValue(initialValues);
+              logAction(LogLevel.INFO, LogActionCreateTask.TRAINING_CONFIG_SUBMIT_SUCCESS, {
+                taskId,
+                finalState: progressRes.results.state,
+              });
+              message.success(
+                <FormattedMessage
+                  id="pages.createTask.successMessage"
+                  defaultMessage="創建訓練任務完成"
+                />,
+              );
+            } else {
+              logAction(LogLevel.DEBUG, 'TASK_PROGRESS', {
+                taskId,
+                currentState: progressRes.results.state,
+              });
+            }
+          } catch (error) {
+            logAction(LogLevel.ERROR, LogActionCreateTask.TRAINING_CONFIG_SUBMIT_FAILURE, {
+              taskId,
+              error: error,
+            });
           }
         };
 
         const intervalId = setInterval(fetchTaskProgress, 2000);
       }
-    } catch (error) {
+    } catch (error: any) {
+      logAction(LogLevel.ERROR, LogActionCreateTask.TRAINING_CONFIG_SUBMIT_FAILURE, {
+        error: error,
+      });
       setCreateTaskState(undefined);
       setSubmitLoading(false);
       message.error(
@@ -146,40 +186,63 @@ const TrainingConfigForm = () => {
     }
   };
 
+  // 处理 Epoch 变化并记录日志
   const handleEpochChange = useCallback(
     (value: number) => {
       setEpoch(value);
       form.setFieldsValue({ epoch: value });
+      logAction(LogLevel.DEBUG, LogActionCreateTask.TRAINING_CONFIG_SELECT_EPOCH, {
+        epoch: value,
+      });
     },
     [form],
   );
 
+  // 处理 Train Val Ratio 变化并记录日志
   const handleTrainValRatioChange = useCallback(
     (value: number) => {
       setTrainValRatio(value);
       form.setFieldsValue({ trainValRatio: value });
+      logAction(LogLevel.DEBUG, LogActionCreateTask.TRAINING_CONFIG_SELECT_TRAIN_VAL_RATIO, {
+        trainValRatio: value,
+      });
     },
     [form],
   );
 
+  // 处理选择数据集并记录日志
   const handleSelectedDatasetData = useCallback(
     (datasetId: string) => {
       const foundItem = datasetData?.find((item: DatasetItem) => item._id === datasetId);
       setSelectedDataset(foundItem);
+      if (foundItem) {
+        logAction(LogLevel.INFO, LogActionCreateTask.TRAINING_CONFIG_SELECT_DATASET, {
+          datasetId: foundItem._id,
+          datasetName: foundItem.name,
+        });
+      }
     },
     [datasetData],
   );
 
+  // 处理选择训练配置并记录日志
   const handleSelectTrainingConfigData = useCallback(
     (trainingConfigId: string) => {
       const foundItem = trainingConfigData?.find(
         (item: TrainingConfigItem) => item._id === trainingConfigId,
       );
       setSelectedTrainingConfigData(foundItem);
+      if (foundItem) {
+        logAction(LogLevel.INFO, LogActionCreateTask.TRAINING_CONFIG_SELECT_CONFIG, {
+          trainingConfigId: foundItem._id,
+          trainingConfigName: foundItem.name,
+        });
+      }
     },
     [trainingConfigData],
   );
 
+  // 处理表单变化并记录日志（可选）
   const handleFormChange = useCallback(() => {
     const { dataset, config, epoch, trainValRatio } = form.getFieldsValue();
     setDisableSubmit(
@@ -190,16 +253,15 @@ const TrainingConfigForm = () => {
         trainValRatio !== undefined
       ),
     );
-  }, []);
-
-  useEffect(() => {
-    fetchAlgorithmData(setAlgorithmData);
+    logAction(LogLevel.DEBUG, 'FORM_CHANGE', {
+      dataset,
+      config,
+      epoch,
+      trainValRatio,
+    });
   }, [form]);
 
-  useEffect(() => {
-    form.setFieldsValue({ gpu: selectedGpu });
-  }, [selectedGpu]);
-
+  // 监听算法ID变化，加载相关数据并记录日志
   useEffect(() => {
     if (selectedAlgorithmId) {
       const selectedAlgoItem = algorithmData.find(
@@ -225,9 +287,67 @@ const TrainingConfigForm = () => {
 
         setSelectedDataset(undefined);
         setSelectedTrainingConfigData(undefined);
+
+        logAction(LogLevel.INFO, LogActionCreateTask.TRAINING_CONFIG_SELECT_ALGORITHM, {
+          algorithmId: selectedAlgoItem._id,
+          algorithmName: selectedAlgoItem.name,
+          trainingFrameworkId: training_framework._id,
+          trainingFrameworkName: training_framework.name,
+        });
       }
     }
   }, [algorithmData, selectedAlgorithmId, form]);
+
+  // 监听组件挂载，加载算法数据并记录日志
+  useEffect(() => {
+    fetchAlgorithmData(setAlgorithmData);
+  }, [form]);
+
+  // 监听 GPU 变化并记录日志
+  useEffect(() => {
+    form.setFieldsValue({ gpu: selectedGpu });
+    logAction(LogLevel.DEBUG, LogActionCreateTask.TRAINING_CONFIG_SELECT_GPU, {
+      gpu: selectedGpu,
+    });
+  }, [selectedGpu, form]);
+
+  // 处理查看数据集详情并记录日志
+  const handleViewDatasetDetails = useCallback(() => {
+    if (selectedDataset) {
+      setDatasetDetailModalOpen(true);
+      logAction(LogLevel.INFO, LogActionCreateTask.TRAINING_CONFIG_VIEW_DATASET_DETAILS, {
+        datasetId: selectedDataset._id,
+        datasetName: selectedDataset.name,
+      });
+    }
+  }, [selectedDataset]);
+
+  // 处理查看训练配置详情并记录日志
+  const handleViewTrainingConfigDetails = useCallback(() => {
+    if (selectedTrainingConfigData) {
+      setTrainingConfigModalOpen(true);
+      logAction(LogLevel.INFO, LogActionCreateTask.TRAINING_CONFIG_VIEW_CONFIG_DETAILS, {
+        trainingConfigId: selectedTrainingConfigData._id,
+        trainingConfigName: selectedTrainingConfigData.name,
+      });
+    }
+  }, [selectedTrainingConfigData]);
+
+  // 处理表单重置并记录日志
+  const handleResetForm = useCallback(() => {
+    setSelectedAlgorithm(undefined);
+    setSelectedGpu(0);
+    setSelectedAlgorithmId('');
+    form.setFieldsValue(initialValues);
+    setDatasetData(undefined);
+    setTrainingConfigsData(undefined);
+    setSelectedDataset(undefined);
+    setSelectedTrainingConfigData(undefined);
+    setDisableSubmit(true);
+    logAction(LogLevel.INFO, LogActionCreateTask.TRAINING_CONFIG_RESET_FORM, {
+      initialValues,
+    });
+  }, [form]);
 
   return (
     <Card
@@ -310,11 +430,7 @@ const TrainingConfigForm = () => {
                   defaultMessage="選擇訓練集數據"
                 />
                 {selectedDataset && (
-                  <Button
-                    type="text"
-                    icon={<EyeOutlined />}
-                    onClick={() => setDatasetDetailModalOpen(true)}
-                  />
+                  <Button type="text" icon={<EyeOutlined />} onClick={handleViewDatasetDetails} />
                 )}
               </>
             }
@@ -378,7 +494,7 @@ const TrainingConfigForm = () => {
                   <Button
                     type="text"
                     icon={<EyeOutlined />}
-                    onClick={() => setTrainingConfigModalOpen(true)}
+                    onClick={handleViewTrainingConfigDetails}
                   />
                 )}
               </>
@@ -638,15 +754,7 @@ const TrainingConfigForm = () => {
                 <FormattedMessage id="pages.createTask.createTask" defaultMessage="創建任務" />
               </Button>
             </Tooltip>
-            <Button
-              style={{ marginLeft: '10px' }}
-              onClick={() => {
-                setSelectedAlgorithm(undefined);
-                setSelectedGpu(0);
-                setSelectedAlgorithmId('');
-                form.setFieldsValue(initialValues);
-              }}
-            >
+            <Button style={{ marginLeft: '10px' }} onClick={handleResetForm}>
               <FormattedMessage id="pages.createTask.reset" defaultMessage="重置" />
             </Button>
           </Form.Item>
