@@ -1,6 +1,7 @@
 import { outLogin } from '@/services/ant-design-pro/api';
+import logger from '@/utils/Logger';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-import { history, useModel } from '@umijs/max';
+import { FormattedMessage, history, useModel } from '@umijs/max';
 import { Spin } from 'antd';
 import { createStyles } from 'antd-style';
 import { stringify } from 'querystring';
@@ -43,6 +44,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
    * 退出登录，并且将当前的 url 保存
    */
   const loginOut = async () => {
+    logger.logAction('INFO', 'Log out', 'User log out');
     await outLogin();
     // token.save(null);
     const { search, pathname } = window.location;
@@ -106,12 +108,12 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
           {
             key: 'center',
             icon: <UserOutlined />,
-            label: '个人中心',
+            label: <FormattedMessage id="menu.center" defaultMessage="個人中心" />,
           },
           {
             key: 'settings',
             icon: <SettingOutlined />,
-            label: '个人设置',
+            label: <FormattedMessage id="menu.settings" defaultMessage="個人設置" />,
           },
           {
             type: 'divider' as const,
@@ -121,7 +123,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     {
       key: 'logout',
       icon: <LogoutOutlined />,
-      label: '退出登录',
+      label: <FormattedMessage id="menu.account.logout" defaultMessage="退出登錄" />,
     },
   ];
 
