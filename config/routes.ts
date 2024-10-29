@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-06 16:57:58
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-22 08:23:33
+ * @LastEditTime: 2024-10-18 17:03:29
  * @FilePath: /PoseidonAI-Client/config/routes.ts
  */
 /**
@@ -29,6 +29,28 @@ export default [
       },
     ],
   },
+  {
+    path: '/account',
+    name: 'account',
+    hideInMenu: true,
+    routes: [
+      {
+        path: '/account',
+        redirect: '/account/center',
+      },
+      {
+        name: 'center',
+        path: '/account/center',
+        component: './Account/Center',
+      },
+      {
+        name: 'settings',
+        path: '/account/settings',
+        component: './Account/Settings',
+      },
+    ],
+  },
+
   {
     path: '/welcome',
     name: 'welcome',
