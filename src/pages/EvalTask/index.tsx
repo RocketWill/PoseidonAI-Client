@@ -3,6 +3,9 @@ import {
   getEvaluationResults,
   getEvaluationStatus,
 } from '@/services/ant-design-pro/trainingTask';
+import { LogActionEvalTask } from '@/utils/LogActions'; // 日志操作
+import { LogLevel } from '@/utils/LogLevels'; // 日志级别
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 日志钩子
 import { Col, Collapse, notification, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { TaskItem } from '../TrainingTask';
@@ -16,7 +19,6 @@ import ReasultDict from './components/Charts/ReasultDict';
 import RecallConfidenceChart from './components/Charts/RecallConfidenceChart';
 import ModelInferenceForm from './components/ModelInferenceForm';
 
-// 定義 EvalTaskProps 介面，指定 taskData 的類型
 interface EvalTaskProps {
   taskData: TaskItem;
 }
@@ -57,14 +59,12 @@ export interface MetricsItem {
   };
 }
 
-// 定義表單數值的介面
 export interface FormValues {
   iou: number;
   gpu: number;
   batchSize: number;
 }
 
-// 定義評估任務的狀態類型
 export type EvalStatus =
   | 'IDLE'
   | 'PENDING'
@@ -73,10 +73,8 @@ export type EvalStatus =
   | 'FAILURE'
   | 'ERROR'
   | 'REVOKED';
-
 export type EvalAction = 'restart' | 'start' | 'idle';
 
-// 初始化表單數值
 const initialState: FormValues = {
   iou: 0.3,
   gpu: 0,
@@ -87,12 +85,23 @@ const fetchEvalResult = async (
   taskId: string,
   setMetrics: (d: MetricsItem) => void,
   notification: any,
+  logger: any,
 ) => {
   try {
     const resp = await getEvaluationResults(taskId);
     setMetrics(resp.results);
+    logger.logAction(
+      LogLevel.DEBUG,
+      LogActionEvalTask.EVAL_TASK_FETCH_RESULT,
+      `Evaluation results fetched for task ${taskId}`,
+    );
   } catch (err) {
     console.error(err);
+    logger.logAction(
+      LogLevel.ERROR,
+      LogActionEvalTask.EVAL_TASK_ERROR,
+      `Error fetching evaluation results for task ${taskId}`,
+    );
     notification.error({
       message: '讀取評估文件失敗',
       description: '請稍後重試',
@@ -102,15 +111,14 @@ const fetchEvalResult = async (
 };
 
 const EvalTask: React.FC<EvalTaskProps> = ({ taskData }) => {
-  // 使用 useState 管理表單數值和評估任務 ID 的狀態
   const [api, contextHolder] = notification.useNotification();
   const [formValues, setFormValues] = useState<FormValues>(initialState);
   const [isEvaling, setIsEvaling] = useState<boolean>(false);
   const [evalId, setEvalId] = useState<string | null>(null);
   const [metrics, setMetrics] = useState<MetricsItem>();
   const [currentAction, setCurrentAction] = useState<EvalAction>('idle');
+  const logger = useUserActionLogger(); // 初始化日志钩子
 
-  // 清理和格式化演算法名稱和框架名稱
   const algoName: string = taskData.task_detail.algorithm.name.replace(/\s+/g, '');
   const frameworkName: string = taskData.task_detail.algorithm.training_framework.name.replace(
     /\s+/g,
@@ -118,7 +126,6 @@ const EvalTask: React.FC<EvalTaskProps> = ({ taskData }) => {
   );
   const detectType: string = taskData.task_detail.algorithm.detect_type.tag_name;
 
-  // 使用 useEffect 進行狀態輪詢
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
 
@@ -126,49 +133,70 @@ const EvalTask: React.FC<EvalTaskProps> = ({ taskData }) => {
       if (evalId) {
         const resp = await getEvaluationStatus(evalId, algoName, frameworkName);
         const state: EvalStatus = resp.results.state;
-        console.log(resp.results.state); // 輸出當前狀態
+        logger.logAction(
+          LogLevel.DEBUG,
+          LogActionEvalTask.EVAL_TASK_PROGRESS_FETCH,
+          `Evaluation progress: ${state} for evalId ${evalId}`,
+        );
 
-        // 當任務完成或發生錯誤時停止輪詢
         if (state === 'SUCCESS' || state === 'ERROR' || state === 'FAILURE') {
           setMetrics(resp.results.data.results);
           if (intervalId) {
-            clearInterval(intervalId); // 停止輪詢
+            clearInterval(intervalId);
             intervalId = null;
           }
           setIsEvaling(false);
           setCurrentAction('idle');
-          api.success({
-            message: '模型評估完成',
-            placement: 'topLeft',
-          });
+
+          if (state === 'SUCCESS') {
+            api.success({
+              message: '模型評估完成',
+              placement: 'topLeft',
+            });
+            logger.logAction(
+              LogLevel.INFO,
+              LogActionEvalTask.EVAL_TASK_SUCCESS,
+              `Evaluation successful for evalId ${evalId}`,
+            );
+          } else {
+            logger.logAction(
+              LogLevel.ERROR,
+              LogActionEvalTask.EVAL_TASK_FAILURE,
+              `Evaluation failed for evalId ${evalId}`,
+            );
+          }
         }
       }
     };
 
-    // 啟動輪詢
     if (evalId) {
       intervalId = setInterval(fetchEvalStatus, 2000);
     }
 
-    // 清除定時器以避免內存洩漏
     return () => {
       if (intervalId) {
-        clearInterval(intervalId); // 清除定時器
+        clearInterval(intervalId);
       }
     };
   }, [evalId, algoName, frameworkName]);
 
   useEffect(() => {
-    fetchEvalResult(taskData.task_detail._id, setMetrics, api);
+    fetchEvalResult(taskData.task_detail._id, setMetrics, api, logger);
   }, []);
 
-  // 處理開始評估的按鈕點擊事件
   const handleStartEval = async (body: FormValues, action: EvalAction) => {
     setIsEvaling(true);
     const taskId: string = taskData.task_detail._id;
     const resp = await evaluationTask(taskId, body);
-    setEvalId(resp.results); // 保存 evalId 以啟動輪詢
+    setEvalId(resp.results);
     setCurrentAction(action);
+    logger.logAction(
+      LogLevel.INFO,
+      action === 'restart'
+        ? LogActionEvalTask.EVAL_TASK_RESTART
+        : LogActionEvalTask.EVAL_TASK_START,
+      `Evaluation ${action} for task ${taskId}`,
+    );
   };
 
   return (
