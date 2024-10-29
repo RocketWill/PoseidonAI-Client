@@ -2,7 +2,7 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-24 19:40:43
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-18 13:16:48
+ * @LastEditTime: 2024-10-22 11:52:24
  * @FilePath: /PoseidonAI-Client/src/pages/Configuration/components/ListConfigurations.tsx
  * @Description:
  *
@@ -17,6 +17,10 @@ import React, { useState } from 'react';
 import { TrainingConfigItem } from '..';
 import './ListConfigurations.css';
 import UserConfigDisplay from './UserConfigDisplay';
+
+import { LogActionConfig } from '@/utils/LogActions'; // 导入 LogAction
+import { LogLevel } from '@/utils/LogLevels'; // 导入 LogLevel
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 导入日志钩子
 
 interface ListConfigurationsProps {
   data: TrainingConfigItem[];
@@ -59,42 +63,64 @@ const ListConfigurations: React.FC<ListConfigurationsProps> = ({ data, setRefres
       moment(b.created_at).valueOf() - moment(a.created_at).valueOf(),
   );
 
+  const { logAction } = useUserActionLogger(); // 获取日志记录函数
+
   const handleDisplayDetails = (_id: string) => {
     const foundItem = data?.find((item) => item._id === _id);
     setUserConfigDisplayData(foundItem);
     setUserConfigDisplayModelOpen(true);
+    logAction(LogLevel.INFO, LogActionConfig.LIST_CONFIGURATIONS_VIEW_DETAILS, {
+      configId: _id,
+      configName: foundItem?.name,
+    });
   };
 
   const handleConfirmDeleteConfig = (_id: string) => {
-    // deleteTrainingConfig(_id);
     setSelectedConfigId(_id);
     setDeleteModalOpen(true);
+    logAction(LogLevel.DEBUG, LogActionConfig.LIST_CONFIGURATIONS_DELETE_START, {
+      configId: _id,
+    });
   };
 
   const handleDeleteConfig = async (_id: string) => {
     setRefresh(false);
     try {
+      logAction(LogLevel.INFO, LogActionConfig.LIST_CONFIGURATIONS_DELETE_START, {
+        configId: _id,
+      });
       const resp = await deleteTrainingConfig(_id);
       if (resp.code === 200) {
         message.success(
           <FormattedMessage id="pages.trainingConfig.deleteSuccess" defaultMessage="刪除成功" />,
         );
+        logAction(LogLevel.INFO, LogActionConfig.LIST_CONFIGURATIONS_DELETE_SUCCESS, {
+          configId: _id,
+        });
       } else {
         message.error(
           <FormattedMessage id="pages.trainingConfig.deleteError" defaultMessage="刪除失敗" /> +
             resp.msg,
         );
+        logAction(LogLevel.WARN, LogActionConfig.LIST_CONFIGURATIONS_DELETE_FAILURE, {
+          configId: _id,
+          errorMsg: resp.msg,
+        });
       }
     } catch (e: any) {
       message.error(
         <FormattedMessage id="pages.trainingConfig.deleteError" defaultMessage="刪除失敗" /> +
           e.message,
       );
+      logAction(LogLevel.ERROR, LogActionConfig.LIST_CONFIGURATIONS_DELETE_FAILURE, {
+        configId: _id,
+        error: e.message || 'Unknown error',
+      });
     } finally {
       setSelectedConfigId('');
       setDeleteModalOpen(false);
+      setRefresh(true);
     }
-    setRefresh(true);
   };
 
   return (
