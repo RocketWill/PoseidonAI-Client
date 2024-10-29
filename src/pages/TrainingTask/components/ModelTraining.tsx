@@ -8,6 +8,9 @@ import {
   startTraining,
   stopTraining,
 } from '@/services/ant-design-pro/trainingTask'; // 引入訓練相關的服務
+import { LogActionTrainingTask } from '@/utils/LogActions'; // 日志操作
+import { LogLevel } from '@/utils/LogLevels'; // 日志级别
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 日志钩子
 import { FormattedMessage } from '@umijs/max';
 import { TaskItem, TrainingStatus } from '..'; // 引入專案內部的類型
 import DatasetSummary from './DatasetSummary'; // 引入數據集摘要組件
@@ -169,6 +172,8 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
   const intervalId = useRef<NodeJS.Timeout | null>(null); // 用於儲存定時器 ID
   const _id = taskData?.task_detail._id;
 
+  const logger = useUserActionLogger(); // 初始化日志钩子
+
   // 開始獲取訓練進度
   const startFetchingProgress = (
     taskId: string,
@@ -181,22 +186,40 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
         const progressRes = await getTrainingStatus(taskId, algoName, frameworkName, saveKey);
         const state = progressRes.results.state;
         setTrainingStatus(state);
+
+        // 记录训练状态
+        logger.logAction(
+          LogLevel.DEBUG,
+          LogActionTrainingTask.MODEL_TRAINING_PROGRESS_FETCH,
+          `Fetching training progress for Task ${taskId}, Status: ${state}`,
+        );
+
         if (state === 'FAILURE') {
           message.error(
             '訓練遇到狀況，建議重新整理頁面後再嘗試。' + progressRes.results.data.error_detail,
           );
-          setIsTraining(false); // 訓練失敗時停止訓練
+          setIsTraining(false);
+          logger.logAction(
+            LogLevel.ERROR,
+            LogActionTrainingTask.TASKLIST_DELETE_FAILURE,
+            `Training failed for Task ${taskId}`,
+          );
         }
         if (state === 'SUCCESS') {
           message.success('訓練完成');
-          setIsTraining(false); // 訓練成功時停止訓練
+          setIsTraining(false);
+          logger.logAction(
+            LogLevel.INFO,
+            LogActionTrainingTask.MODEL_TRAINING_SUCCESS,
+            `Training succeeded for Task ${taskId}`,
+          );
         }
         if (state === 'SUCCESS' || state === 'FAILURE' || state === 'REVOKED') {
-          setRefreshFlag((prev) => !prev); // 刷新頁面（更新狀態Tag）
+          setRefreshFlag((prev) => !prev);
           if (intervalId.current) {
             clearInterval(intervalId.current);
             intervalId.current = null;
-            setIsTraining(false); // 訓練終止時停止訓練
+            setIsTraining(false);
           }
         } else {
           if (progressRes.results && progressRes.results.data && progressRes.results.data.results) {
@@ -205,7 +228,12 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
         }
       } catch (error) {
         console.error(error);
-        setIsTraining(false); // 捕獲到錯誤時停止訓練
+        setIsTraining(false);
+        logger.logAction(
+          LogLevel.ERROR,
+          LogActionTrainingTask.MODEL_TRAINING_ERROR,
+          `Error occurred while fetching training progress for Task ${taskId}`,
+        );
       }
     };
 
@@ -228,25 +256,41 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
     const saveKey = taskData?.task_detail?.save_key;
 
     try {
-      setIsTraining(true); // 開始訓練時設置狀態
+      setIsTraining(true);
       const resp = await startTraining(taskData.task_detail._id);
       if (resp['code'] === 200) {
         if (_id) startFetchingProgress(_id, algoName, frameworkName, saveKey);
+        logger.logAction(
+          LogLevel.INFO,
+          isRestart
+            ? LogActionTrainingTask.MODEL_TRAINING_RESTART
+            : LogActionTrainingTask.MODEL_TRAINING_START,
+          `Training ${isRestart ? 'restarted' : 'started'} for Task ${_id}`,
+        );
       } else {
-        setIsTraining(false); // 訓練未能啟動時停止訓練
+        setIsTraining(false);
+        logger.logAction(
+          LogLevel.ERROR,
+          LogActionTrainingTask.MODEL_TRAINING_ERROR,
+          `Failed to start training for Task ${_id}`,
+        );
       }
     } catch (error) {
       console.error(error);
-      setIsTraining(false); // 捕獲到錯誤時停止訓練
+      setIsTraining(false);
+      logger.logAction(
+        LogLevel.ERROR,
+        LogActionTrainingTask.MODEL_TRAINING_ERROR,
+        `Error occurred while starting training for Task ${_id}`,
+      );
     } finally {
-      // 延遲重置按鈕加載狀態
       setTimeout(() => {
         if (isRestart) {
           setRestartBtnLoading(false);
         } else {
           setStartBtnLoading(false);
         }
-      }, 3000); // 3秒的延遲
+      }, 3000);
     }
   };
 
@@ -295,7 +339,7 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
   const handleStopTraining = async () => {
     if (!taskData) return;
 
-    setStopBtnLoading(true); // 開始操作時設置加載狀態
+    setStopBtnLoading(true);
 
     const algoName = taskData?.task_detail.algorithm.name.replace(/\s+/g, '');
     const frameworkName = taskData?.task_detail.algorithm.training_framework.name;
@@ -306,15 +350,25 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
         setTimeout(() => {
           message.success(resp['msg']);
           setIsTraining(false);
-        }, 3000); // 3秒的延遲
+          logger.logAction(
+            LogLevel.INFO,
+            LogActionTrainingTask.MODEL_TRAINING_STOP,
+            `Training stopped for Task ${taskData.task_detail._id}`,
+          );
+        }, 3000);
       }
     } catch (err) {
       message.error('遇到錯誤，' + err);
-      setIsTraining(false); // 捕獲到錯誤時停止訓練
+      setIsTraining(false);
+      logger.logAction(
+        LogLevel.ERROR,
+        LogActionTrainingTask.MODEL_TRAINING_ERROR,
+        `Error occurred while stopping training for Task ${taskData.task_detail._id}`,
+      );
     } finally {
       setTimeout(() => {
-        setStopBtnLoading(false); // 操作完成後重置加載狀態
-      }, 5000); // 5秒的延遲
+        setStopBtnLoading(false);
+      }, 5000);
     }
   };
 
