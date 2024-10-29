@@ -2,12 +2,14 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-29 08:28:24
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-06 16:45:12
+ * @LastEditTime: 2024-10-18 15:40:23
  * @FilePath: /PoseidonAI-Client/src/locales/zh-TW/menu.ts
  */
 export default {
   'menu.welcome': '歡迎',
   'menu.dataset': '資料集管理',
+  'menu.center': '個人中心',
+  'menu.settings': '個人設置',
   'menu.trainingConfiguration': '訓練參數配置',
   'menu.modelTraining': '模型訓練',
   'menu.project': '專案',
