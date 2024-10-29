@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { Footer } from '@/components';
 import { login } from '@/services/ant-design-pro/api';
+import logger from '@/utils/Logger';
 import token from '@/utils/token';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
@@ -10,6 +11,7 @@ import { createStyles } from 'antd-style';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
+
 let access = ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION === 'site' ? 'admin' : '';
 
 const useStyles = createStyles(({ token }) => {
@@ -77,6 +79,7 @@ const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
   const { initialState, setInitialState } = useModel('@@initialState');
+
   const { styles } = useStyles();
   const intl = useIntl();
 
@@ -107,6 +110,7 @@ const Login: React.FC = () => {
         await fetchUserInfo();
         const urlParams = new URL(window.location.href).searchParams;
         history.push(urlParams.get('redirect') || '/');
+        logger.logAction('INFO', 'AUTH_USER_LOGIN', msg);
         return;
       }
       console.log(msg);
@@ -119,6 +123,7 @@ const Login: React.FC = () => {
       });
       console.log(error);
       message.error(defaultLoginFailureMessage);
+      logger.logAction('ERROR', 'AUTH_USER_LOGIN_FAILURE', error);
     }
   };
   const { status, type: loginType } = userLoginState;
