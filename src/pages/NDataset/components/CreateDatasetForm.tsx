@@ -1,10 +1,13 @@
 /* eslint-disable */
 import { createDataset } from '@/services/ant-design-pro/dataset';
+import { LogActionDataset } from '@/utils/LogActions';
+import { LogLevel } from '@/utils/LogLevels';
 import { generateRandomName } from '@/utils/tools';
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 导入日志钩子
 import { FormattedMessage } from '@umijs/max';
 import { Button, Card, Form, Input, message, Select, Upload } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DatasetFormatItem, DetectTypeItem } from '..';
 
 const { Dragger } = Upload;
@@ -30,6 +33,12 @@ const CreateDatasetForm: React.FC<CreateDatasetFormProps> = ({
   const [form] = Form.useForm();
   const [jsonFile, setJsonFile] = useState<UploadFile | undefined>();
   const [imgList, setImgList] = useState<UploadFile[]>([]);
+  const { logAction } = useUserActionLogger(); // 获取日志记录函数
+
+  // 组件挂载时记录日志
+  useEffect(() => {
+    logAction(LogLevel.INFO, LogActionDataset.CREATE_DATASET_FORM_MOUNT, '');
+  }, [logAction]);
 
   const beforeJsonUpload = (file: UploadFile) => {
     const isJson = file.type === 'application/json';
@@ -40,6 +49,10 @@ const CreateDatasetForm: React.FC<CreateDatasetFormProps> = ({
           defaultMessage="只能上傳一個 Json 文件"
         />,
       );
+      logAction(LogLevel.WARN, LogActionDataset.CREATE_DATASET_UPLOAD_JSON_FAILURE, {
+        fileName: file.name,
+        reason: 'File type is not JSON',
+      });
     }
     return isJson;
   };
@@ -53,6 +66,10 @@ const CreateDatasetForm: React.FC<CreateDatasetFormProps> = ({
           defaultMessage="只能上傳圖片資料"
         />,
       );
+      logAction(LogLevel.WARN, LogActionDataset.CREATE_DATASET_UPLOAD_IMAGE_FAILURE, {
+        fileName: file.name,
+        reason: 'File type is not image',
+      });
     }
 
     const fileSize = file.size || 0;
@@ -64,6 +81,10 @@ const CreateDatasetForm: React.FC<CreateDatasetFormProps> = ({
           defaultMessage="圖片大小不能超過200MB"
         />,
       );
+      logAction(LogLevel.WARN, LogActionDataset.CREATE_DATASET_UPLOAD_IMAGE_FAILURE, {
+        fileName: file.name,
+        reason: 'File size exceeds 200MB',
+      });
     }
     return isImage && isLt200MB;
   };
@@ -71,10 +92,34 @@ const CreateDatasetForm: React.FC<CreateDatasetFormProps> = ({
   const onJsonChange = ({ fileList: newFileList }: { fileList: UploadFile[] }) => {
     const file = newFileList[newFileList.length - 1];
     setJsonFile(file);
+    if (file.status === 'done') {
+      logAction(LogLevel.INFO, LogActionDataset.CREATE_DATASET_UPLOAD_JSON_SUCCESS, {
+        fileName: file.name,
+        response: file.response,
+      });
+    } else if (file.status === 'error') {
+      logAction(LogLevel.ERROR, LogActionDataset.CREATE_DATASET_UPLOAD_JSON_FAILURE, {
+        fileName: file.name,
+        error: file.error,
+      });
+    }
   };
 
   const onImageChange = ({ fileList: newFileList }: { fileList: UploadFile[] }) => {
     setImgList(newFileList);
+    newFileList.forEach((file) => {
+      if (file.status === 'done') {
+        logAction(LogLevel.INFO, LogActionDataset.CREATE_DATASET_UPLOAD_IMAGE_SUCCESS, {
+          fileName: file.name,
+          response: file.response,
+        });
+      } else if (file.status === 'error') {
+        logAction(LogLevel.ERROR, LogActionDataset.CREATE_DATASET_UPLOAD_IMAGE_FAILURE, {
+          fileName: file.name,
+          error: file.error,
+        });
+      }
+    });
   };
 
   const jsonUploadProps = {
@@ -93,32 +138,59 @@ const CreateDatasetForm: React.FC<CreateDatasetFormProps> = ({
   };
 
   const onFinish = async (values: any) => {
-    const formData = new FormData();
-    formData.append('data', JSON.stringify(values));
-    if (jsonFile) {
-      formData.append('jsonFile', jsonFile.originFileObj as Blob);
-    }
-    imgList.forEach((file) => {
-      formData.append('imageFiles', file.originFileObj as Blob);
+    logAction(LogLevel.INFO, LogActionDataset.CREATE_DATASET_SUBMIT_START, {
+      formValues: values,
     });
-    const result = await createDataset(formData);
-    if (result.code === 200) {
-      message.success(
-        <FormattedMessage id="pages.dataset.display.createSuccess" defaultMessage="創建成功" />,
-      );
-    } else {
+    try {
+      const formData = new FormData();
+      formData.append('data', JSON.stringify(values));
+      if (jsonFile) {
+        formData.append('jsonFile', jsonFile.originFileObj as Blob);
+      }
+      imgList.forEach((file) => {
+        formData.append('imageFiles', file.originFileObj as Blob);
+      });
+      const result = await createDataset(formData);
+      if (result.code === 200) {
+        message.success(
+          <FormattedMessage id="pages.dataset.display.createSuccess" defaultMessage="創建成功" />,
+        );
+        logAction(LogLevel.INFO, LogActionDataset.CREATE_DATASET_SUBMIT_SUCCESS, {
+          datasetName: values.name,
+          response: result,
+        });
+      } else {
+        message.error(
+          `${(
+            <FormattedMessage id="pages.dataset.display.createFail" defaultMessage="創建失敗" />
+          )}: ${result.msg}`,
+        );
+        logAction(LogLevel.WARN, LogActionDataset.CREATE_DATASET_SUBMIT_FAILURE, {
+          datasetName: values.name,
+          errorMsg: result.msg,
+        });
+      }
+      form.resetFields();
+      setRefreshFlag((prev) => !prev);
+    } catch (error) {
       message.error(
-        `${(
-          <FormattedMessage id="pages.dataset.display.createFail" defaultMessage="創建失敗" />
-        )}: ${result.msg}`,
+        <FormattedMessage
+          id="pages.dataset.display.createFailNetwork"
+          defaultMessage="創建失敗，請檢查網絡連接"
+        />,
       );
+      logAction(LogLevel.ERROR, LogActionDataset.CREATE_DATASET_SUBMIT_FAILURE, {
+        datasetName: values.name,
+        error: error,
+      });
     }
-    form.resetFields();
-    setRefreshFlag((prev) => !prev);
   };
 
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo);
+    logAction(LogLevel.WARN, LogActionDataset.CREATE_DATASET_SUBMIT_FAILURE, {
+      errorInfo,
+    });
   };
 
   return (

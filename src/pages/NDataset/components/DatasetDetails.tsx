@@ -15,26 +15,44 @@ import DisplayImage from './DisplayImage'; // 引入內部組件 DisplayImage
 import HorizontalBarChart from './HorizontalBarCharts'; // 引入內部組件 HorizontalBarChart
 import LabelPieCharts from './LabelPieCharts'; // 引入內部組件 LabelPieCharts
 
-// 定義 DatasetDetailsProps 的接口，描述組件的 props 結構
+import { LogActionDataset } from '@/utils/LogActions'; // 引入日志操作
+import { LogLevel } from '@/utils/LogLevels'; // 引入日志级别
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 引入日志钩子
+
+// 定义 DatasetDetailsProps 的接口，描述组件的 props 结构
 interface DatasetDetailsProps {
-  dataset: DatasetItem | undefined; // 數據集信息，可為未定義
+  dataset: DatasetItem | undefined; // 数据集信息，可为未定义
 }
 
-// 異步函數：獲取已視覺化的文件
+// 异步函数：获取已视觉化的文件
 const fetchVisualizedFiles = async (
   datasetId: string,
   setVisualizedFiles: (d: string[]) => void,
+  logAction: (level: LogLevel, action: LogActionDataset, details?: Record<string, any>) => void,
 ) => {
-  const resp = await checkVisDatasetDirExist(datasetId);
-  const visualizedFiles = resp.results.files;
-  setVisualizedFiles(visualizedFiles);
+  try {
+    const resp = await checkVisDatasetDirExist(datasetId);
+    const visualizedFiles = resp.results.files;
+    setVisualizedFiles(visualizedFiles);
+    logAction(LogLevel.INFO, LogActionDataset.DATASET_FETCH_VISUALIZED_FILES, {
+      datasetId,
+      visualizedFiles,
+    });
+  } catch (error: any) {
+    logAction(LogLevel.ERROR, LogActionDataset.DATASET_FETCH_VISUALIZED_FILES_FAILURE, {
+      datasetId,
+      error: error.message || 'Unknown error',
+    });
+    console.error('Error fetching visualized files:', error);
+  }
 };
 
-// 處理視覺化數據集的圖片顯示
+// 处理视觉化数据集的图片显示
 const handleDisplayVisDatasetChildren = (
   dataset: DatasetItem,
   visualizedFiles: string[],
   handleDisplayImage: (imageLink: string, title: string) => void,
+  logAction: (level: LogLevel, action: LogActionDataset, details?: Record<string, any>) => void,
 ) => {
   const imageList = (imageFile: string, i: number) => {
     const userId = dataset.user_id;
@@ -44,14 +62,26 @@ const handleDisplayVisDatasetChildren = (
         <Badge
           key={`${i}-${imageFile}`}
           status="success"
-          text={<a onClick={() => handleDisplayImage(link, imageFile)}>{imageFile}</a>}
+          text={
+            <a
+              onClick={() => {
+                handleDisplayImage(link, imageFile);
+                logAction(LogLevel.DEBUG, LogActionDataset.DATASET_DISPLAY_IMAGE, {
+                  datasetId: dataset._id,
+                  imageFile,
+                });
+              }}
+            >
+              {imageFile}
+            </a>
+          }
         />
       );
     }
     return <Badge key={`${i}-${imageFile}`} status="default" text={imageFile} />;
   };
 
-  // 返回一個左對齊且可換行的彈性容器
+  // 返回一个左对齐且可换行的弹性容器
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', justifyContent: 'flex-start' }}>
       {dataset.image_files.map((imageFile, i) => (
@@ -74,13 +104,14 @@ const handleDisplayVisDatasetChildren = (
   );
 };
 
-// 處理顯示視覺化數據集標籤
+// 处理显示视觉化数据集标签
 const handleDisplayVisDatasetLabel = (
   datasetId: string,
   imageFiles: string[],
   visualizedFiles: string[],
   handleVisDataset: (datasetId: string) => void,
   visDatasetLoading: boolean,
+  logAction: (level: LogLevel, action: LogActionDataset, details?: Record<string, any>) => void,
 ) => {
   if (!visualizedFiles.length) {
     return (
@@ -88,7 +119,10 @@ const handleDisplayVisDatasetLabel = (
         size="small"
         style={{ marginLeft: 15 }}
         loading={visDatasetLoading}
-        onClick={() => handleVisDataset(datasetId)}
+        onClick={() => {
+          handleVisDataset(datasetId);
+          logAction(LogLevel.INFO, LogActionDataset.DATASET_START_VISUALIZATION, { datasetId });
+        }}
       >
         <FormattedMessage
           id="pages.dataset.display.visualizeAnnotations"
@@ -115,7 +149,7 @@ const handleDisplayVisDatasetLabel = (
   }
 };
 
-// 獲取數據集詳細信息
+// 获取数据集详细信息
 const getDatasetDetails = (
   dataset: DatasetItem,
   visualizedFiles: string[],
@@ -125,6 +159,7 @@ const getDatasetDetails = (
   visDatasetLoading: boolean,
   showAllClasses: boolean,
   setShowAllClasses: (b: boolean) => void,
+  logAction: (level: LogLevel, action: LogActionDataset, details?: Record<string, any>) => void,
 ) => {
   const items = [
     {
@@ -132,19 +167,6 @@ const getDatasetDetails = (
       label: <FormattedMessage id="pages.dataset.display.createdAt" defaultMessage="創建日期" />,
       children: moment(dataset.created_at).format('YYYY-MM-DD HH:mm'),
     },
-    // {
-    //   key: 2,
-    //   label: (
-    //     <FormattedMessage id="pages.dataset.display.datasetFormat" defaultMessage="資料格式" />
-    //   ),
-    //   children: (
-    //     <>
-    //       {dataset.dataset_format.map((format: DatasetFormatItem, i: number) => (
-    //         <Tag key={`${i}-${format}`}>{format.name.toUpperCase()}</Tag>
-    //       ))}
-    //     </>
-    //   ),
-    // },
     {
       key: 2,
       label: <FormattedMessage id="pages.dataset.display.description" defaultMessage="描述" />,
@@ -163,14 +185,18 @@ const getDatasetDetails = (
       children: (
         <>
           {dataset.class_names
-            .slice(0, showAllClasses ? dataset.class_names.length : 5) // 根據狀態顯示5個或全部
+            .slice(0, showAllClasses ? dataset.class_names.length : 5) // 根据状态显示5个或全部
             .map((className: string, i: number) => (
               <Tag color="blue" key={`${i}-${className}`}>
                 {className}
               </Tag>
             ))}
           {dataset.class_names.length > 5 && (
-            <Tag onClick={() => setShowAllClasses(!showAllClasses)}>
+            <Tag
+              onClick={() => {
+                setShowAllClasses(!showAllClasses);
+              }}
+            >
               <a>{showAllClasses ? 'Show less' : `+${dataset.class_names.length - 5}`}</a>
             </Tag>
           )}
@@ -188,10 +214,16 @@ const getDatasetDetails = (
             visualizedFiles,
             handleVisDataset,
             visDatasetLoading,
+            logAction, // 传递 logAction
           )}
         </>
       ),
-      children: handleDisplayVisDatasetChildren(dataset, visualizedFiles, handleDisplayImage),
+      children: handleDisplayVisDatasetChildren(
+        dataset,
+        visualizedFiles,
+        handleDisplayImage,
+        logAction,
+      ),
       span: 12,
     },
     {
@@ -208,8 +240,11 @@ const getDatasetDetails = (
   return items;
 };
 
-// 獲取數據集統計信息詳細信息
-const getDatasetStatisticsDetails = (datasetStatistics: DatasetStatisticsItem | undefined) => {
+// 获取数据集统计信息详细信息
+const getDatasetStatisticsDetails = (
+  datasetStatistics: DatasetStatisticsItem | undefined,
+  logAction: (level: LogLevel, action: LogActionDataset, details?: Record<string, any>) => void,
+) => {
   const items = [
     {
       key: 1,
@@ -237,50 +272,96 @@ const getDatasetStatisticsDetails = (datasetStatistics: DatasetStatisticsItem | 
   return items;
 };
 
-// 定義 DatasetDetails 組件
+// 定义 DatasetDetails 组件
 const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
-  const [visualizedFiles, setVisualizedFiles] = useState<string[]>([]); // 已視覺化的文件
-  const [imageModalOpen, setImageModalOpen] = useState<boolean>(false); // 圖片模態框開啟狀態
-  const [imageModalTitle, setImageModalTitle] = useState<string>(''); // 圖片模態框標題
-  const [selectedImage, setSelectedImage] = useState<string>(''); // 選中的圖片
-  const [visDatasetLoading, setVisDatasetLoading] = useState<boolean>(false); // 視覺化加載狀態
-  const [taskProgress, setTaskProgress] = useState<string>(''); // 任務進度
-  const [showAllClasses, setShowAllClasses] = useState<boolean>(false); // 控制類別顯示的狀態
+  const [visualizedFiles, setVisualizedFiles] = useState<string[]>([]); // 已视觉化的文件
+  const [imageModalOpen, setImageModalOpen] = useState<boolean>(false); // 图片模态框开启状态
+  const [imageModalTitle, setImageModalTitle] = useState<string>(''); // 图片模态框标题
+  const [selectedImage, setSelectedImage] = useState<string>(''); // 选中的图片
+  const [visDatasetLoading, setVisDatasetLoading] = useState<boolean>(false); // 视觉化加载状态
+  const [taskProgress, setTaskProgress] = useState<string>(''); // 任务进度
+  const [showAllClasses, setShowAllClasses] = useState<boolean>(false); // 控制类别显示的状态
+
+  const { logAction } = useUserActionLogger(); // 获取日志记录函数
 
   if (!dataset) return null;
 
+  // 处理显示图片
   const handleDisplayImage = (imageLink: string, title: string) => {
     setImageModalTitle(title);
     setSelectedImage(imageLink);
     setImageModalOpen(true);
+    logAction(LogLevel.DEBUG, LogActionDataset.DATASET_DISPLAY_IMAGE, {
+      datasetId: dataset._id,
+      imageLink,
+      title,
+    });
   };
 
+  // 处理视觉化任务
   const handleVisDataset = async (datasetId: string) => {
     console.log('Starting visualization task...');
+    logAction(LogLevel.INFO, LogActionDataset.DATASET_START_VISUALIZATION, { datasetId });
     setVisDatasetLoading(true);
-    const resp = await visDataset(datasetId);
-    const taskId = resp.results;
+    try {
+      const resp = await visDataset(datasetId);
+      const taskId = resp.results;
 
-    const fetchTaskProgress = async () => {
-      const progressRes = await getVisDatasetStatus(taskId);
-      console.log('Task progress:', progressRes);
-      setTaskProgress(progressRes.results);
-      if (progressRes.results === 'SUCCESS' || progressRes.results === 'FAILURE') {
-        clearInterval(intervalId);
-        setVisDatasetLoading(false);
-        console.log('Task completed');
-        fetchVisualizedFiles(datasetId, setVisualizedFiles); // 刷新視覺化文件列表
-      } else {
-        fetchVisualizedFiles(datasetId, setVisualizedFiles);
-        console.log('Task still in progress');
-      }
-    };
+      const fetchTaskProgress = async () => {
+        try {
+          const progressRes = await getVisDatasetStatus(taskId);
+          console.log('Task progress:', progressRes);
+          setTaskProgress(progressRes.results);
+          logAction(LogLevel.DEBUG, LogActionDataset.DATASET_VISUALIZATION_PROGRESS, {
+            datasetId,
+            taskId,
+            progress: progressRes.results,
+          });
+          if (progressRes.results === 'SUCCESS') {
+            clearInterval(intervalId);
+            setVisDatasetLoading(false);
+            logAction(LogLevel.INFO, LogActionDataset.DATASET_VISUALIZATION_SUCCESS, {
+              datasetId,
+              taskId,
+            });
+            fetchVisualizedFiles(datasetId, setVisualizedFiles, logAction); // 刷新视觉化文件列表
+          } else if (progressRes.results === 'FAILURE') {
+            clearInterval(intervalId);
+            setVisDatasetLoading(false);
+            logAction(LogLevel.ERROR, LogActionDataset.DATASET_VISUALIZATION_FAILURE, {
+              datasetId,
+              taskId,
+              error: 'Visualization task failed',
+            });
+          } else {
+            fetchVisualizedFiles(datasetId, setVisualizedFiles, logAction);
+            console.log('Task still in progress');
+          }
+        } catch (error: any) {
+          clearInterval(intervalId);
+          setVisDatasetLoading(false);
+          logAction(LogLevel.ERROR, LogActionDataset.DATASET_VISUALIZATION_FAILURE, {
+            datasetId,
+            taskId,
+            error: error.message || 'Unknown error',
+          });
+          console.error('Error fetching task progress:', error);
+        }
+      };
 
-    const intervalId = setInterval(fetchTaskProgress, 2000);
+      const intervalId = setInterval(fetchTaskProgress, 2000);
+    } catch (error: any) {
+      setVisDatasetLoading(false);
+      logAction(LogLevel.ERROR, LogActionDataset.DATASET_VISUALIZATION_FAILURE, {
+        datasetId,
+        error: error.message || 'Unknown error',
+      });
+      console.error('Error starting visualization task:', error);
+    }
   };
 
   useEffect(() => {
-    fetchVisualizedFiles(dataset._id, setVisualizedFiles);
+    fetchVisualizedFiles(dataset._id, setVisualizedFiles, logAction);
   }, [dataset._id]);
 
   return (
@@ -290,7 +371,7 @@ const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
         layout="vertical"
         bordered
         column={2}
-        items={getDatasetStatisticsDetails(dataset.statistics)}
+        items={getDatasetStatisticsDetails(dataset.statistics, logAction)}
         style={{
           marginTop: 15,
         }}
@@ -309,6 +390,7 @@ const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
           visDatasetLoading,
           showAllClasses,
           setShowAllClasses,
+          logAction, // 传递 logAction
         )}
         style={{
           marginTop: 15,

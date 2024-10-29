@@ -3,7 +3,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-31 15:41:18
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-14 13:09:15
+ * @LastEditTime: 2024-10-22 13:15:16
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/components/ListDatasets.tsx
  */
 
@@ -15,6 +15,10 @@ import { deleteDataset } from '@/services/ant-design-pro/dataset';
 import { DatasetItem } from '..';
 import DatasetDetails from './DatasetDetails';
 import DatasetListItem from './DatasetListItem';
+
+import { LogActionDataset } from '@/utils/LogActions'; // 导入 LogAction
+import { LogLevel } from '@/utils/LogLevels'; // 导入 LogLevel
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 导入日志钩子
 
 interface ListDatasetsProps {
   datasetData: DatasetItem[];
@@ -35,28 +39,60 @@ const ListDatasets: React.FC<ListDatasetsProps> = ({ datasetData, setRefreshFlag
   const [detailModalOpen, setDetailModalOpen] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [selectedDatasetData, setSelectedDatasetData] = useState<DatasetItem | undefined>();
+  const { logAction } = useUserActionLogger(); // 获取日志记录函数
 
+  // 处理显示详情
   const handleEditDataset = (dataset: DatasetItem) => {
     setSelectedDatasetData(dataset);
     setDetailModalOpen(true);
+    logAction(LogLevel.INFO, LogActionDataset.LIST_DATASETS_VIEW_DETAILS, {
+      datasetId: dataset._id,
+      datasetName: dataset.name,
+    });
   };
 
+  // 处理删除操作
   const handleDeleteDataset = async (datasetId: string | undefined) => {
     if (!datasetId) return;
-    const result = await deleteDataset(datasetId);
-    if (result.code === 200) {
-      message.success(
-        <FormattedMessage id="pages.dataset.display.deleteSuccess" defaultMessage="刪除成功" />,
-      );
-    } else {
+
+    logAction(LogLevel.INFO, LogActionDataset.LIST_DATASETS_DELETE_START, {
+      datasetId,
+    });
+
+    setRefreshFlag(false);
+    try {
+      const resp = await deleteDataset(datasetId);
+      if (resp.code === 200) {
+        message.success(
+          <FormattedMessage id="pages.dataset.display.deleteSuccess" defaultMessage="刪除成功" />,
+        );
+        logAction(LogLevel.INFO, LogActionDataset.LIST_DATASETS_DELETE_SUCCESS, {
+          datasetId,
+        });
+      } else {
+        message.error(
+          <FormattedMessage id="pages.dataset.display.deleteFail" defaultMessage="刪除失敗" /> +
+            resp.msg,
+        );
+        logAction(LogLevel.WARN, LogActionDataset.LIST_DATASETS_DELETE_FAILURE, {
+          datasetId,
+          errorMsg: resp.msg,
+        });
+      }
+    } catch (e: any) {
       message.error(
-        `${(
-          <FormattedMessage id="pages.dataset.display.deleteFail" defaultMessage="刪除失敗" />
-        )}: ${result.msg}`,
+        <FormattedMessage id="pages.dataset.display.deleteFail" defaultMessage="刪除失敗" /> +
+          e.message,
       );
+      logAction(LogLevel.ERROR, LogActionDataset.LIST_DATASETS_DELETE_FAILURE, {
+        datasetId,
+        error: e.message || 'Unknown error',
+      });
+    } finally {
+      setSelectedDatasetData(undefined);
+      setDeleteModalOpen(false);
+      setRefreshFlag(true);
     }
-    setDeleteModalOpen(false);
-    setRefreshFlag((prev) => !prev);
   };
 
   return (

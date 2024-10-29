@@ -9,6 +9,9 @@ import EvalTask from '@/pages/EvalTask';
 import ExportModel from '@/pages/ExportModel';
 import ViszualizeVal from '@/pages/VisualizeVal';
 import { getUserTask } from '@/services/ant-design-pro/trainingTask'; // 引入服務方法用於獲取任務數據
+import { LogActionTrainingTask } from '@/utils/LogActions'; // 日志操作
+import { LogLevel } from '@/utils/LogLevels'; // 日志级别
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 日志钩子
 import { ArrowLeftOutlined } from '@ant-design/icons'; // 引入 Ant Design 的圖標
 import { PageContainer } from '@ant-design/pro-components'; // 引入 Ant Design Pro 的頁面容器組件
 import { FormattedMessage, useIntl } from '@umijs/max';
@@ -21,34 +24,83 @@ import ModelTraining from './ModelTraining'; // 引入 ModelTraining 組件
 
 const history = createBrowserHistory();
 
-// TaskDetails 組件
 const TaskDetails: React.FC = () => {
-  // 定義狀態用於存儲任務數據
   const [taskData, setTaskData] = useState<TaskItem | undefined>(undefined);
-  // 定義狀態用於控制刷新標誌
   const [refreshFlag, setRefreshFlag] = useState<boolean>(false);
-  // 從 URL 中提取 taskId
   const { taskId } = useParams();
-
   const evalMode = taskData?.task_detail.status === 'SUCCESS' ? false : true;
+  const logger = useUserActionLogger();
 
-  // 獲取任務數據的異步函數
+  useEffect(() => {
+    logger.logAction(
+      LogLevel.INFO,
+      LogActionTrainingTask.TASK_DETAILS_PAGE_LOAD,
+      'TaskDetails page loaded',
+    );
+  }, []);
+
   const fetchTask = async () => {
     try {
-      // 呼叫 API 獲取任務數據
       const resp = await getUserTask(taskId as string);
-      // 更新狀態
       setTaskData(resp.results);
+      logger.logAction(
+        LogLevel.INFO,
+        LogActionTrainingTask.TASK_DETAILS_FETCH_SUCCESS,
+        `Task ${taskId} fetched successfully`,
+      );
     } catch (error) {
-      // 異常處理，打印錯誤信息
       console.error(error);
+      logger.logAction(
+        LogLevel.ERROR,
+        LogActionTrainingTask.TASK_DETAILS_FETCH_FAILURE,
+        `Failed to fetch task ${taskId}`,
+      );
     }
   };
 
-  // 使用 useEffect 來監控 refreshFlag 和 taskId 的變化
   useEffect(() => {
-    if (taskId) fetchTask(); // taskId 存在時調用 fetchTask
-  }, [refreshFlag]); // 當 refreshFlag 改變時重新獲取數據
+    if (taskId) fetchTask();
+  }, [refreshFlag]);
+
+  // 处理 Tab 切换日志
+  const handleTabChange = (key: string) => {
+    switch (key) {
+      case '1':
+        logger.logAction(
+          LogLevel.DEBUG,
+          LogActionTrainingTask.TASK_DETAILS_TAB_LOAD_TRAINING,
+          'Training tab loaded',
+        );
+        break;
+      case '2':
+        logger.logAction(
+          LogLevel.DEBUG,
+          LogActionTrainingTask.TASK_DETAILS_TAB_LOAD_EVAL,
+          'Evaluation tab loaded',
+        );
+        break;
+      case '3':
+        logger.logAction(
+          LogLevel.DEBUG,
+          LogActionTrainingTask.TASK_DETAILS_TAB_LOAD_VISUALIZE,
+          'Visualization tab loaded',
+        );
+        break;
+      case '4':
+        logger.logAction(
+          LogLevel.DEBUG,
+          LogActionTrainingTask.TASK_DETAILS_TAB_LOAD_EXPORT,
+          'Model export tab loaded',
+        );
+        break;
+      default:
+        logger.logAction(
+          LogLevel.DEBUG,
+          LogActionTrainingTask.TASK_DETAILS_TAB_SWITCH,
+          `Switched to tab ${key}`,
+        );
+    }
+  };
 
   return (
     <PageContainer
@@ -58,9 +110,9 @@ const TaskDetails: React.FC = () => {
         </Button>
       }
     >
-      {/* 渲染 ModelTraining 組件並傳遞任務數據和刷新標誌的 set 函數 */}
       <Tabs
         defaultActiveKey="1"
+        onChange={handleTabChange}
         items={[
           {
             label: <FormattedMessage id="pages.evalTask.trainingModel" defaultMessage="模型訓練" />,
@@ -69,10 +121,7 @@ const TaskDetails: React.FC = () => {
           },
           {
             label: evalMode ? (
-              <Tooltip
-                title={useIntl().formatMessage({ id: 'pages.evalTask.finishTrainFirst' })}
-                // title={<FormattedMessage id='pages.evalTask.finishTrainFirst' defaultMessage='請先完成模型訓練後再進行評估' />}
-              >
+              <Tooltip title={useIntl().formatMessage({ id: 'pages.evalTask.finishTrainFirst' })}>
                 {useIntl().formatMessage({ id: 'pages.evalTask.evalModel' })}
               </Tooltip>
             ) : (

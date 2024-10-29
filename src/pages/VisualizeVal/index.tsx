@@ -1,18 +1,11 @@
-/*
- * @Author: Will Cheng chengyong@pku.edu.cn
- * @Date: 2024-08-24 13:58:39
- * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-09 15:38:25
- * @FilePath: /PoseidonAI-Client/src/pages/VisualizeVal/index.tsx
- * @Description:
- *
- * Copyright (c) 2024 by chengyong@pku.edu.cn, All Rights Reserved.
- */
 import {
   getVisualizationResults,
   getVisualizationStatus,
   visualizationTask,
 } from '@/services/ant-design-pro/trainingTask';
+import { LogActionVisTask } from '@/utils/LogActions'; // 日志操作
+import { LogLevel } from '@/utils/LogLevels'; // 日志级别
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 日志钩子
 import { notification } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { TaskItem } from '../TrainingTask';
@@ -47,7 +40,6 @@ export interface VisualizationItem {
   preds: PredItem[];
 }
 
-// 定義評估任務的狀態類型
 export type VisStatus =
   | 'IDLE'
   | 'PENDING'
@@ -56,10 +48,8 @@ export type VisStatus =
   | 'FAILURE'
   | 'ERROR'
   | 'REVOKED';
-
 export type VisAction = 'restart' | 'start' | 'idle';
 
-// 初始化表單數值
 const initialState: FormValues = {
   iou: 0.7,
   conf: 0.5,
@@ -69,12 +59,23 @@ const fetchEvalResult = async (
   taskId: string,
   setVisualization: (d: VisualizationItem) => void,
   notification: any,
+  logger: any,
 ) => {
   try {
     const resp = await getVisualizationResults(taskId);
     setVisualization(resp.results);
+    logger.logAction(
+      LogLevel.DEBUG,
+      LogActionVisTask.VIS_TASK_FETCH_RESULT,
+      `Visualization results fetched for task ${taskId}`,
+    );
   } catch (err) {
     console.error(err);
+    logger.logAction(
+      LogLevel.ERROR,
+      LogActionVisTask.VIS_TASK_ERROR,
+      `Error fetching visualization results for task ${taskId}`,
+    );
     notification.error({
       message: '讀取評估文件失敗',
       description: '請稍後重試',
@@ -91,15 +92,14 @@ const ViszualizeVal: React.FC<ViszualizeValProps> = ({ taskData }) => {
   const [visId, setVisId] = useState<string>();
   const [currentAction, setCurrentAction] = useState<VisAction>('idle');
   const address = `http://localhost:5000/static/val_visualization/${taskData.task_detail.user_id}/${taskData.task_detail.save_key}`;
+  const logger = useUserActionLogger(); // 初始化日志钩子
 
-  // 清理和格式化演算法名稱和框架名稱
   const algoName: string = taskData.task_detail.algorithm.name.replace(/\s+/g, '');
   const frameworkName: string = taskData.task_detail.algorithm.training_framework.name.replace(
     /\s+/g,
     '',
   );
 
-  // 使用 useEffect 進行狀態輪詢
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
 
@@ -107,49 +107,68 @@ const ViszualizeVal: React.FC<ViszualizeValProps> = ({ taskData }) => {
       if (visId) {
         const resp = await getVisualizationStatus(visId, algoName, frameworkName);
         const state: VisStatus = resp.results.state;
-        console.log(resp.results); // 輸出當前狀態
+        logger.logAction(
+          LogLevel.DEBUG,
+          LogActionVisTask.VIS_TASK_PROGRESS_FETCH,
+          `Visualization progress: ${state} for visId ${visId}`,
+        );
 
-        // 當任務完成或發生錯誤時停止輪詢
         if (state === 'SUCCESS' || state === 'ERROR' || state === 'FAILURE') {
           setVisualization(resp.results.data.results);
           if (intervalId) {
-            clearInterval(intervalId); // 停止輪詢
+            clearInterval(intervalId);
             intervalId = null;
           }
           setIsVising(false);
           setCurrentAction('idle');
-          api.success({
-            message: '模型驗證集可視化完成',
-            placement: 'topLeft',
-          });
+
+          if (state === 'SUCCESS') {
+            api.success({
+              message: '模型驗證集可視化完成',
+              placement: 'topLeft',
+            });
+            logger.logAction(
+              LogLevel.INFO,
+              LogActionVisTask.VIS_TASK_SUCCESS,
+              `Visualization successful for visId ${visId}`,
+            );
+          } else {
+            logger.logAction(
+              LogLevel.ERROR,
+              LogActionVisTask.VIS_TASK_FAILURE,
+              `Visualization failed for visId ${visId}`,
+            );
+          }
         }
       }
     };
 
-    // 啟動輪詢
     if (visId) {
       intervalId = setInterval(fetchEvalStatus, 2000);
     }
 
-    // 清除定時器以避免內存洩漏
     return () => {
       if (intervalId) {
-        clearInterval(intervalId); // 清除定時器
+        clearInterval(intervalId);
       }
     };
   }, [visId, algoName, frameworkName]);
 
   useEffect(() => {
-    fetchEvalResult(taskData.task_detail._id, setVisualization, api);
+    fetchEvalResult(taskData.task_detail._id, setVisualization, api, logger);
   }, []);
 
   const handleStartVis = async (body: FormValues, action: VisAction) => {
-    console.log(body);
     setIsVising(true);
     const taskId: string = taskData.task_detail._id;
     const resp = await visualizationTask(taskId, body);
-    setVisId(resp.results); // 保存 evalId 以啟動輪詢
+    setVisId(resp.results);
     setCurrentAction(action);
+    logger.logAction(
+      LogLevel.INFO,
+      action === 'restart' ? LogActionVisTask.VIS_TASK_RESTART : LogActionVisTask.VIS_TASK_START,
+      `Visualization ${action} for task ${taskId}`,
+    );
   };
 
   return (

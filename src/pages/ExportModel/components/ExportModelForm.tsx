@@ -1,16 +1,9 @@
-/*
- * @Author: Will Cheng chengyong@pku.edu.cn
- * @Date: 2024-09-15 10:52:46
- * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-16 09:07:32
- * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/ExportModelForm.tsx
- * @Description:
- *
- * Copyright (c) 2024 by chengyong@pku.edu.cn, All Rights Reserved.
- */
 import { TaskItem } from '@/pages/TrainingTask';
 import { exportModel, getExportStatus } from '@/services/ant-design-pro/trainingTask';
+import { LogActionExportTask } from '@/utils/LogActions'; // 日志操作
+import { LogLevel } from '@/utils/LogLevels'; // 日志级别
 import { capitalizeWords } from '@/utils/tools';
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 日志钩子
 import { DownloadOutlined } from '@ant-design/icons';
 import {
   Button,
@@ -26,7 +19,7 @@ import {
   notification,
 } from 'antd';
 import React, { CSSProperties, useEffect, useState } from 'react';
-import './ExportModelForm.css'; // 引入自定义CSS
+import './ExportModelForm.css';
 
 const { Option } = Select;
 
@@ -35,7 +28,6 @@ interface ExportModelFormProps {
   taskData: TaskItem | undefined;
 }
 
-// 定義評估任務的狀態類型
 export type ExportStatus =
   | 'IDLE'
   | 'PENDING'
@@ -51,6 +43,7 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
   const [exportId, setExportId] = useState<string>();
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const detectType = taskData?.task_detail.algorithm.detect_type;
+  const logger = useUserActionLogger(); // 初始化日志钩子
 
   const algoName: string = taskData?.task_detail.algorithm.name.replace(/\s+/g, '') || '';
   const frameworkName: string =
@@ -60,7 +53,6 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
 
   const handleFinish = async (values: any) => {
     const trainingTaskId = taskData ? taskData.task_detail._id : null;
-    console.log('Form values:', { ...values, training_task_id: trainingTaskId });
     if (taskData) {
       try {
         setIsExporting(true);
@@ -70,8 +62,18 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
         });
         setExportId(resp.results);
         form.resetFields();
+        logger.logAction(
+          LogLevel.INFO,
+          LogActionExportTask.EXPORT_TASK_START,
+          `Export started for task ${taskData?.task_detail._id}`,
+        );
       } catch (err) {
         console.error(err);
+        logger.logAction(
+          LogLevel.ERROR,
+          LogActionExportTask.EXPORT_TASK_ERROR,
+          `Error starting export for task ${taskData?.task_detail._id}`,
+        );
         notification.error({
           message: '模型下載失敗',
           description: '請稍後重試',
@@ -102,17 +104,17 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
       const link = document.createElement('a');
       link.href = url;
       link.download = fileName;
-
-      // 将 <a> 添加到 DOM 中
       document.body.appendChild(link);
-      // 触发点击事件
       link.click();
-      // 移除 <a> 元素
       document.body.removeChild(link);
-      // 释放 URL 对象
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('下載文件時出錯:', error);
+      logger.logAction(
+        LogLevel.ERROR,
+        LogActionExportTask.EXPORT_TASK_ERROR,
+        'Error occurred during file download',
+      );
       notification.error({
         message: '下載文件時出錯',
         description: '請稍後重試',
@@ -127,21 +129,36 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
       if (exportId) {
         const resp = await getExportStatus(exportId, algoName, frameworkName);
         const state: ExportStatus = resp.results.state;
-        console.log(resp.results); // 輸出當前狀態
+        logger.logAction(
+          LogLevel.DEBUG,
+          LogActionExportTask.EXPORT_TASK_PROGRESS_FETCH,
+          `Export progress: ${state} for exportId ${exportId}`,
+        );
 
-        // 當任務完成或發生錯誤時停止輪詢
         if (state === 'SUCCESS' || state === 'ERROR' || state === 'FAILURE') {
           if (intervalId) {
-            clearInterval(intervalId); // 停止輪詢
+            clearInterval(intervalId);
             intervalId = null;
           }
           setIsExporting(false);
-          downloadModel(resp.results.data.results);
+          if (state === 'SUCCESS') {
+            logger.logAction(
+              LogLevel.INFO,
+              LogActionExportTask.EXPORT_TASK_SUCCESS,
+              `Export successful for exportId ${exportId}`,
+            );
+            downloadModel(resp.results.data.results);
+          } else {
+            logger.logAction(
+              LogLevel.ERROR,
+              LogActionExportTask.EXPORT_TASK_FAILURE,
+              `Export failed for exportId ${exportId}`,
+            );
+          }
         }
       }
     };
 
-    // 啟動輪詢
     if (exportId) {
       api.info({
         message: '模型打包完成會自動開始下載',
@@ -150,10 +167,9 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
       intervalId = setInterval(fetchEvalStatus, 2000);
     }
 
-    // 清除定時器以避免內存洩漏
     return () => {
       if (intervalId) {
-        clearInterval(intervalId); // 清除定時器
+        clearInterval(intervalId);
       }
     };
   }, [exportId, algoName, frameworkName]);
@@ -175,7 +191,6 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
             content: 'model',
           }}
         >
-          {/* 导出格式 */}
           <Form.Item
             name="format"
             label="導出格式"
@@ -200,15 +215,10 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
             </Select>
           </Form.Item>
 
-          {/* 下载文件命名 */}
           <Form.Item name="filename" label="下載文件命名 (非必填)">
-            <Input
-              placeholder="輸入下載文件名 (默認為: model)"
-              addonAfter=".zip" // 在输入框右侧显示.zip
-            />
+            <Input placeholder="輸入下載文件名 (默認為: model)" addonAfter=".zip" />
           </Form.Item>
 
-          {/* 下载内容 */}
           <Form.Item
             name="content"
             label="下載的内容"
@@ -246,7 +256,6 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
             </Radio.Group>
           </Form.Item>
 
-          {/* 提交按钮 */}
           <Form.Item>
             <Button type="primary" htmlType="submit">
               導出模型

@@ -1,8 +1,8 @@
 /*
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-07-24 19:40:43
- * @LastEditors: Will Cheng chengyong@pku.edu.cn
- * @LastEditTime: 2024-07-28 14:37:03
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-10-22 11:48:54
  * @FilePath: /PoseidonAI-Client/src/pages/Configuration/components/CreateConfiguration.tsx
  * @Description:
  *
@@ -16,6 +16,10 @@ import { TrainingFrameworkItem } from '..';
 import ChooseTrainingFramework from './chooseTrainingFramework';
 import Detectron2InsSegSettings from './Detectron2InsSegSettings';
 import YoloV8Settings from './Yolov8Settings';
+
+import { LogActionConfig } from '@/utils/LogActions'; // 导入 LogAction
+import { LogLevel } from '@/utils/LogLevels'; // 导入 LogLevel
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 导入日志钩子
 
 export interface TrainingFrameworkProps {
   framework: TrainingFrameworkItem;
@@ -33,7 +37,28 @@ const CreateConfiguration: React.FC<CreateConfigurationProps> = ({ data, setRefr
   const [selectedFramework, setSelectedFramework] = useState<TrainingFrameworkItem>();
   const [saving, setSaving] = useState<boolean>(false);
 
+  const { logAction } = useUserActionLogger(); // 获取日志记录函数
+
+  // 选择框架时记录日志
+  useEffect(() => {
+    const foundItem = data.find((item) => item._id === frameworkId);
+    setSelectedFramework(foundItem);
+
+    if (foundItem) {
+      logAction(LogLevel.INFO, LogActionConfig.CREATE_CONFIGURATION_SELECT_FRAMEWORK, {
+        frameworkId: foundItem._id,
+        frameworkName: foundItem.name,
+      });
+    }
+  }, [frameworkId, data]);
+
+  // 处理配置提交
   const handleSubmitConfig = async (data: any, resetForm: () => void) => {
+    logAction(LogLevel.INFO, LogActionConfig.CREATE_CONFIGURATION_SUBMIT_START, {
+      data: data,
+      frameworkId: selectedFramework?._id,
+    });
+
     setRefresh(false);
     setSaving(true);
     try {
@@ -45,6 +70,10 @@ const CreateConfiguration: React.FC<CreateConfigurationProps> = ({ data, setRefr
             defaultMessage="保存成功"
           />,
         );
+        logAction(LogLevel.INFO, LogActionConfig.CREATE_CONFIGURATION_SUBMIT_SUCCESS, {
+          frameworkId: selectedFramework?._id,
+          configData: data,
+        });
       } else {
         message.error(
           (
@@ -54,6 +83,10 @@ const CreateConfiguration: React.FC<CreateConfigurationProps> = ({ data, setRefr
             />
           ) + resp.msg,
         );
+        logAction(LogLevel.WARN, LogActionConfig.CREATE_CONFIGURATION_SUBMIT_FAILURE, {
+          frameworkId: selectedFramework?._id,
+          errorMsg: resp.msg,
+        });
       }
     } catch (e: any) {
       message.error(
@@ -64,17 +97,16 @@ const CreateConfiguration: React.FC<CreateConfigurationProps> = ({ data, setRefr
           />
         ) + e.message,
       );
+      logAction(LogLevel.ERROR, LogActionConfig.CREATE_CONFIGURATION_SUBMIT_FAILURE, {
+        frameworkId: selectedFramework?._id,
+        error: e.message || 'Unknown error',
+      });
     }
     setSaving(false);
     resetForm();
     setRefresh(true);
     return;
   };
-
-  useEffect(() => {
-    const foundItem = data.find((item) => item._id === frameworkId);
-    setSelectedFramework(foundItem);
-  }, [frameworkId]);
 
   return (
     <>
