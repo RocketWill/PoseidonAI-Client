@@ -1,5 +1,6 @@
 import { outLogin } from '@/services/ant-design-pro/api';
 import logger from '@/utils/Logger';
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 日志钩子
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { FormattedMessage, history, useModel } from '@umijs/max';
 import { Spin } from 'antd';
@@ -43,8 +44,10 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   /**
    * 退出登录，并且将当前的 url 保存
    */
+  const { sendLogs } = useUserActionLogger();
   const loginOut = async () => {
-    logger.logAction('INFO', 'Log out', 'User log out');
+    sendLogs();
+    logger.logAction('INFO', 'AUTH_USER_LOGOUT', '');
     await outLogin();
     // token.save(null);
     const { search, pathname } = window.location;
