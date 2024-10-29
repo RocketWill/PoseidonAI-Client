@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-06 16:56:25
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-18 13:47:35
+ * @LastEditTime: 2024-10-29 13:54:33
  * @FilePath: /PoseidonAI-Client/src/pages/TrainingTask/components/TaskList.tsx
  */
 
@@ -13,11 +13,15 @@ import { Button, Card, Col, Empty, List, Modal, Row, Space, Tag, Typography, mes
 import moment from 'moment';
 import React, { useState } from 'react';
 import { history } from 'umi';
-
 import './TaskList.css'; // Import custom CSS
 
 // Import types and constants
 import { TaskDetail, TrainingStatus, TrainingStatusTagMap } from '..';
+
+// Import log functions
+import { LogActionTrainingTask } from '@/utils/LogActions';
+import { LogLevel } from '@/utils/LogLevels';
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext';
 
 const { Text } = Typography;
 
@@ -34,7 +38,8 @@ const getPreviewImage = (item: TaskDetail): string => {
 };
 
 // Handler for showing task detail
-const handleShowTaskDetail = (_id: string): void => {
+const handleShowTaskDetail = (_id: string, logAction: any): void => {
+  logAction(LogLevel.INFO, LogActionTrainingTask.TASKLIST_VIEW_DETAILS, { taskId: _id });
   history.push(`/project/training-task/${_id}`);
 };
 
@@ -45,10 +50,15 @@ const EmptyList: React.FC = () => (
     </Button>
   </Empty>
 );
+
 // Main TaskList component
 const TaskList: React.FC<TaskListProps> = ({ tasksData, setRefreshFlag }) => {
   const [deleteModelOpen, setDeleteModelOpen] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
+
+  // Use the logging hook
+  const { logAction } = useUserActionLogger();
+
   if (!tasksData.length) return <EmptyList />;
 
   const sortedTasks = tasksData.sort((a, b) => {
@@ -56,7 +66,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasksData, setRefreshFlag }) => {
     const timeA = new Date(a.created_at).getTime();
     const timeB = new Date(b.created_at).getTime();
 
-    // 比较两个时间与当前时间的差值，绝对值越小的越接近当前时间
+    // Compare the two times relative to the current time
     return Math.abs(timeA - now) - Math.abs(timeB - now);
   });
 
@@ -65,12 +75,21 @@ const TaskList: React.FC<TaskListProps> = ({ tasksData, setRefreshFlag }) => {
       setDeleteModelOpen(false);
       return;
     }
+
+    logAction(LogLevel.INFO, LogActionTrainingTask.TASKLIST_DELETE_START, { taskId: _id });
+
     const result = await deleteUserTask(_id);
     if (result.code === 200) {
+      logAction(LogLevel.INFO, LogActionTrainingTask.TASKLIST_DELETE_SUCCESS, { taskId: _id });
       message.success('刪除成功');
     } else {
+      logAction(LogLevel.ERROR, LogActionTrainingTask.TASKLIST_DELETE_FAILURE, {
+        taskId: _id,
+        errorMsg: result.msg,
+      });
       message.error('刪除失敗' + result.msg);
     }
+
     setDeleteModelOpen(false);
     setRefreshFlag((prev) => !prev);
   };
@@ -105,7 +124,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasksData, setRefreshFlag }) => {
                   <img alt="preview" src={getPreviewImage(item)} loading="lazy" />
                 </div>
               }
-              onClick={() => handleShowTaskDetail(item._id)}
+              onClick={() => handleShowTaskDetail(item._id, logAction)}
               style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
               hoverable
               actions={[
