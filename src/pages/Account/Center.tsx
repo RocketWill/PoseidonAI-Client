@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-10-18 15:25:20
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-29 14:07:36
+ * @LastEditTime: 2024-10-29 14:49:28
  * @FilePath: /PoseidonAI-Client/src/pages/Account/Center.tsx
  */
 import { PageContainer } from '@ant-design/pro-components';
@@ -81,7 +81,7 @@ const LogViewer: React.FC<LogViewerProps> = ({ data }) => {
         columns={columns}
         dataSource={filteredLogs}
         rowKey="id"
-        pagination={{ pageSize: 50 }}
+        // pagination={{ pageSize: 50 }}
       />
     </div>
   );
@@ -106,7 +106,7 @@ const AccountCenter: React.FC = () => {
 
   return (
     <PageContainer>
-      <Card title="操作日志">
+      <Card title="操作日志" style={{ maxWidth: 1000 }}>
         <LogViewer data={logs} />
       </Card>
     </PageContainer>
