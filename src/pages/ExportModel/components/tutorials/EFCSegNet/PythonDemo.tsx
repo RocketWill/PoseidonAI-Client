@@ -2,12 +2,13 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-09-15 14:55:43
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-04 17:14:31
+ * @LastEditTime: 2024-10-31 13:35:06
  * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/EFCSegNet/PythonDemo.tsx
  * @Description:
  *
  * Copyright (c) 2024 by chengyong@pku.edu.cn, All Rights Reserved.
  */
+import { FormattedMessage } from '@umijs/max';
 import { Tabs } from 'antd';
 import React from 'react';
 import DisplayCode from '../DisplayCode';
@@ -207,12 +208,22 @@ const PythonDemo: React.FC = () => {
     <Tabs
       items={[
         {
-          label: '部署說明文檔',
+          label: (
+            <FormattedMessage
+              id="pages.exportModel.tutorial.documentation"
+              defaultMessage="部署說明文檔"
+            />
+          ),
           key: '0',
           children: <DisplayMarkdown>{readme}</DisplayMarkdown>,
         },
         {
-          label: '示範程式碼',
+          label: (
+            <FormattedMessage
+              id="pages.exportModel.tutorial.demoCode"
+              defaultMessage="示範程式碼"
+            />
+          ),
           key: '1',
           children: <DisplayCode codeString={codeString} />,
         },

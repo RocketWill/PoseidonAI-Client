@@ -114,4 +114,11 @@ export default {
   'pages.dataset.display.visualized': '視覺化',
   'pages.dataset.display.classNames': '類別',
   'pages.dataset.display.uploaded': '上傳於',
+  'pages.dataset.display.onlyZip': '只能上傳 ZIP 文件',
+  'pages.dataset.display.clickToUploadZip': '點擊或拖動上傳 ZIP 文件',
+  'pages.dataset.display.uploadZipDescription': '支持單個文件上傳，且必須符合特定目錄結構',
+  'pages.dataset.display.classifyStructure': '資料集壓縮檔目錄結構參考',
+  'pages.dataset.display.taskType': '任務類型',
+  'pages.dataset.display.selectTaskType': '請選擇任務類型',
+  'pages.dataset.display.uploadZip': '資料集壓縮檔',
 };

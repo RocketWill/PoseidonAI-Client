@@ -1,3 +1,10 @@
+/*
+ * @Author: Will Cheng (will.cheng@efctw.com)
+ * @Date: 2024-07-29 08:28:24
+ * @LastEditors: Will Cheng (will.cheng@efctw.com)
+ * @LastEditTime: 2024-10-31 14:10:42
+ * @FilePath: /PoseidonAI-Client/src/components/RightContent/index.tsx
+ */
 import { GlobalOutlined } from '@ant-design/icons';
 import { SelectLang as UmiSelectLang } from '@umijs/max';
 
@@ -22,6 +29,24 @@ const langs = [
     icon: '🇨🇳',
     title: '语言',
   },
+  {
+    lang: 'es-ES',
+    label: 'Español',
+    icon: '🇪🇸',
+    title: 'Idioma',
+  },
+  {
+    lang: 'fr-FR',
+    label: 'Français',
+    icon: '🇫🇷',
+    title: 'Langue',
+  },
+  // {
+  //   lang: 'pt-BR',
+  //   label: 'Português (Brasil)',
+  //   icon: '🇧🇷',
+  //   title: 'Idioma',
+  // },
 ];
 
 export const SelectLang = () => {

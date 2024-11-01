@@ -57,7 +57,7 @@ const UploadZip: React.FC<UploadZipProps> = ({ onChange, value }) => {
               const fileName = parts[2];
               // 检查第三层是否为图片文件
               if (!fileName.match(/\.(jpg|jpeg|png|gif|bmp|tiff|webp)$/i)) {
-                message.error('子目录下的文件必须是图片格式！');
+                message.error('子目錄下的文件必須是圖片格式！');
                 return reject(); // 使用 reject() 而不是 Promise.reject()
               }
             }
@@ -65,7 +65,7 @@ const UploadZip: React.FC<UploadZipProps> = ({ onChange, value }) => {
 
           // 验证 train 和 val 目录下的子目录数量和名称是否相同
           if (structure.train.size !== structure.val.size) {
-            message.error('train 和 val 目录下的子目录数量不匹配！');
+            message.error('train 和 val 目錄下的子目錄數量不匹配！');
             return reject(); // 使用 reject() 而不是 Promise.reject()
           }
 
@@ -74,15 +74,15 @@ const UploadZip: React.FC<UploadZipProps> = ({ onChange, value }) => {
 
           for (const dir of trainDirs) {
             if (!valDirs.includes(dir)) {
-              message.error(`val 目录中缺少与 train 目录同名的子目录: ${dir}`);
+              message.error(`val 目錄中缺少與 train 目錄同明子目錄: ${dir}`);
               return reject(); // 使用 reject() 而不是 Promise.reject()
             }
           }
 
-          message.success('ZIP 文件的目录结构符合要求！');
+          message.success('ZIP 文件的目錄結構符合要求！');
           resolve(); // 使用 resolve() 而不是 Promise.resolve()
         } catch (error) {
-          message.error('读取 ZIP 文件时发生错误！');
+          message.error('讀取 ZIP 文件時發生錯誤！');
           reject(); // 使用 reject() 而不是 Promise.reject()
         }
       };

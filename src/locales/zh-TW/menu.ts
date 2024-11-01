@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-29 08:28:24
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-18 15:40:23
+ * @LastEditTime: 2024-11-01 11:57:40
  * @FilePath: /PoseidonAI-Client/src/locales/zh-TW/menu.ts
  */
 export default {
@@ -18,8 +18,8 @@ export default {
   'menu.project.taskDetails': '任務詳情',
   'menu.more-blocks': '更多區塊',
   'menu.home': '首頁',
-  'menu.admin': '权限',
-  'menu.admin.sub-page': '二级管理页',
+  'menu.admin': '權限',
+  'menu.admin.sub-page': '二級管理頁',
   'menu.login': '登錄',
   'menu.register': '註冊',
   'menu.register-result': '註冊結果',

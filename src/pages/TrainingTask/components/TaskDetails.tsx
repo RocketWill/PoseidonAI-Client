@@ -14,7 +14,7 @@ import { LogLevel } from '@/utils/LogLevels'; // 日志级别
 import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 日志钩子
 import { ArrowLeftOutlined } from '@ant-design/icons'; // 引入 Ant Design 的圖標
 import { PageContainer } from '@ant-design/pro-components'; // 引入 Ant Design Pro 的頁面容器組件
-import { FormattedMessage, useIntl } from '@umijs/max';
+import { FormattedMessage, useIntl, useModel } from '@umijs/max';
 import { Button, Tabs, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react'; // 引入 React 和 Hook
 import { useParams } from 'react-router-dom'; // 引入用於獲取 URL 參數的 Hook
@@ -25,11 +25,15 @@ import ModelTraining from './ModelTraining'; // 引入 ModelTraining 組件
 const history = createBrowserHistory();
 
 const TaskDetails: React.FC = () => {
+  const intl = useIntl();
+  const { initialState, setInitialState } = useModel('@@initialState');
   const [taskData, setTaskData] = useState<TaskItem | undefined>(undefined);
   const [refreshFlag, setRefreshFlag] = useState<boolean>(false);
-  const { taskId } = useParams();
+  const [activeKey, setActiveKey] = useState<string>('1');
+  const { taskId } = useParams() || '';
   const evalMode = taskData?.task_detail.status === 'SUCCESS' ? false : true;
   const logger = useUserActionLogger();
+  const prevActiveKey = initialState?.trainingPage?.[taskId];
 
   useEffect(() => {
     logger.logAction(
@@ -64,6 +68,9 @@ const TaskDetails: React.FC = () => {
 
   // 处理 Tab 切换日志
   const handleTabChange = (key: string) => {
+    const { trainingPage } = initialState || {};
+    setInitialState((s) => ({ ...s, trainingPage: { ...trainingPage, [taskId]: key } }));
+    setActiveKey(key);
     switch (key) {
       case '1':
         logger.logAction(
@@ -106,53 +113,89 @@ const TaskDetails: React.FC = () => {
     <PageContainer
       subTitle={
         <Button type="default" icon={<ArrowLeftOutlined />} onClick={() => history.back()}>
-          <FormattedMessage id="pages.evalTask.back" defaultMessage="回上頁" />
+          <FormattedMessage id="pages.trainTask.back" defaultMessage="回上頁" />
         </Button>
       }
     >
-      <Tabs
-        defaultActiveKey="1"
-        onChange={handleTabChange}
-        items={[
-          {
-            label: <FormattedMessage id="pages.evalTask.trainingModel" defaultMessage="模型訓練" />,
-            key: '1',
-            children: <ModelTraining taskData={taskData} setRefreshFlag={setRefreshFlag} />,
-          },
-          {
-            label: evalMode ? (
-              <Tooltip title={useIntl().formatMessage({ id: 'pages.evalTask.finishTrainFirst' })}>
-                {useIntl().formatMessage({ id: 'pages.evalTask.evalModel' })}
-              </Tooltip>
-            ) : (
-              <FormattedMessage id="pages.evalTask.evalModel" defaultMessage="模型評估" />
-            ),
-            key: '2',
-            children: <EvalTask taskData={taskData} />,
-            disabled: evalMode,
-          },
-          {
-            label: evalMode ? (
-              <Tooltip title="請先完成模型訓練再進行可視化">驗證集可視化</Tooltip>
-            ) : (
-              '驗證集可視化'
-            ),
-            key: '3',
-            children: <ViszualizeVal taskData={taskData} />,
-            disabled: evalMode,
-          },
-          {
-            label: evalMode ? (
-              <Tooltip title="請先完成模型訓練再進行模型導出">模型權重導出</Tooltip>
-            ) : (
-              '模型權重導出'
-            ),
-            key: '4',
-            children: <ExportModel taskData={taskData} />,
-            disabled: evalMode,
-          },
-        ]}
-      />
+      {taskData && (
+        <Tabs
+          defaultActiveKey="1"
+          activeKey={prevActiveKey ? prevActiveKey : activeKey}
+          onChange={handleTabChange}
+          items={[
+            {
+              label: (
+                <FormattedMessage id="pages.trainTask.trainingModel" defaultMessage="模型訓練" />
+              ),
+              key: '1',
+              children: <ModelTraining taskData={taskData} setRefreshFlag={setRefreshFlag} />,
+            },
+            {
+              label: evalMode ? (
+                <Tooltip
+                  title={intl.formatMessage({
+                    id: 'pages.trainTask.finishTrainFirst',
+                    defaultMessage: '請先完成模型訓練再進行評估',
+                  })}
+                >
+                  {intl.formatMessage({
+                    id: 'pages.trainTask.evalModel',
+                    defaultMessage: '模型評估',
+                  })}
+                </Tooltip>
+              ) : (
+                <FormattedMessage id="pages.trainTask.evalModel" defaultMessage="模型評估" />
+              ),
+              key: '2',
+              children: <EvalTask taskData={taskData} />,
+              disabled: evalMode,
+            },
+            {
+              label: evalMode ? (
+                <Tooltip
+                  title={intl.formatMessage({
+                    id: 'pages.trainTask.finishTrainFirst',
+                    defaultMessage: '請先完成模型訓練再進行可視化',
+                  })}
+                >
+                  {intl.formatMessage({
+                    id: 'pages.trainTask.visualizeValidation',
+                    defaultMessage: '驗證集可視化',
+                  })}
+                </Tooltip>
+              ) : (
+                <FormattedMessage
+                  id="pages.trainTask.visualizeValidation"
+                  defaultMessage="驗證集可視化"
+                />
+              ),
+              key: '3',
+              children: <ViszualizeVal taskData={taskData} />,
+              disabled: evalMode,
+            },
+            {
+              label: evalMode ? (
+                <Tooltip
+                  title={intl.formatMessage({
+                    id: 'pages.trainTask.finishTrainFirst',
+                    defaultMessage: '請先完成模型訓練再進行模型導出',
+                  })}
+                >
+                  {intl.formatMessage({
+                    id: 'pages.trainTask.exportModel',
+                    defaultMessage: '模型權重導出',
+                  })}
+                </Tooltip>
+              ) : (
+                <FormattedMessage id="pages.trainTask.exportModel" defaultMessage="模型權重導出" />
+              ),
+              key: '4',
+              children: <ExportModel taskData={taskData} />,
+              disabled: evalMode,
+            },
+          ]}
+        />
+      )}
     </PageContainer>
   );
 };

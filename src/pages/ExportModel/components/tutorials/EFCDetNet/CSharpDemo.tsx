@@ -3,12 +3,13 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-09-08 19:54:02
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-04 16:33:32
+ * @LastEditTime: 2024-10-31 13:32:24
  * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/EFCDetNet/CSharpDemo.tsx
  * @Description:
  *
  * Copyright (c) 2024 by chengyong@pku.edu.cn, All Rights Reserved.
  */
+import { FormattedMessage } from '@umijs/max';
 import { Tabs } from 'antd';
 import React from 'react';
 import DisplayCode from '../DisplayCode';
@@ -252,12 +253,22 @@ const CSharpDemo: React.FC = () => {
     <Tabs
       items={[
         {
-          label: '部署說明文檔',
+          label: (
+            <FormattedMessage
+              id="pages.exportModel.tutorial.documentation"
+              defaultMessage="部署說明文檔"
+            />
+          ),
           key: '0',
           children: <DisplayMarkdown>{markdown}</DisplayMarkdown>,
         },
         {
-          label: '示範程式碼',
+          label: (
+            <FormattedMessage
+              id="pages.exportModel.tutorial.demoCode"
+              defaultMessage="示範程式碼"
+            />
+          ),
           key: '1',
           children: <DisplayCode codeString={codeString} />,
         },

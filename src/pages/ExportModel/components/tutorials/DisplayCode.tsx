@@ -2,55 +2,73 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-09-16 09:13:15
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-04 15:31:55
- * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/EFCDetNet/DisplayCode.tsx
+ * @LastEditTime: 2024-10-31 13:27:54
+ * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/DisplayCode.tsx
  */
 import { CopyOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
+import { FormattedMessage, useIntl } from '@umijs/max';
 import { Button, Typography, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { base16AteliersulphurpoolLight } from 'react-syntax-highlighter/dist/esm/styles/prism'; // 选择一种高亮风格
-import './DisplayCode.css'; // 引入样式文件
+import { base16AteliersulphurpoolLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import './DisplayCode.css';
 
 interface DisplayCodeProps {
   codeString: string;
 }
 
-const handleCopyCode = (codeString: string) => {
+const handleCopyCode = (codeString: string, intl: any) => {
   navigator.clipboard
     .writeText(codeString)
     .then(() => {
-      message.success('程式碼已複製到剪貼簿');
+      message.success(
+        intl.formatMessage({
+          id: 'pages.exportModel.tutorial.copySuccess',
+          defaultMessage: '程式碼已複製到剪貼簿',
+        }),
+      );
     })
     .catch(() => {
-      message.error('複製失敗');
+      message.error(
+        intl.formatMessage({
+          id: 'pages.exportModel.tutorial.copyFail',
+          defaultMessage: '複製失敗',
+        }),
+      );
     });
 };
 
 const DisplayCode: React.FC<DisplayCodeProps> = ({ codeString }) => {
+  const intl = useIntl();
   const [expanded, setExpanded] = useState(false);
   const codeContainerRef = useRef<HTMLDivElement>(null);
-  const [maxHeight, setMaxHeight] = useState('300px'); // 设置默认高度
+  const [maxHeight, setMaxHeight] = useState('300px');
 
   useEffect(() => {
-    // 当expanded变化时，动态调整maxHeight
     if (expanded) {
       setMaxHeight(codeContainerRef.current?.scrollHeight + 'px');
     } else {
-      setMaxHeight('300px'); // 初始高度可以调节
+      setMaxHeight('300px');
     }
   }, [expanded]);
 
   return (
     <>
       <Typography.Title level={5}>
-        <Button icon={<CopyOutlined />} size="small" onClick={() => handleCopyCode(codeString)}>
-          複製程式碼
+        <Button
+          icon={<CopyOutlined />}
+          size="small"
+          onClick={() => handleCopyCode(codeString, intl)}
+        >
+          <FormattedMessage
+            id="pages.exportModel.tutorial.copyButton"
+            defaultMessage="複製程式碼"
+          />
         </Button>
       </Typography.Title>
       <div
         ref={codeContainerRef}
-        className={`code-container ${expanded ? 'expanded' : ''}`} // 应用CSS
+        className={`code-container ${expanded ? 'expanded' : ''}`}
         style={{ maxHeight }}
       >
         <SyntaxHighlighter
@@ -67,7 +85,11 @@ const DisplayCode: React.FC<DisplayCodeProps> = ({ codeString }) => {
         onClick={() => setExpanded(!expanded)}
         icon={expanded ? <UpOutlined /> : <DownOutlined />}
       >
-        {expanded ? '收起' : '展開全部'}
+        {expanded ? (
+          <FormattedMessage id="pages.exportModel.tutorial.collapse" defaultMessage="收起" />
+        ) : (
+          <FormattedMessage id="pages.exportModel.tutorial.expandAll" defaultMessage="展開全部" />
+        )}
       </Button>
     </>
   );

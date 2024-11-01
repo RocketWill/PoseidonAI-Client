@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-08-20 08:55:03
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-08-21 16:35:15
+ * @LastEditTime: 2024-10-31 11:45:58
  * @FilePath: /PoseidonAI-Client/src/pages/EvalTask/components/ActionButtons.tsx
  */
 import { CaretRightOutlined, UndoOutlined } from '@ant-design/icons';
@@ -59,21 +59,21 @@ const ActionButtonCpmponent: React.FC<ActionButtonCpmponentProps> = ({
         type="primary"
         size="large"
         icon={<CaretRightOutlined />}
-        onClick={() => handleStartEval(formValues, 'start')} // 傳遞 false 表示這是 start 操作
+        onClick={() => handleStartEval(formValues, 'start')}
         shape="round"
         disabled={handleDisableButton('start', status)}
       >
-        <FormattedMessage id="pages.trainingTask.start" defaultMessage="Start" />
+        <FormattedMessage id="pages.evalTask.start" defaultMessage="Start Evaluation" />
       </Button>
       <Button
         loading={currentAction === 'restart' && isEvaling === true ? true : false}
         size="large"
         icon={<UndoOutlined />}
-        onClick={() => handleStartEval(formValues, 'restart')} // 傳遞 true 表示這是 restart 操作
+        onClick={() => handleStartEval(formValues, 'restart')}
         shape="round"
         disabled={handleDisableButton('restart', status)}
       >
-        <FormattedMessage id="pages.trainingTask.restart" defaultMessage="Restart" />
+        <FormattedMessage id="pages.evalTask.restart" defaultMessage="Restart Evaluation" />
       </Button>
     </Space>
   );

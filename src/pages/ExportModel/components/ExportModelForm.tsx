@@ -1,10 +1,11 @@
 import { TaskItem } from '@/pages/TrainingTask';
 import { exportModel, getExportStatus } from '@/services/ant-design-pro/trainingTask';
-import { LogActionExportTask } from '@/utils/LogActions'; // 日志操作
-import { LogLevel } from '@/utils/LogLevels'; // 日志级别
+import { LogActionExportTask } from '@/utils/LogActions';
+import { LogLevel } from '@/utils/LogLevels';
 import { capitalizeWords } from '@/utils/tools';
-import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 日志钩子
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext';
 import { DownloadOutlined } from '@ant-design/icons';
+import { FormattedMessage, useIntl } from '@umijs/max';
 import {
   Button,
   Card,
@@ -38,12 +39,13 @@ export type ExportStatus =
   | 'REVOKED';
 
 const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) => {
+  const intl = useIntl();
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
   const [exportId, setExportId] = useState<string>();
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const detectType = taskData?.task_detail.algorithm.detect_type;
-  const logger = useUserActionLogger(); // 初始化日志钩子
+  const logger = useUserActionLogger();
 
   const algoName: string = taskData?.task_detail.algorithm.name.replace(/\s+/g, '') || '';
   const frameworkName: string =
@@ -75,8 +77,14 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
           `Error starting export for task ${taskData?.task_detail._id}`,
         );
         notification.error({
-          message: '模型下載失敗',
-          description: '請稍後重試',
+          message: intl.formatMessage({
+            id: 'pages.exportModel.downloadFailed',
+            defaultMessage: '模型下載失敗',
+          }),
+          description: intl.formatMessage({
+            id: 'pages.exportModel.tryAgainLater',
+            defaultMessage: '請稍後重試',
+          }),
           placement: 'topLeft',
         });
       }
@@ -96,7 +104,12 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
       });
 
       if (!response.ok) {
-        throw new Error('網路響應不是 OK');
+        throw new Error(
+          intl.formatMessage({
+            id: 'pages.exportModel.networkError',
+            defaultMessage: '網路響應不是 OK',
+          }),
+        );
       }
 
       const blob = await response.blob();
@@ -109,15 +122,27 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('下載文件時出錯:', error);
+      console.error(
+        intl.formatMessage({
+          id: 'pages.exportModel.downloadError',
+          defaultMessage: '下載文件時出錯:',
+        }),
+        error,
+      );
       logger.logAction(
         LogLevel.ERROR,
         LogActionExportTask.EXPORT_TASK_ERROR,
         'Error occurred during file download',
       );
       notification.error({
-        message: '下載文件時出錯',
-        description: '請稍後重試',
+        message: intl.formatMessage({
+          id: 'pages.exportModel.downloadError',
+          defaultMessage: '下載文件時出錯',
+        }),
+        description: intl.formatMessage({
+          id: 'pages.exportModel.tryAgainLater',
+          defaultMessage: '請稍後重試',
+        }),
         placement: 'topLeft',
       });
     }
@@ -161,7 +186,10 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
 
     if (exportId) {
       api.info({
-        message: '模型打包完成會自動開始下載',
+        message: intl.formatMessage({
+          id: 'pages.exportModel.downloadStartsOnComplete',
+          defaultMessage: '模型打包完成會自動開始下載',
+        }),
         placement: 'topLeft',
       });
       intervalId = setInterval(fetchEvalStatus, 2000);
@@ -175,95 +203,166 @@ const ExportModelForm: React.FC<ExportModelFormProps> = ({ taskData, style }) =>
   }, [exportId, algoName, frameworkName]);
 
   return (
-    <Spin spinning={isExporting}>
+    <>
       {contextHolder}
       <Card style={style}>
-        <Typography.Title level={4}>
-          <DownloadOutlined style={{ marginRight: '8px' }} />
-          模型導出
-        </Typography.Title>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleFinish}
-          initialValues={{
-            format: detectType?.tag_name === 'classify' ? 'openvino' : 'torchscript',
-            content: 'model',
-          }}
-        >
-          <Form.Item
-            name="format"
-            label="導出格式"
-            rules={[{ required: true, message: '請選擇導出格式' }]}
+        <Spin spinning={isExporting}>
+          <Typography.Title level={4}>
+            <DownloadOutlined style={{ marginRight: '8px' }} />
+            <FormattedMessage id="pages.exportModel.exportModel" defaultMessage="模型導出" />
+          </Typography.Title>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleFinish}
+            initialValues={{
+              format: detectType?.tag_name === 'classify' ? 'openvino' : 'torchscript',
+              content: 'model',
+            }}
           >
-            <Select placeholder="請選擇導出格式">
-              <Option
-                value="torchscript"
-                disabled={detectType?.tag_name === 'classify' ? true : false}
+            <Form.Item
+              name="format"
+              label={
+                <FormattedMessage id="pages.exportModel.exportFormat" defaultMessage="導出格式" />
+              }
+              rules={[
+                {
+                  required: true,
+                  message: intl.formatMessage({
+                    id: 'pages.exportModel.selectExportFormat',
+                    defaultMessage: '請選擇導出格式',
+                  }),
+                },
+              ]}
+            >
+              <Select
+                placeholder={intl.formatMessage({
+                  id: 'pages.exportModel.selectExportFormat',
+                  defaultMessage: '請選擇導出格式',
+                })}
               >
-                TorchSript
-              </Option>
-              <Option value="onnx" disabled>
-                ONNX
-              </Option>
-              <Option value="openvino" disabled={detectType?.tag_name === 'segment' ? true : false}>
-                OpenVINO
-              </Option>
-              <Option value="ncnn" disabled>
-                NCNN
-              </Option>
-            </Select>
-          </Form.Item>
+                <Option value="torchscript" disabled={detectType?.tag_name === 'classify'}>
+                  TorchSript
+                </Option>
+                <Option value="onnx" disabled>
+                  ONNX
+                </Option>
+                <Option value="openvino" disabled={detectType?.tag_name === 'segment'}>
+                  OpenVINO
+                </Option>
+                <Option value="ncnn" disabled>
+                  NCNN
+                </Option>
+              </Select>
+            </Form.Item>
 
-          <Form.Item name="filename" label="下載文件命名 (非必填)">
-            <Input placeholder="輸入下載文件名 (默認為: model)" addonAfter=".zip" />
-          </Form.Item>
+            <Form.Item
+              name="filename"
+              label={
+                <FormattedMessage
+                  id="pages.exportModel.fileName"
+                  defaultMessage="下載文件命名 (非必填)"
+                />
+              }
+            >
+              <Input
+                placeholder={intl.formatMessage({
+                  id: 'pages.exportModel.enterFileName',
+                  defaultMessage: '輸入下載文件名 (默認為: model)',
+                })}
+                addonAfter=".zip"
+              />
+            </Form.Item>
 
-          <Form.Item
-            name="content"
-            label="下載的内容"
-            rules={[{ required: true, message: '請選擇下載内容' }]}
-          >
-            <Radio.Group style={{ width: '100%' }}>
-              <Row gutter={8}>
-                <Col span={8}>
-                  <Card hoverable className="custom-card">
-                    <Radio value="model">只下載模型</Radio>
-                    <div className="card-description">僅包含模型權重文件</div>
-                  </Card>
-                </Col>
-                <Col span={8}>
-                  <Card hoverable className="custom-card">
-                    <Radio value="model_runtime">模型 + EFC Runtime 運行庫</Radio>
-                    <div className="card-description">
-                      {`包含模型和 EFC Deep Learning Runtime ${capitalizeWords(
-                        detectTypeName,
-                      )} 運行庫`}
-                    </div>
-                  </Card>
-                </Col>
-                <Col span={8}>
-                  <Card hoverable className="custom-card">
-                    <Radio value="model_runtime_deps">模型 + EFC Runtime 運行庫 + 其他依賴</Radio>
-                    <div className="card-description">
-                      {`包含模型和 EFC Deep Learning Runtime ${capitalizeWords(
-                        detectTypeName,
-                      )} 運行庫和其他依賴庫 (OpenCV, Spd日誌等)`}
-                    </div>
-                  </Card>
-                </Col>
-              </Row>
-            </Radio.Group>
-          </Form.Item>
+            <Form.Item
+              name="content"
+              label={
+                <FormattedMessage
+                  id="pages.exportModel.downloadContent"
+                  defaultMessage="下載的内容"
+                />
+              }
+              rules={[
+                {
+                  required: true,
+                  message: intl.formatMessage({
+                    id: 'pages.exportModel.selectDownloadContent',
+                    defaultMessage: '請選擇下載内容',
+                  }),
+                },
+              ]}
+            >
+              <Radio.Group style={{ width: '100%' }}>
+                <Row gutter={8}>
+                  <Col span={8}>
+                    <Card hoverable className="custom-card">
+                      <Radio value="model">
+                        <FormattedMessage
+                          id="pages.exportModel.onlyModel"
+                          defaultMessage="只下載模型"
+                        />
+                      </Radio>
+                      <div className="card-description">
+                        <FormattedMessage
+                          id="pages.exportModel.modelOnlyDesc"
+                          defaultMessage="僅包含模型權重文件"
+                        />
+                      </div>
+                    </Card>
+                  </Col>
+                  <Col span={8}>
+                    <Card hoverable className="custom-card">
+                      <Radio value="model_runtime">
+                        <FormattedMessage
+                          id="pages.exportModel.modelAndRuntime"
+                          defaultMessage="模型 + EFC Runtime 運行庫"
+                        />
+                      </Radio>
+                      <div className="card-description">
+                        {intl.formatMessage(
+                          {
+                            id: 'pages.exportModel.modelRuntimeDesc',
+                            defaultMessage:
+                              '包含模型和 EFC Deep Learning Runtime {detectTypeName} 運行庫',
+                          },
+                          { detectTypeName: capitalizeWords(detectTypeName) },
+                        )}
+                      </div>
+                    </Card>
+                  </Col>
+                  <Col span={8}>
+                    <Card hoverable className="custom-card">
+                      <Radio value="model_runtime_deps">
+                        <FormattedMessage
+                          id="pages.exportModel.modelRuntimeAndDeps"
+                          defaultMessage="模型 + EFC Runtime 運行庫 + 其他依賴"
+                        />
+                      </Radio>
+                      <div className="card-description">
+                        {intl.formatMessage(
+                          {
+                            id: 'pages.exportModel.fullPackageDesc',
+                            defaultMessage:
+                              '包含模型和 EFC Deep Learning Runtime {detectTypeName} 運行庫和其他依賴庫 (OpenCV, Spd日誌等)',
+                          },
+                          { detectTypeName: capitalizeWords(detectTypeName) },
+                        )}
+                      </div>
+                    </Card>
+                  </Col>
+                </Row>
+              </Radio.Group>
+            </Form.Item>
 
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              導出模型
-            </Button>
-          </Form.Item>
-        </Form>
+            <Form.Item>
+              <Button type="primary" htmlType="submit">
+                <FormattedMessage id="pages.exportModel.exportButton" defaultMessage="導出模型" />
+              </Button>
+            </Form.Item>
+          </Form>
+        </Spin>
       </Card>
-    </Spin>
+    </>
   );
 };
 

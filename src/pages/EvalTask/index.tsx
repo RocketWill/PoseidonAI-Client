@@ -3,9 +3,10 @@ import {
   getEvaluationResults,
   getEvaluationStatus,
 } from '@/services/ant-design-pro/trainingTask';
-import { LogActionEvalTask } from '@/utils/LogActions'; // 日志操作
-import { LogLevel } from '@/utils/LogLevels'; // 日志级别
-import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 日志钩子
+import { LogActionEvalTask } from '@/utils/LogActions';
+import { LogLevel } from '@/utils/LogLevels';
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext';
+import { FormattedMessage, useIntl } from '@umijs/max';
 import { Col, Collapse, notification, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { TaskItem } from '../TrainingTask';
@@ -14,7 +15,7 @@ import ActionButtons from './components/ActionButtons';
 import ClassifyResultChart from './components/Charts/ClassifyResultChart';
 import F1ConfidenceChart from './components/Charts/F1ConfidenceChart';
 import PRChart from './components/Charts/PRCurves';
-import PrecisionConfidenceChart from './components/Charts/PrecisionConfidenceChart ';
+import PrecisionConfidenceChart from './components/Charts/PrecisionConfidenceChart';
 import ReasultDict from './components/Charts/ReasultDict';
 import RecallConfidenceChart from './components/Charts/RecallConfidenceChart';
 import ModelInferenceForm from './components/ModelInferenceForm';
@@ -103,21 +104,26 @@ const fetchEvalResult = async (
       `Error fetching evaluation results for task ${taskId}`,
     );
     notification.error({
-      message: '讀取評估文件失敗',
-      description: '請稍後重試',
+      message: (
+        <FormattedMessage id="pages.evalTask.errorFetch" defaultMessage="讀取評估文件失敗" />
+      ),
+      description: (
+        <FormattedMessage id="pages.evalTask.tryAgainLater" defaultMessage="請稍後重試" />
+      ),
       placement: 'topLeft',
     });
   }
 };
 
 const EvalTask: React.FC<EvalTaskProps> = ({ taskData }) => {
+  const intl = useIntl();
   const [api, contextHolder] = notification.useNotification();
   const [formValues, setFormValues] = useState<FormValues>(initialState);
   const [isEvaling, setIsEvaling] = useState<boolean>(false);
   const [evalId, setEvalId] = useState<string | null>(null);
   const [metrics, setMetrics] = useState<MetricsItem>();
   const [currentAction, setCurrentAction] = useState<EvalAction>('idle');
-  const logger = useUserActionLogger(); // 初始化日志钩子
+  const logger = useUserActionLogger();
 
   const algoName: string = taskData.task_detail.algorithm.name.replace(/\s+/g, '');
   const frameworkName: string = taskData.task_detail.algorithm.training_framework.name.replace(
@@ -150,7 +156,10 @@ const EvalTask: React.FC<EvalTaskProps> = ({ taskData }) => {
 
           if (state === 'SUCCESS') {
             api.success({
-              message: '模型評估完成',
+              message: intl.formatMessage({
+                id: 'pages.evalTask.evalComplete',
+                defaultMessage: '模型評估完成',
+              }),
               placement: 'topLeft',
             });
             logger.logAction(
@@ -216,7 +225,10 @@ const EvalTask: React.FC<EvalTaskProps> = ({ taskData }) => {
         items={[
           {
             key: '1',
-            label: 'Inference and Evaluation settings',
+            label: intl.formatMessage({
+              id: 'pages.evalTask.inferenceAndEvalSettings',
+              defaultMessage: '推論與評估設置',
+            }),
             children: (
               <ModelInferenceForm
                 formValues={formValues}

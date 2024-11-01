@@ -3,13 +3,14 @@
  * @Author: Will Cheng chengyong@pku.edu.cn
  * @Date: 2024-09-08 19:54:02
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-04 16:02:09
+ * @LastEditTime: 2024-10-31 13:30:56
  * @FilePath: /PoseidonAI-Client/src/pages/ExportModel/components/tutorials/EFCDetNet/DetNetTutorials.tsx
  * @Description:
  *
  * Copyright (c) 2024 by chengyong@pku.edu.cn, All Rights Reserved.
  */
 import { DeploymentUnitOutlined } from '@ant-design/icons';
+import { FormattedMessage } from '@umijs/max';
 import { Card, Divider, Radio, Typography } from 'antd';
 import React, { CSSProperties, useState } from 'react';
 import CppDemo from './CppDemo';
@@ -34,12 +35,25 @@ const DetNetTutorials: React.FC<TutorialsProps> = ({ style }) => {
     <Card style={style}>
       <Typography.Title level={4}>
         <DeploymentUnitOutlined style={{ marginRight: '8px' }} />
-        模型部署
+        <FormattedMessage
+          id="pages.exportModel.tutorial.modelDeployment"
+          defaultMessage="模型部署"
+        />
       </Typography.Title>
-      <Typography.Paragraph>了解如何使用不同的程式語言部署 EFC 深度學習模型。</Typography.Paragraph>
+      <Typography.Paragraph>
+        <FormattedMessage
+          id="pages.exportModel.tutorial.deploymentDescription"
+          defaultMessage="了解如何使用不同的程式語言部署 EFC 深度學習模型。"
+        />
+      </Typography.Paragraph>
       <Divider />
 
-      <Typography.Title level={5}>選擇部署語言</Typography.Title>
+      <Typography.Title level={5}>
+        <FormattedMessage
+          id="pages.exportModel.tutorial.selectLanguage"
+          defaultMessage="選擇部署語言"
+        />
+      </Typography.Title>
       <Radio.Group
         value={selectedLanguage}
         onChange={(e) => setSelectedLanguage(e.target.value)}

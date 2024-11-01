@@ -2,15 +2,15 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-10-18 15:25:20
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-29 14:49:28
+ * @LastEditTime: 2024-11-01 13:26:01
  * @FilePath: /PoseidonAI-Client/src/pages/Account/Center.tsx
  */
-import { PageContainer } from '@ant-design/pro-components';
-import { Card, Select, Table, Tag, Typography } from 'antd';
-import React, { useEffect, useState } from 'react';
-// import { useModel } from '@umijs/max';
 import { getUserLogs } from '@/services/ant-design-pro/userLogs';
-import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 日志钩子
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext';
+import { PageContainer } from '@ant-design/pro-components';
+import { FormattedMessage, useIntl } from '@umijs/max';
+import { Badge, Card, Select, Table, Tag, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -20,78 +20,104 @@ interface LogViewerProps {
 }
 
 const LogViewer: React.FC<LogViewerProps> = ({ data }) => {
-  const [filteredLevels, setFilteredLevels] = useState<string[]>([]); // 多选过滤级别
+  const [filteredLevels, setFilteredLevels] = useState<string[]>([]);
+  const intl = useIntl();
 
-  // 处理级别选择变更
   const handleLevelChange = (value: string[]) => {
     setFilteredLevels(value);
   };
 
   const filteredLogs = (
     filteredLevels.length > 0 ? data.filter((log) => filteredLevels.includes(log.level)) : data
-  ).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); // 按时间排序，最近的在上面
+  ).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-  // 定义表格列
   const columns = [
     {
-      title: 'Level',
+      title: intl.formatMessage({ id: 'pages.account.center.level', defaultMessage: '級別' }),
       dataIndex: 'level',
       key: 'level',
       render: (level: string) => (
-        <Tag color={level === 'ERROR' ? 'red' : level === 'INFO' ? 'blue' : 'green'}>{level}</Tag>
+        <Tag
+          color={
+            level === 'FATAL'
+              ? 'purple'
+              : level === 'ERROR'
+              ? 'red'
+              : level === 'INFO'
+              ? 'blue'
+              : 'green'
+          }
+        >
+          {level}
+        </Tag>
       ),
     },
     {
-      title: 'Action',
+      title: intl.formatMessage({ id: 'pages.account.center.action', defaultMessage: '操作' }),
       dataIndex: 'action',
       key: 'action',
     },
     {
-      title: 'Message',
+      title: intl.formatMessage({ id: 'pages.account.center.message', defaultMessage: '訊息' }),
       dataIndex: 'message',
       key: 'message',
     },
     {
-      title: 'Timestamp',
+      title: intl.formatMessage({
+        id: 'pages.account.center.timestamp',
+        defaultMessage: '時間戳',
+      }),
       dataIndex: 'timestamp',
       key: 'timestamp',
-      render: (timestamp: string) => new Date(timestamp).toLocaleString(), // 转换为当前时区时间
+      render: (timestamp: string) => new Date(timestamp).toLocaleString(),
     },
   ];
 
   return (
     <div>
       <Text strong style={{ marginRight: 10 }}>
-        Filter by Log Level:
+        <FormattedMessage
+          id="pages.account.center.filterByLevel"
+          defaultMessage="按日誌級別篩選："
+        />
       </Text>
       <Select
         mode="multiple"
         allowClear
-        placeholder="Select log levels"
+        placeholder={intl.formatMessage({
+          id: 'pages.account.center.selectPlaceholder',
+          defaultMessage: '選擇日誌級別',
+        })}
         style={{ width: 300, marginBottom: 20 }}
         onChange={handleLevelChange}
       >
-        <Option value="INFO">INFO</Option>
-        <Option value="ERROR">ERROR</Option>
-        <Option value="DEBUG">DEBUG</Option>
+        <Option value="FATAL">
+          <Badge color="purple" style={{ marginRight: 8 }} />
+          {intl.formatMessage({ id: 'pages.account.center.level.FATAL', defaultMessage: 'FATAL' })}
+        </Option>
+        <Option value="ERROR">
+          <Badge color="red" style={{ marginRight: 8 }} />
+          {intl.formatMessage({ id: 'pages.account.center.level.ERROR', defaultMessage: 'ERROR' })}
+        </Option>
+        <Option value="INFO">
+          <Badge color="blue" style={{ marginRight: 8 }} />
+          {intl.formatMessage({ id: 'pages.account.center.level.INFO', defaultMessage: 'INFO' })}
+        </Option>
+        <Option value="DEBUG">
+          <Badge color="green" style={{ marginRight: 8 }} />
+          {intl.formatMessage({ id: 'pages.account.center.level.DEBUG', defaultMessage: 'DEBUG' })}
+        </Option>
       </Select>
 
-      <Table
-        size="small"
-        columns={columns}
-        dataSource={filteredLogs}
-        rowKey="id"
-        // pagination={{ pageSize: 50 }}
-      />
+      <Table size="small" columns={columns} dataSource={filteredLogs} rowKey="id" />
     </div>
   );
 };
 
 const AccountCenter: React.FC = () => {
-  // const { initialState } = useModel('@@initialState');
-  // const { currentUser } = initialState || {};
   const [logs, setLogs] = useState<any[]>([]);
   const { sendLogs } = useUserActionLogger();
+  const intl = useIntl();
 
   const fetchData = async () => {
     const resp = await getUserLogs();
@@ -106,7 +132,13 @@ const AccountCenter: React.FC = () => {
 
   return (
     <PageContainer>
-      <Card title="操作日志" style={{ maxWidth: 1000 }}>
+      <Card
+        title={intl.formatMessage({
+          id: 'pages.account.center.cardTitle',
+          defaultMessage: '操作日誌',
+        })}
+        style={{ maxWidth: 1000 }}
+      >
         <LogViewer data={logs} />
       </Card>
     </PageContainer>

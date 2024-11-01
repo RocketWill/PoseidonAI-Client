@@ -1,34 +1,30 @@
-import { CaretRightOutlined, StopOutlined, UndoOutlined } from '@ant-design/icons'; // 引入 Ant Design 的圖標
-import { Affix, Button, Card, Col, Collapse, Row, Skeleton, Space, message } from 'antd'; // 引入 Ant Design 的組件
-import ReactECharts from 'echarts-for-react'; // 引入 ECharts 進行圖表繪製
+import { CaretRightOutlined, StopOutlined, UndoOutlined } from '@ant-design/icons';
+import { Affix, Button, Card, Col, Collapse, Row, Skeleton, Space, message } from 'antd';
+import ReactECharts from 'echarts-for-react';
 import React, { useEffect, useRef, useState } from 'react';
 
 import {
   getTrainingStatus,
   startTraining,
   stopTraining,
-} from '@/services/ant-design-pro/trainingTask'; // 引入訓練相關的服務
-import { LogActionTrainingTask } from '@/utils/LogActions'; // 日志操作
-import { LogLevel } from '@/utils/LogLevels'; // 日志级别
-import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 日志钩子
-import { FormattedMessage } from '@umijs/max';
-import { TaskItem, TrainingStatus } from '..'; // 引入專案內部的類型
-import DatasetSummary from './DatasetSummary'; // 引入數據集摘要組件
-import TaskDetailsDescription from './TaskDetailsDescription'; // 引入任務詳細描述組件
+} from '@/services/ant-design-pro/trainingTask';
+import { LogActionTrainingTask } from '@/utils/LogActions';
+import { LogLevel } from '@/utils/LogLevels';
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext';
+import { FormattedMessage, useIntl } from '@umijs/max';
+import { TaskItem, TrainingStatus } from '..';
+import DatasetSummary from './DatasetSummary';
+import TaskDetailsDescription from './TaskDetailsDescription';
 
-// 創建瀏覽器歷史對象，便於控制瀏覽器歷史操作
-
-// 定義組件的屬性類型
 interface ModelTrainingProps {
-  taskData: TaskItem | undefined; // 任務數據，可為未定義
-  setRefreshFlag: React.Dispatch<React.SetStateAction<boolean>>; // 用於刷新狀態標記
+  taskData: TaskItem | undefined;
+  setRefreshFlag: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface ActionButtonsProps {
   buttonFixTop: boolean | undefined;
 }
 
-// 定義損失數據的類型
 interface LossDataItem {
   epoch?: number[];
   iteration?: number[];
@@ -36,8 +32,8 @@ interface LossDataItem {
   val_loss: number[];
 }
 
-// 訓練損失圖表組件
 const TrainLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
+  const intl = useIntl();
   const xAxisData = data.epoch || data.iteration || [];
   const totalXPoints = xAxisData.length;
 
@@ -48,7 +44,7 @@ const TrainLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
 
   const option = {
     title: {
-      text: 'Training Loss',
+      text: intl.formatMessage({ id: 'pages.trainingTask.trainLoss', defaultMessage: '訓練損失' }),
     },
     tooltip: {
       trigger: 'axis',
@@ -56,11 +52,13 @@ const TrainLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
     xAxis: {
       type: 'category',
       data: xAxisData,
-      name: data.epoch ? 'Epoch' : 'Iteration',
+      name: data.epoch
+        ? intl.formatMessage({ id: 'pages.trainingTask.epoch', defaultMessage: '迭代' })
+        : intl.formatMessage({ id: 'pages.trainingTask.iteration', defaultMessage: '次數' }),
     },
     yAxis: {
       type: 'value',
-      name: 'Train Loss',
+      name: intl.formatMessage({ id: 'pages.trainingTask.trainLoss', defaultMessage: '訓練損失' }),
       axisLine: {
         lineStyle: {
           color: '#5B8FF9',
@@ -69,7 +67,10 @@ const TrainLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
     },
     series: [
       {
-        name: 'Train Loss',
+        name: intl.formatMessage({
+          id: 'pages.trainingTask.trainLoss',
+          defaultMessage: '訓練損失',
+        }),
         type: 'line',
         data: data.train_loss,
         lineStyle: {
@@ -87,7 +88,7 @@ const TrainLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
         handleSize: '100%',
       },
       {
-        type: 'inside', // 允許鼠標滾輪縮放
+        type: 'inside',
         yAxisIndex: 0,
         zoomOnMouseWheel: true,
         moveOnMouseWheel: true,
@@ -98,8 +99,8 @@ const TrainLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
   return <ReactECharts option={option} style={{ height: '400px', width: '100%' }} />;
 };
 
-// 驗證損失圖表組件
 const ValLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
+  const intl = useIntl();
   const xAxisData = data.epoch || data.iteration || [];
   const totalXPoints = xAxisData.length;
 
@@ -110,7 +111,10 @@ const ValLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
 
   const option = {
     title: {
-      text: 'Validation Loss',
+      text: intl.formatMessage({
+        id: 'pages.trainingTask.valLoss',
+        defaultMessage: '驗證損失',
+      }),
     },
     tooltip: {
       trigger: 'axis',
@@ -118,11 +122,13 @@ const ValLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
     xAxis: {
       type: 'category',
       data: xAxisData,
-      name: data.epoch ? 'Epoch' : 'Iteration',
+      name: data.epoch
+        ? intl.formatMessage({ id: 'pages.trainingTask.epoch', defaultMessage: '迭代' })
+        : intl.formatMessage({ id: 'pages.trainingTask.iteration', defaultMessage: '次數' }),
     },
     yAxis: {
       type: 'value',
-      name: 'Validation Loss',
+      name: intl.formatMessage({ id: 'pages.trainingTask.valLoss', defaultMessage: '驗證損失' }),
       axisLine: {
         lineStyle: {
           color: '#5AD8A6',
@@ -131,7 +137,10 @@ const ValLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
     },
     series: [
       {
-        name: 'Validation Loss',
+        name: intl.formatMessage({
+          id: 'pages.trainingTask.valLoss',
+          defaultMessage: '驗證損失',
+        }),
         type: 'line',
         data: data.val_loss,
         lineStyle: {
@@ -149,7 +158,7 @@ const ValLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
         handleSize: '100%',
       },
       {
-        type: 'inside', // 允許鼠標滾輪縮放
+        type: 'inside',
         yAxisIndex: 0,
         zoomOnMouseWheel: true,
         moveOnMouseWheel: true,
@@ -160,21 +169,20 @@ const ValLossChart: React.FC<{ data: LossDataItem }> = ({ data }) => {
   return <ReactECharts option={option} style={{ height: '400px', width: '100%' }} />;
 };
 
-// 模型訓練組件
 const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag }) => {
-  const [lossData, setLossData] = useState<LossDataItem | null>(null); // 訓練和驗證損失數據
-  const [trainingStatus, setTrainingStatus] = useState<TrainingStatus>('IDLE'); // 訓練狀態
-  const [isTraining, setIsTraining] = useState<boolean>(false); // 訓練進行中標記
-  const [restartBtnLoading, setRestartBtnLoading] = useState<boolean>(false); // 重啟按鈕加載狀態
-  const [startBtnLoading, setStartBtnLoading] = useState<boolean>(false); // 開始按鈕加載狀態
-  const [stopBtnLoading, setStopBtnLoading] = useState<boolean>(false); // 停止按鈕加載狀態
+  const intl = useIntl();
+  const [lossData, setLossData] = useState<LossDataItem | null>(null);
+  const [trainingStatus, setTrainingStatus] = useState<TrainingStatus>('IDLE');
+  const [isTraining, setIsTraining] = useState<boolean>(false);
+  const [restartBtnLoading, setRestartBtnLoading] = useState<boolean>(false);
+  const [startBtnLoading, setStartBtnLoading] = useState<boolean>(false);
+  const [stopBtnLoading, setStopBtnLoading] = useState<boolean>(false);
   const [buttonFixTop, setButtonFixTop] = useState<boolean | undefined>(false);
-  const intervalId = useRef<NodeJS.Timeout | null>(null); // 用於儲存定時器 ID
+  const intervalId = useRef<NodeJS.Timeout | null>(null);
   const _id = taskData?.task_detail._id;
 
-  const logger = useUserActionLogger(); // 初始化日志钩子
+  const logger = useUserActionLogger();
 
-  // 開始獲取訓練進度
   const startFetchingProgress = (
     taskId: string,
     algoName: string,
@@ -187,7 +195,6 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
         const state = progressRes.results.state;
         setTrainingStatus(state);
 
-        // 记录训练状态
         logger.logAction(
           LogLevel.DEBUG,
           LogActionTrainingTask.MODEL_TRAINING_PROGRESS_FETCH,
@@ -196,7 +203,10 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
 
         if (state === 'FAILURE') {
           message.error(
-            '訓練遇到狀況，建議重新整理頁面後再嘗試。' + progressRes.results.data.error_detail,
+            intl.formatMessage({
+              id: 'pages.trainingTask.errorTraining',
+              defaultMessage: '訓練遇到錯誤，請稍後重試。',
+            }) + progressRes.results.data.error_detail,
           );
           setIsTraining(false);
           logger.logAction(
@@ -206,7 +216,12 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
           );
         }
         if (state === 'SUCCESS') {
-          message.success('訓練完成');
+          message.success(
+            intl.formatMessage({
+              id: 'pages.trainingTask.successTraining',
+              defaultMessage: '訓練完成',
+            }),
+          );
           setIsTraining(false);
           logger.logAction(
             LogLevel.INFO,
@@ -240,11 +255,9 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
     intervalId.current = setInterval(fetchTaskProgress, 2000);
   };
 
-  // 處理開始訓練
   const handleStartTraining = async (isRestart: boolean = false) => {
     if (!taskData) return;
 
-    // 設置按鈕加載狀態
     if (isRestart) {
       setRestartBtnLoading(true);
     } else {
@@ -294,7 +307,6 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
     }
   };
 
-  // 初始化時根據任務狀態設置訓練進度
   useEffect(() => {
     setTrainingStatus(taskData?.task_detail.status as TrainingStatus);
     if (taskData?.task_state?.data?.results) {
@@ -313,14 +325,12 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
     };
   }, [taskData]);
 
-  // 訓練狀態改變時刷新頁面
   useEffect(() => {
     if (!isTraining) {
       setRefreshFlag((prev) => !prev);
     }
   }, [isTraining]);
 
-  // 判斷是否禁用重啟按鈕
   const handleDisableRestart = () =>
     !(
       trainingStatus === 'ERROR' ||
@@ -329,13 +339,10 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
       trainingStatus === 'REVOKED'
     );
 
-  // 判斷是否禁用開始按鈕
   const handleDisableStart = () => !(trainingStatus === 'IDLE');
 
-  // 判斷是否禁用停止按鈕
   const handleDisableStop = () => !(trainingStatus === 'PROCESSING');
 
-  // 處理停止訓練
   const handleStopTraining = async () => {
     if (!taskData) return;
 
@@ -358,7 +365,12 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
         }, 3000);
       }
     } catch (err) {
-      message.error('遇到錯誤，' + err);
+      message.error(
+        intl.formatMessage({
+          id: 'pages.trainingTask.error',
+          defaultMessage: '遇到錯誤，',
+        }) + err,
+      );
       setIsTraining(false);
       logger.logAction(
         LogLevel.ERROR,
@@ -380,7 +392,7 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
           type="primary"
           size="large"
           icon={<CaretRightOutlined />}
-          onClick={() => handleStartTraining(false)} // 傳遞 false 表示這是 start 操作
+          onClick={() => handleStartTraining(false)}
           shape="round"
           disabled={handleDisableStart()}
         >
@@ -401,7 +413,7 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
           loading={restartBtnLoading}
           size="large"
           icon={<UndoOutlined />}
-          onClick={() => handleStartTraining(true)} // 傳遞 true 表示這是 restart 操作
+          onClick={() => handleStartTraining(true)}
           shape="round"
           disabled={handleDisableRestart()}
         >
@@ -434,7 +446,14 @@ const ModelTraining: React.FC<ModelTrainingProps> = ({ taskData, setRefreshFlag 
       <Collapse
         size="large"
         items={[
-          { key: '1', label: 'Dataset Summary', children: <DatasetSummary taskData={taskData} /> },
+          {
+            key: '1',
+            label: intl.formatMessage({
+              id: 'pages.trainingTask.datasetSummary',
+              defaultMessage: '資料集摘要',
+            }),
+            children: <DatasetSummary taskData={taskData} />,
+          },
         ]}
         defaultActiveKey={['1']}
       />

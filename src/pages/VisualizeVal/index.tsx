@@ -3,9 +3,10 @@ import {
   getVisualizationStatus,
   visualizationTask,
 } from '@/services/ant-design-pro/trainingTask';
-import { LogActionVisTask } from '@/utils/LogActions'; // 日志操作
-import { LogLevel } from '@/utils/LogLevels'; // 日志级别
-import { useUserActionLogger } from '@/utils/UserActionLoggerContext'; // 日志钩子
+import { LogActionVisTask } from '@/utils/LogActions';
+import { LogLevel } from '@/utils/LogLevels';
+import { useUserActionLogger } from '@/utils/UserActionLoggerContext';
+import { FormattedMessage, useIntl } from '@umijs/max';
 import { notification } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { TaskItem } from '../TrainingTask';
@@ -77,14 +78,19 @@ const fetchEvalResult = async (
       `Error fetching visualization results for task ${taskId}`,
     );
     notification.error({
-      message: '讀取評估文件失敗',
-      description: '請稍後重試',
+      message: (
+        <FormattedMessage id="pages.visTask.errorFetch" defaultMessage="讀取可視化文件失敗" />
+      ),
+      description: (
+        <FormattedMessage id="pages.visTask.tryAgainLater" defaultMessage="請稍後重試" />
+      ),
       placement: 'topLeft',
     });
   }
 };
 
 const ViszualizeVal: React.FC<ViszualizeValProps> = ({ taskData }) => {
+  const intl = useIntl();
   const [api, contextHolder] = notification.useNotification();
   const [formValues, setFormValues] = useState<FormValues>(initialState);
   const [isVising, setIsVising] = useState<boolean>(false);
@@ -92,7 +98,7 @@ const ViszualizeVal: React.FC<ViszualizeValProps> = ({ taskData }) => {
   const [visId, setVisId] = useState<string>();
   const [currentAction, setCurrentAction] = useState<VisAction>('idle');
   const address = `http://localhost:5000/static/val_visualization/${taskData.task_detail.user_id}/${taskData.task_detail.save_key}`;
-  const logger = useUserActionLogger(); // 初始化日志钩子
+  const logger = useUserActionLogger();
 
   const algoName: string = taskData.task_detail.algorithm.name.replace(/\s+/g, '');
   const frameworkName: string = taskData.task_detail.algorithm.training_framework.name.replace(
@@ -124,7 +130,10 @@ const ViszualizeVal: React.FC<ViszualizeValProps> = ({ taskData }) => {
 
           if (state === 'SUCCESS') {
             api.success({
-              message: '模型驗證集可視化完成',
+              message: intl.formatMessage({
+                id: 'pages.visTask.visualizationComplete',
+                defaultMessage: '模型驗證集可視化完成',
+              }),
               placement: 'topLeft',
             });
             logger.logAction(

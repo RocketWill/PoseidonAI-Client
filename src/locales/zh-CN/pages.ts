@@ -115,4 +115,11 @@ export default {
   'pages.dataset.display.classNames': '类别',
   'pages.dataset.display.uploaded': '上传于',
   'pages.dataset.display.annotatedDataStatistics': '标注数据统计',
+  'pages.dataset.display.onlyZip': '只能上传 ZIP 文件',
+  'pages.dataset.display.clickToUploadZip': '点击或拖动上传 ZIP 文件',
+  'pages.dataset.display.uploadZipDescription': '支持单个文件上传，且必须符合特定目录结构',
+  'pages.dataset.display.taskType': '任务类型',
+  'pages.dataset.display.selectTaskType': '请选择任务类型',
+  'pages.dataset.display.classifyStructure': '数据集压缩包目录结构参考',
+  'pages.dataset.display.uploadZip': '数据集压缩包',
 };

@@ -120,4 +120,12 @@ export default {
   'pages.dataset.display.classNames': 'Class Names',
   'pages.dataset.display.uploaded': 'Uploaded',
   'pages.dataset.display.annotatedDataStatistics': 'Annotated data statistics',
+  'pages.dataset.display.onlyZip': 'Only ZIP files can be uploaded',
+  'pages.dataset.display.clickToUploadZip': 'Click or drag to upload a ZIP file',
+  'pages.dataset.display.uploadZipDescription':
+    'Only single file uploads are supported, and they must follow a specific directory structure',
+  'pages.dataset.display.taskType': 'Task Type',
+  'pages.dataset.display.selectTaskType': 'Please select a task type',
+  'pages.dataset.display.classifyStructure': 'Dataset compressed directory structure reference',
+  'pages.dataset.display.uploadZip': 'Dataset ZIP file',
 };
