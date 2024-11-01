@@ -1,7 +1,18 @@
 /* eslint-disable */
 import { CheckOutlined, Loading3QuartersOutlined } from '@ant-design/icons'; // 引入 Ant Design 的圖標
-import { FormattedMessage } from '@umijs/max'; // 引入 FormattedMessage 用於多語言支持
-import { Badge, Button, Col, Descriptions, Modal, Row, Tag, Tooltip, Typography } from 'antd'; // 引入 Ant Design 的組件
+import { FormattedMessage, useModel } from '@umijs/max'; // 引入 FormattedMessage 用於多語言支持
+import {
+  Badge,
+  Button,
+  Col,
+  Descriptions,
+  Modal,
+  Row,
+  Tag,
+  Tooltip,
+  Typography,
+  Watermark,
+} from 'antd'; // 引入 Ant Design 的組件
 import moment from 'moment'; // 引入 moment 來處理日期格式化
 import React, { useEffect, useState } from 'react'; // 首先引入 React 和相關 Hook
 
@@ -274,6 +285,8 @@ const getDatasetStatisticsDetails = (
 
 // 定义 DatasetDetails 组件
 const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
+  const { initialState } = useModel('@@initialState');
+  const { currentUser } = initialState || {};
   const [visualizedFiles, setVisualizedFiles] = useState<string[]>([]); // 已视觉化的文件
   const [imageModalOpen, setImageModalOpen] = useState<boolean>(false); // 图片模态框开启状态
   const [imageModalTitle, setImageModalTitle] = useState<string>(''); // 图片模态框标题
@@ -365,7 +378,7 @@ const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
   }, [dataset._id]);
 
   return (
-    <>
+    <Watermark content={currentUser?.name}>
       <Typography.Text strong>{dataset.name}</Typography.Text>
       <Descriptions
         layout="vertical"
@@ -408,7 +421,7 @@ const DatasetDetails: React.FC<DatasetDetailsProps> = ({ dataset }) => {
       >
         <DisplayImage imageSrc={selectedImage} />
       </Modal>
-    </>
+    </Watermark>
   );
 };
 
