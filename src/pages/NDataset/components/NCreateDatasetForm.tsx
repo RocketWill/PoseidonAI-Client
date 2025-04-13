@@ -2,7 +2,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-10-07 09:16:43
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-11-01 11:12:03
+ * @LastEditTime: 2024-11-01 15:01:56
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/components/NCreateDatasetForm.tsx
  */
 /* eslint-disable */
@@ -26,6 +26,7 @@ interface CreateDatasetFormProps {
   detectTypes: DetectTypeItem[];
   datasetFormats: DatasetFormatItem[];
   setRefreshFlag: React.Dispatch<React.SetStateAction<boolean>>;
+  setActiveKey: React.Dispatch<React.SetStateAction<string>>;
 }
 
 type detectTypes = [string, string];
@@ -41,6 +42,7 @@ const NCreateDatasetForm: React.FC<CreateDatasetFormProps> = ({
   detectTypes,
   datasetFormats,
   setRefreshFlag,
+  setActiveKey,
 }) => {
   const intl = useIntl();
   const [form] = Form.useForm();
@@ -276,6 +278,7 @@ const NCreateDatasetForm: React.FC<CreateDatasetFormProps> = ({
         setDatasetInitName(generateRandomName()); // Update datasetInitName
 
         setRefreshFlag((prev) => !prev);
+        setTimeout(() => setActiveKey((prev) => (prev === '1' ? '2' : '1')), 1500);
       } else {
         message.error(
           `${intl.formatMessage({

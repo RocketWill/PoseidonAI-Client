@@ -3,7 +3,7 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-31 15:34:59
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-07 09:20:58
+ * @LastEditTime: 2024-11-01 14:56:26
  * @FilePath: /PoseidonAI-Client/src/pages/NDataset/index.tsx
  */
 import { PageContainer } from '@ant-design/pro-components';
@@ -83,6 +83,7 @@ const NDataset: React.FC = () => {
   const [datasetFormatData, setDatasetFormatData] = useState<DatasetFormatItem[]>([]);
   const [datasetData, setDatasetData] = useState<DatasetItem[]>([]);
   const [refreshFlag, setRefreshFlag] = useState(false);
+  const [activeKey, setActiveKey] = useState<string>('1');
 
   const items: TabsProps['items'] = [
     {
@@ -102,6 +103,7 @@ const NDataset: React.FC = () => {
           detectTypes={detectTypeData}
           datasetFormats={datasetFormatData}
           setRefreshFlag={setRefreshFlag}
+          setActiveKey={setActiveKey}
         />
       ),
     },
@@ -113,7 +115,7 @@ const NDataset: React.FC = () => {
 
   return (
     <PageContainer>
-      <Tabs defaultActiveKey="1" items={items} />
+      <Tabs activeKey={activeKey} items={items} onChange={(e) => setActiveKey(e)} />
     </PageContainer>
   );
 };

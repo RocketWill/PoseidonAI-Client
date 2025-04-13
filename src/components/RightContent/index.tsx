@@ -2,11 +2,12 @@
  * @Author: Will Cheng (will.cheng@efctw.com)
  * @Date: 2024-07-29 08:28:24
  * @LastEditors: Will Cheng (will.cheng@efctw.com)
- * @LastEditTime: 2024-10-31 14:10:42
+ * @LastEditTime: 2024-11-01 16:32:39
  * @FilePath: /PoseidonAI-Client/src/components/RightContent/index.tsx
  */
 import { GlobalOutlined } from '@ant-design/icons';
-import { SelectLang as UmiSelectLang } from '@umijs/max';
+import { SelectLang as UmiSelectLang, useModel } from '@umijs/max';
+import { Switch, Tooltip } from 'antd';
 
 export type SiderTheme = 'light' | 'dark';
 
@@ -73,5 +74,25 @@ export const Question = () => {
     >
       <GlobalOutlined />
     </div>
+  );
+};
+
+export const ChangeColorMode = () => {
+  const { initialState, setInitialState } = useModel('@@initialState');
+  const { settings } = initialState || {};
+
+  const handleChange = (e: boolean) => {
+    const theme = e ? 'realDark' : 'light';
+    setInitialState((s) => ({ ...s, settings: { ...settings, navTheme: theme } }));
+  };
+  return (
+    <Tooltip title={'Enable/Disable Dark Mode'}>
+      <Switch
+        defaultChecked={false}
+        onChange={handleChange}
+        style={{ borderRadius: 12 }}
+        size="small"
+      />
+    </Tooltip>
   );
 };
